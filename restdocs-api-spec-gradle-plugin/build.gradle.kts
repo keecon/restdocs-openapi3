@@ -49,7 +49,7 @@ dependencies {
     implementation("io.swagger.core.v3:swagger-core:2.1.13")
 
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
-    testImplementation("org.junit-pioneer:junit-pioneer:0.3.3")
+    testImplementation("org.junit-pioneer:junit-pioneer:1.6.1")
     testImplementation("org.assertj:assertj-core")
     testImplementation("com.jayway.jsonpath:json-path")
 

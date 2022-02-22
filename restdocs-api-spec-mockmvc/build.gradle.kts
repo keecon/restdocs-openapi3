@@ -14,7 +14,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-hateoas")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
-    testImplementation("org.junit-pioneer:junit-pioneer:0.3.3")
+    testImplementation("org.junit-pioneer:junit-pioneer:1.6.1")
 }
 
 publishing {
