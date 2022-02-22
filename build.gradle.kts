@@ -53,10 +53,6 @@ subprojects {
             publications {
                 create<MavenPublication>(project.name) {
                     from(components["java"])
-
-                    // groupId = project.group.toString()
-                    // artifactId = project.name
-                    // version = project.version.toString()
                 }
             }
         }
@@ -79,8 +75,8 @@ subprojects {
     tasks.withType<JacocoReport> {
         dependsOn("test")
         reports {
-            html.required.set(true)
             xml.required.set(true)
+            html.required.set(true)
         }
     }
 }

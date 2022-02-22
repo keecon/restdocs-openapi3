@@ -1,4 +1,4 @@
-# Spring REST Docs OpenAPI3
+# Spring REST Docs OpenAPI 3 Specification
 
 ![](https://img.shields.io/github/license/keecon/restdocs-openapi3.svg)
 [![release](https://github.com/keecon/restdocs-openapi3/actions/workflows/release.yml/badge.svg)](https://github.com/keecon/restdocs-openapi3/actions/workflows/release.yml)
