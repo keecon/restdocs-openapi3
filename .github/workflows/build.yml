@@ -29,19 +29,11 @@ jobs:
       - name: Build, test with Gradle
         run: ./gradlew clean build --no-daemon
 
-      - name: check
-        run: |
-          ls ./restdocs-api-spec/build/reports/jacoco/test
-          ls ./restdocs-api-spec-gradle-plugin/build/reports/jacoco/test
-          ls ./restdocs-api-spec-jsonschema/build/reports/jacoco/test
-          ls ./restdocs-api-spec-mockmvc/build/reports/jacoco/test
-          ls ./restdocs-api-spec-openapi3-generator/build/reports/jacoco/test
-
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
           token: ${{secrets.CODECOV_TOKEN}}
-          file: >-
+          files: >-
             ./restdocs-api-spec/build/reports/jacoco/test/jacocoTestReport.xml,
             ./restdocs-api-spec-gradle-plugin/build/reports/jacoco/test/jacocoTestReport.xml,
             ./restdocs-api-spec-jsonschema/build/reports/jacoco/test/jacocoTestReport.xml,
