@@ -29,9 +29,15 @@ pluginBundle {
 
     mavenCoordinates {
         groupId = "com.keecon"
-        artifactId = "restdocs-openapi3-gradle-plugin"
+        artifactId = "restdocs-api-spec-gradle-plugin"
     }
 }
+
+val jacksonVersion: String by extra
+val swaggerVersion: String by extra
+val assertjVersion: String by extra
+val jsonpathVersion: String by extra
+val junitVersion: String by extra
 
 val jacocoRuntime: Configuration by configurations.creating
 
@@ -44,14 +50,14 @@ dependencies {
     implementation(project(":restdocs-api-spec-openapi3-generator"))
 
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10")
-    implementation("com.fasterxml.jackson.core:jackson-databind")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("io.swagger.core.v3:swagger-core:2.1.13")
+    implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
+    implementation("io.swagger.core.v3:swagger-core:$swaggerVersion")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     testImplementation("org.junit-pioneer:junit-pioneer:0.3.3")
-    testImplementation("org.assertj:assertj-core")
-    testImplementation("com.jayway.jsonpath:json-path")
+    testImplementation("org.assertj:assertj-core:$assertjVersion")
+    testImplementation("com.jayway.jsonpath:json-path:$jsonpathVersion")
 
     testCompileOnly(gradleTestKit())
 
