@@ -1,6 +1,7 @@
 plugins {
     java
     kotlin("jvm")
+    signing
 }
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
@@ -52,6 +53,10 @@ publishing {
             }
         }
     }
+}
+
+signing {
+    sign(publishing.publications["mavenJava"])
 }
 
 java {

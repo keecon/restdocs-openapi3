@@ -17,8 +17,6 @@
             <option value="$PROJECT_DIR$/restdocs-api-spec-mockmvc" />
             <option value="$PROJECT_DIR$/restdocs-api-spec-model" />
             <option value="$PROJECT_DIR$/restdocs-api-spec-openapi3-generator" />
-            <option value="$PROJECT_DIR$/restdocs-api-spec-restassured" />
-            <option value="$PROJECT_DIR$/restdocs-api-spec-webtestclient" />
           </set>
         </option>
       </GradleProjectSettings>

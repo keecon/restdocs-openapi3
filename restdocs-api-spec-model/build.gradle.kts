@@ -1,6 +1,7 @@
 plugins {
     java
     kotlin("jvm")
+    signing
 }
 
 dependencies {
@@ -39,6 +40,10 @@ publishing {
             }
         }
     }
+}
+
+signing {
+    sign(publishing.publications["mavenJava"])
 }
 
 java {
