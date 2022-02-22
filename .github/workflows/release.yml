@@ -1,0 +1,52 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          cache: gradle
+      - name: Set up Go 1.17
+        uses: actions/setup-go@v2
+        with:
+          go-version: '^1.17.0'
+
+      - name: Build
+        run: ./gradlew clean build publish --no-daemon
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag
+        uses: actions/github-script@v6
+        id: tag
+        with:
+          result-encoding: string
+          script: |
+            return context.payload.ref.replace(/refs\/tags\/v/, '');
+
+      - name: Generate release note
+        run: |
+          go install github.com/git-chglog/git-chglog/cmd/git-chglog@latest
+          git-chglog -c .github/chglog/release.yml $(git describe --tags) > build/RELEASE.md
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/dist/*
+          body_path: build/RELEASE.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

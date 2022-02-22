@@ -1,0 +1,40 @@
+style: github
+template: RELEASE.tpl.md
+info:
+  title: RELEASE
+  repository_url: https://github.com/keecon/restdocs-openapi3
+
+options:
+  commit_groups:
+    sort_by: Custom
+    title_order:
+      - feat
+      - fix
+      - perf
+      - update
+      - refactor
+      - docs
+      - build
+      - chore
+    title_maps:
+      feat: 🌟 New features
+      fix: 🛠️ Bug fixes
+      perf: ⚡ Performance improvements
+      update: 🔄 Updates
+      refactor: ♻ Code Refactoring
+      docs: 📖 Documentation
+      build: 👷 Build script changes
+      chore: Other changes
+
+  header:
+    pattern: "^(\\w*)(?:\\(([\\w\\$\\.\\-\\*\\s]*)\\))?\\:\\s(.*)$"
+    pattern_maps:
+      - Type
+      - Scope
+      - Subject
+
+  notes:
+    keywords:
+      - Breaking change
+      - Deprecated
+      - Dependencies
