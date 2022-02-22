@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.6.10" apply false
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
+    id("pl.allegro.tech.build.axion-release") version "1.13.6"
     java
     jacoco
     `maven-publish`
@@ -13,10 +14,22 @@ repositories {
     mavenCentral()
 }
 
+scmVersion {
+    tag(
+        closureOf<pl.allegro.tech.build.axion.release.domain.TagNameSerializationConfig> {
+            prefix = ""
+        }
+    )
+}
+
+val scmVer = scmVersion.version!!
+
+fun Project.isPluginProject() = this.name.contains("plugin")
+
 allprojects {
 
     group = "com.keecon"
-    version = "0.16.0"
+    version = scmVer
 
     apply(plugin = "java")
     apply(plugin = "kotlin")
@@ -29,8 +42,6 @@ allprojects {
         mavenCentral()
     }
 }
-
-fun Project.isPluginProject() = this.name.contains("plugin")
 
 subprojects {
 
