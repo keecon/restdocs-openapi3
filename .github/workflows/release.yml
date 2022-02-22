@@ -26,7 +26,10 @@ jobs:
           go-version: '^1.17.0'
 
       - name: Build
-        run: ./gradlew clean build publish --no-daemon
+        run: ./gradlew clean build --no-daemon
+
+      - name: Publish packages
+        run: ./gradlew publish --no-daemon
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
