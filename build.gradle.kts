@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    java
     kotlin("jvm") version "1.6.10" apply false
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
+    java
     jacoco
     `maven-publish`
 }
@@ -43,6 +43,13 @@ subprojects {
     val swaggerParserVersion by extra { "2.0.30" }
     val assertjVersion by extra { "3.21.0" }
 
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = JavaVersion.VERSION_11.toString()
+        }
+    }
+
     if (!isPluginProject()) {
         java {
             withSourcesJar()
@@ -58,25 +65,66 @@ subprojects {
         }
     }
 
-    tasks.withType<KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = "11"
-        }
-    }
-
-    tasks.withType<Test> {
+    tasks.test {
         useJUnitPlatform()
+        finalizedBy(tasks.jacocoTestReport)
+
         testLogging {
             events("passed", "skipped", "failed")
         }
     }
 
-    tasks.withType<JacocoReport> {
-        dependsOn("test")
+    tasks.jacocoTestReport {
+        dependsOn(tasks.test)
+        finalizedBy(tasks.jacocoTestCoverageVerification)
+
         reports {
             xml.required.set(true)
             html.required.set(true)
+            html.outputLocation.set(file("$buildDir/jacocoHtml"))
         }
     }
+
+    tasks.jacocoTestCoverageVerification {
+        violationRules {
+            rule {
+                limit {
+                    // 'counter'    -> 'INSTRUCTION' (default)
+                    // 'value'      -> 'COVEREDRATIO' (default)
+                    minimum = "0.50".toBigDecimal()
+                }
+            }
+
+            // rule {
+            //     enabled = true
+            //     element = "CLASS"
+            //
+            //     limit {
+            //         counter = "BRANCH"
+            //         value = "COVEREDRATIO"
+            //         minimum = "0.90".toBigDecimal()
+            //     }
+            //
+            //     limit {
+            //         counter = "LINE"
+            //         value = "COVEREDRATIO"
+            //         minimum = "0.80".toBigDecimal()
+            //     }
+            //
+            //     limit {
+            //         counter = "LINE"
+            //         value = "TOTALCOUNT"
+            //         maximum = "200".toBigDecimal()
+            //     }
+            //
+            //     excludes = listOf(
+            //         "*.test.*",
+            //     )
+            // }
+        }
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.7"
 }
