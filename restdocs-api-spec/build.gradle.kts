@@ -1,8 +1,3 @@
-plugins {
-    java
-    kotlin("jvm")
-}
-
 val jacksonVersion: String by extra
 val springBootVersion: String by extra
 val springRestDocsVersion: String by extra

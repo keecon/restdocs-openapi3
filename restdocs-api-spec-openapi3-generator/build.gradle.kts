@@ -1,8 +1,3 @@
-plugins {
-    java
-    kotlin("jvm")
-}
-
 val jacksonVersion: String by extra
 val swaggerVersion: String by extra
 val swaggerParserVersion: String by extra

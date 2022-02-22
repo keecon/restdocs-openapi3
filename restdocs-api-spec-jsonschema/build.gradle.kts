@@ -1,8 +1,3 @@
-plugins {
-    java
-    kotlin("jvm")
-}
-
 val jacksonVersion: String by extra
 val assertjVersion: String by extra
 val jsonpathVersion: String by extra
