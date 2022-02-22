@@ -466,14 +466,36 @@ object OpenApi3Generator {
 
     private fun simpleTypeToSchema(parameterDescriptor: AbstractParameterDescriptor): Schema<*>? {
         return when (parameterDescriptor.type.lowercase()) {
-            SimpleType.BOOLEAN.name.lowercase() ->
-                BooleanSchema().apply { this._default(parameterDescriptor.defaultValue?.let { it as Boolean }) }
-            SimpleType.STRING.name.lowercase() ->
-                StringSchema().apply { this._default(parameterDescriptor.defaultValue?.let { it as String }) }
-            SimpleType.NUMBER.name.lowercase() ->
-                NumberSchema().apply { this._default(parameterDescriptor.defaultValue?.let { it as BigDecimal }) }
-            SimpleType.INTEGER.name.lowercase() ->
-                IntegerSchema().apply { this._default(parameterDescriptor.defaultValue?.let { it as Int }) }
+            SimpleType.BOOLEAN.name.lowercase() -> BooleanSchema().apply {
+                this._default(parameterDescriptor.defaultValue?.let { it as Boolean })
+                parameterDescriptor.attributes.enumValues
+                    .map { it as Boolean }
+                    .forEach { this.addEnumItem(it) }
+            }
+            SimpleType.STRING.name.lowercase() -> StringSchema().apply {
+                this._default(parameterDescriptor.defaultValue?.let { it as String })
+                parameterDescriptor.attributes.enumValues
+                    .map { it as String }
+                    .forEach { this.addEnumItem(it) }
+            }
+            SimpleType.NUMBER.name.lowercase() -> NumberSchema().apply {
+                this._default(parameterDescriptor.defaultValue?.let { it as BigDecimal })
+                parameterDescriptor.attributes.enumValues
+                    .map {
+                        when (it) {
+                            is Int -> it.toBigDecimal()
+                            is Double -> it.toBigDecimal()
+                            else -> it as BigDecimal
+                        }
+                    }
+                    .forEach { this.addEnumItem(it) }
+            }
+            SimpleType.INTEGER.name.lowercase() -> IntegerSchema().apply {
+                this._default(parameterDescriptor.defaultValue?.let { it as Int })
+                parameterDescriptor.attributes.enumValues
+                    .map { it as Int }
+                    .forEach { this.addEnumItem(it) }
+            }
             else ->
                 throw IllegalArgumentException("Unknown type '${parameterDescriptor.type}'")
         }
