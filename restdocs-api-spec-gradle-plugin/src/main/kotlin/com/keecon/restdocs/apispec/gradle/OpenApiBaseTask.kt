@@ -1,0 +1,42 @@
+package com.keecon.restdocs.apispec.gradle
+
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
+
+abstract class OpenApiBaseTask : ApiSpecTask() {
+    @Input
+    @Optional
+    lateinit var title: String
+
+    @Input
+    @Optional
+    var apiDescription: String? = null
+
+    @Input
+    @Optional
+    lateinit var apiVersion: String
+
+    @Input
+    @Optional
+    lateinit var format: String
+
+    @Input
+    @Optional
+    lateinit var tagDescriptions: Map<String, String>
+
+    @Input
+    @Optional
+    var oauth2SecuritySchemeDefinition: PluginOauth2Configuration? = null
+
+    override fun outputFileExtension() = format
+
+    fun applyExtension(extension: OpenApiBaseExtension) {
+        super.applyExtension(extension)
+        format = extension.format
+        oauth2SecuritySchemeDefinition = extension.oauth2SecuritySchemeDefinition
+        title = extension.title
+        apiDescription = extension.description
+        tagDescriptions = extension.tagDescriptions()
+        apiVersion = extension.version
+    }
+}
