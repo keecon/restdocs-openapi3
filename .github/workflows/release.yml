@@ -28,11 +28,6 @@ jobs:
       - name: Build
         run: ./gradlew clean build --no-daemon
 
-      - name: Publish packages
-        run: ./gradlew publish --no-daemon
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Generate release note
         run: |
           go install github.com/git-chglog/git-chglog/cmd/git-chglog@latest

@@ -7,7 +7,6 @@ plugins {
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     jacoco
-    `maven-publish`
 }
 
 repositories {
@@ -21,9 +20,8 @@ allprojects {
 
     apply(plugin = "java")
     apply(plugin = "kotlin")
-    apply(plugin = "io.spring.dependency-management")
     apply(plugin = "jacoco")
-    apply(plugin = "maven-publish")
+    apply(plugin = "io.spring.dependency-management")
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
     repositories {
@@ -39,19 +37,6 @@ allprojects {
 }
 
 subprojects {
-
-    configure<PublishingExtension> {
-        repositories {
-            maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/keecon/restdocs-openapi3")
-                credentials {
-                    username = System.getenv("GITHUB_ACTOR")
-                    password = System.getenv("GITHUB_TOKEN")
-                }
-            }
-        }
-    }
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
