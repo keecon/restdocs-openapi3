@@ -19,7 +19,7 @@ dependencies {
     testImplementation("org.assertj:assertj-core")
     testImplementation("com.jayway.jsonpath:json-path")
     testImplementation("com.github.java-json-tools:json-schema-validator:2.2.14")
-    testImplementation("com.github.erosb:everit-json-schema:1.11.0")
+    testImplementation("com.github.erosb:everit-json-schema:1.14.0")
 }
 
 publishing {

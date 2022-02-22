@@ -10,7 +10,7 @@ dependencies {
 
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("com.github.erosb:everit-json-schema:1.11.0")
+    implementation("com.github.erosb:everit-json-schema:1.14.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
     testImplementation("com.jayway.jsonpath:json-path")
