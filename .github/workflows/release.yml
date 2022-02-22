@@ -30,14 +30,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Tag
-        uses: actions/github-script@v6
-        id: tag
-        with:
-          result-encoding: string
-          script: |
-            return context.payload.ref.replace(/refs\/tags\/v/, '');
-
       - name: Generate release note
         run: |
           go install github.com/git-chglog/git-chglog/cmd/git-chglog@latest
