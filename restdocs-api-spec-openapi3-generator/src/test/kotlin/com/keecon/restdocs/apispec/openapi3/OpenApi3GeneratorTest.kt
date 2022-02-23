@@ -16,6 +16,7 @@ import com.keecon.restdocs.apispec.model.ResponseModel
 import com.keecon.restdocs.apispec.model.Schema
 import com.keecon.restdocs.apispec.model.SecurityRequirements
 import com.keecon.restdocs.apispec.model.SecurityType
+import com.keecon.restdocs.apispec.model.TypeDescriptor
 import io.swagger.v3.oas.models.servers.Server
 import io.swagger.v3.parser.OpenAPIV3Parser
 import io.swagger.v3.parser.core.models.ParseOptions
@@ -443,6 +444,12 @@ class OpenApi3GeneratorTest {
                 (it["schema"] as LinkedHashMap<*, *>)["enum"] == listOf(1, 2, 3)
         }
         then(params).anyMatch {
+            it["name"] == "X-SOME-ARRAY" &&
+                (it["schema"] as LinkedHashMap<*, *>)["type"] == "array" &&
+                ((it["schema"] as LinkedHashMap<*, *>)["items"] as LinkedHashMap<*, *>)["type"] == "integer" &&
+                ((it["schema"] as LinkedHashMap<*, *>)["items"] as LinkedHashMap<*, *>)["enum"] == listOf(1, 2, 3, 4, 5)
+        }
+        then(params).anyMatch {
             it["name"] == "booleanParameter" &&
                 (it["schema"] as LinkedHashMap<*, *>)["type"] == "boolean" &&
                 (it["schema"] as LinkedHashMap<*, *>)["enum"] == listOf(true, false)
@@ -462,7 +469,14 @@ class OpenApi3GeneratorTest {
                 (it["schema"] as LinkedHashMap<*, *>)["type"] == "integer" &&
                 (it["schema"] as LinkedHashMap<*, *>)["enum"] == listOf(1, 2, 3)
         }
-        then(params).hasSize(8)
+        then(params).anyMatch {
+            it["name"] == "arrayParameter" &&
+                (it["schema"] as LinkedHashMap<*, *>)["type"] == "array" &&
+                ((it["schema"] as LinkedHashMap<*, *>)["items"] as LinkedHashMap<*, *>)["type"] == "string" &&
+                ((it["schema"] as LinkedHashMap<*, *>)["items"] as LinkedHashMap<*, *>)["enum"] ==
+                listOf("LV1", "LV2", "LV3")
+        }
+        then(params).hasSize(10)
 
         thenOpenApiSpecIsValid()
     }
@@ -1554,7 +1568,21 @@ class OpenApi3GeneratorTest {
                     attributes = Attributes(
                         enumValues = listOf(1, 2, 3)
                     )
-                )
+                ),
+                HeaderDescriptor(
+                    name = "X-SOME-ARRAY",
+                    description = "a header array parameter",
+                    type = "ARRAY",
+                    optional = true,
+                    attributes = Attributes(
+                        items = TypeDescriptor(
+                            type = "INTEGER",
+                            attributes = Attributes(
+                                enumValues = listOf(1, 2, 3, 4, 5),
+                            )
+                        ),
+                    )
+                ),
             ),
             requestParameters = listOf(
                 ParameterDescriptor(
@@ -1596,7 +1624,22 @@ class OpenApi3GeneratorTest {
                     attributes = Attributes(
                         enumValues = listOf(1, 2, 3)
                     )
-                )
+                ),
+                ParameterDescriptor(
+                    name = "arrayParameter",
+                    description = "a array parameter",
+                    type = "ARRAY",
+                    optional = true,
+                    ignored = false,
+                    attributes = Attributes(
+                        items = TypeDescriptor(
+                            type = "STRING",
+                            attributes = Attributes(
+                                enumValues = listOf("LV1", "LV2", "LV3")
+                            )
+                        ),
+                    )
+                ),
             ),
             pathParameters = listOf(),
             requestFields = listOf()
