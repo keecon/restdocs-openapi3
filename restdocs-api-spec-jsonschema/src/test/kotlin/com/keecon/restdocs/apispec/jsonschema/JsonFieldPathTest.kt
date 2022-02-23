@@ -12,7 +12,7 @@ class JsonFieldPathTest {
     fun should_get_remaining_segments() {
         with(
             compile(
-                JsonSchemaFromFieldDescriptorsGenerator.FieldDescriptorWithSchemaType(
+                FieldDescriptorWithSchema(
                     "a.b.c", "", "string", null, false, false,
                     Attributes()
                 )

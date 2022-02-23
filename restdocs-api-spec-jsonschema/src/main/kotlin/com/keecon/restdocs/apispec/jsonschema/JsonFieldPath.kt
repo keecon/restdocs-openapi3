@@ -4,7 +4,7 @@ import java.util.regex.Pattern
 
 internal class JsonFieldPath private constructor(
     private val segments: List<String>,
-    val fieldDescriptor: JsonSchemaFromFieldDescriptorsGenerator.FieldDescriptorWithSchemaType
+    val fieldDescriptor: FieldDescriptorWithSchema
 ) {
 
     fun remainingSegments(traversedSegments: List<String>): List<String> {
@@ -23,13 +23,11 @@ internal class JsonFieldPath private constructor(
 
     companion object {
 
-        private val BRACKETS_AND_ARRAY_PATTERN = Pattern
-            .compile("\\[\'(.+?)\'\\]|\\[([0-9]+|\\*){0,1}\\]")
+        private val BRACKETS_AND_ARRAY_PATTERN = Pattern.compile("\\[\'(.+?)\'\\]|\\[([0-9]+|\\*){0,1}\\]")
 
-        private val ARRAY_INDEX_PATTERN = Pattern
-            .compile("\\[([0-9]+|\\*){0,1}\\]")
+        private val ARRAY_INDEX_PATTERN = Pattern.compile("\\[([0-9]+|\\*){0,1}\\]")
 
-        fun compile(descriptor: JsonSchemaFromFieldDescriptorsGenerator.FieldDescriptorWithSchemaType): JsonFieldPath {
+        fun compile(descriptor: FieldDescriptorWithSchema): JsonFieldPath {
             val segments =
                 extractSegments(descriptor.path)
             return JsonFieldPath(segments, descriptor)

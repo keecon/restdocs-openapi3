@@ -15,7 +15,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     testImplementation("com.jayway.jsonpath:json-path:$jsonpathVersion")
     testImplementation("org.assertj:assertj-core:$assertjVersion")
-    testImplementation("org.hibernate.validator:hibernate-validator:6.2.0.Final")
     testImplementation("javax.validation:validation-api:2.0.1.Final")
     testImplementation("com.github.java-json-tools:json-schema-validator:2.2.14")
 }

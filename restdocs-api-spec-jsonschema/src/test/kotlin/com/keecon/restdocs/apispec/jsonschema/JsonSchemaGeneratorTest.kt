@@ -20,7 +20,6 @@ import org.everit.json.schema.Schema
 import org.everit.json.schema.StringSchema
 import org.everit.json.schema.ValidationException
 import org.everit.json.schema.loader.SchemaLoader
-import org.hibernate.validator.constraints.Length
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.jupiter.api.Test
@@ -33,9 +32,9 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 
-class JsonSchemaFromFieldDescriptorsGeneratorTest {
+class JsonSchemaGeneratorTest {
 
-    private val generator = JsonSchemaFromFieldDescriptorsGenerator()
+    private val generator = JsonSchemaGenerator()
 
     private var schema: Schema? = null
 
@@ -605,11 +604,11 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
                 )
             )
 
-        val constraintAttributeWithLength =
+        val constraintAttributeWithSize =
             Attributes(
                 listOf(
                     Constraint(
-                        Length::class.java.name,
+                        Size::class.java.name,
                         mapOf(
                             "min" to 2,
                             "max" to 255
@@ -638,7 +637,7 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
                 "lineItems[*].name",
                 "some",
                 "STRING",
-                attributes = constraintAttributeWithLength
+                attributes = constraintAttributeWithSize
             ),
             FieldDescriptor(
                 "lineItems[*]._id",

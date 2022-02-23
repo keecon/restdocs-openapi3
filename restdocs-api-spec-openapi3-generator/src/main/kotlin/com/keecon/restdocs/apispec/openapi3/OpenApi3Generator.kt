@@ -1,12 +1,10 @@
 package com.keecon.restdocs.apispec.openapi3
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.keecon.restdocs.apispec.jsonschema.JsonSchemaFromFieldDescriptorsGenerator
+import com.keecon.restdocs.apispec.jsonschema.JsonSchemaGenerator
 import com.keecon.restdocs.apispec.model.AbstractDescriptor
 import com.keecon.restdocs.apispec.model.AbstractParameterDescriptor
-import com.keecon.restdocs.apispec.model.DataFormat
 import com.keecon.restdocs.apispec.model.DataType
-import com.keecon.restdocs.apispec.model.EncodingStyle
 import com.keecon.restdocs.apispec.model.FieldDescriptor
 import com.keecon.restdocs.apispec.model.HTTPMethod
 import com.keecon.restdocs.apispec.model.HeaderDescriptor
@@ -16,6 +14,12 @@ import com.keecon.restdocs.apispec.model.RequestModel
 import com.keecon.restdocs.apispec.model.ResourceModel
 import com.keecon.restdocs.apispec.model.ResponseModel
 import com.keecon.restdocs.apispec.model.groupByPath
+import com.keecon.restdocs.apispec.openapi3.ParameterExtensions.applyProperties
+import com.keecon.restdocs.apispec.openapi3.SchemaConstraints.applyConstraints
+import com.keecon.restdocs.apispec.openapi3.SchemaExtensions.applyDefaultValue
+import com.keecon.restdocs.apispec.openapi3.SchemaExtensions.applyEnumValues
+import com.keecon.restdocs.apispec.openapi3.SchemaExtensions.applyItems
+import com.keecon.restdocs.apispec.openapi3.SchemaExtensions.applyProperties
 import com.keecon.restdocs.apispec.openapi3.SecuritySchemeGenerator.addSecurityDefinitions
 import com.keecon.restdocs.apispec.openapi3.SecuritySchemeGenerator.addSecurityItemFromSecurityRequirements
 import io.swagger.v3.core.util.Json
@@ -36,7 +40,6 @@ import io.swagger.v3.oas.models.media.NumberSchema
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.media.StringSchema
 import io.swagger.v3.oas.models.parameters.HeaderParameter
-import io.swagger.v3.oas.models.parameters.Parameter
 import io.swagger.v3.oas.models.parameters.PathParameter
 import io.swagger.v3.oas.models.parameters.QueryParameter
 import io.swagger.v3.oas.models.parameters.RequestBody
@@ -44,7 +47,6 @@ import io.swagger.v3.oas.models.responses.ApiResponse
 import io.swagger.v3.oas.models.responses.ApiResponses
 import io.swagger.v3.oas.models.servers.Server
 import io.swagger.v3.oas.models.tags.Tag
-import java.math.BigDecimal
 
 object OpenApi3Generator {
 
@@ -393,7 +395,7 @@ object OpenApi3Generator {
         contentType: String,
         schemaName: String? = null
     ): Pair<String, MediaType> {
-        val schema = JsonSchemaFromFieldDescriptorsGenerator().generateSchema(requestFields, schemaName)
+        val schema = JsonSchemaGenerator().generateSchema(requestFields, schemaName)
             .let { Json.mapper().readValue<Schema<Any>>(it) }
 
         if (schemaName != null) schema.name = schemaName
@@ -473,105 +475,38 @@ object OpenApi3Generator {
         }
     }
 
-    private fun simpleTypeToSchema(descriptor: AbstractDescriptor): Schema<*>? {
+    internal fun simpleTypeToSchema(descriptor: AbstractDescriptor): Schema<*>? {
         return when (descriptor.type.lowercase()) {
-            DataType.BOOLEAN.name.lowercase() -> BooleanSchema().apply {
+            DataType.BOOLEAN.lowercase() -> BooleanSchema().apply {
                 applyProperties(descriptor)
                 applyDefaultValue(descriptor as? AbstractParameterDescriptor)
                 applyEnumValues(descriptor)
             }
-            DataType.STRING.name.lowercase() -> StringSchema().apply {
+            DataType.STRING.lowercase() -> StringSchema().apply {
                 applyProperties(descriptor)
                 applyDefaultValue(descriptor as? AbstractParameterDescriptor)
                 applyEnumValues(descriptor)
+                applyConstraints(descriptor)
             }
-            DataType.NUMBER.name.lowercase() -> NumberSchema().apply {
+            DataType.NUMBER.lowercase() -> NumberSchema().apply {
                 applyProperties(descriptor)
                 applyDefaultValue(descriptor as? AbstractParameterDescriptor)
                 applyEnumValues(descriptor)
+                applyConstraints(descriptor)
             }
-            DataType.INTEGER.name.lowercase() -> IntegerSchema().apply {
+            DataType.INTEGER.lowercase() -> IntegerSchema().apply {
                 applyProperties(descriptor)
                 applyDefaultValue(descriptor as? AbstractParameterDescriptor)
                 applyEnumValues(descriptor)
+                applyConstraints(descriptor)
             }
-            DataType.ARRAY.name.lowercase() -> ArraySchema().apply {
+            DataType.ARRAY.lowercase() -> ArraySchema().apply {
                 applyProperties(descriptor)
                 applyItems(descriptor)
+                applyConstraints(descriptor)
             }
             else -> throw IllegalArgumentException("Unknown type '${descriptor.type}'")
         }
-    }
-
-    private fun Parameter.applyProperties(descriptor: AbstractDescriptor) = apply {
-        when (descriptor.attributes.encoding?.style) {
-            EncodingStyle.MATRIX.name.lowercase() -> this.style = Parameter.StyleEnum.MATRIX
-            EncodingStyle.LABEL.name.lowercase() -> this.style = Parameter.StyleEnum.LABEL
-            EncodingStyle.FORM.name.lowercase() -> this.style = Parameter.StyleEnum.FORM
-            EncodingStyle.SIMPLE.name.lowercase() -> this.style = Parameter.StyleEnum.SIMPLE
-            else -> Unit
-        }
-        descriptor.attributes.encoding?.explode?.let { this.explode = it }
-        descriptor.attributes.encoding?.allowReserved?.let { this.allowReserved = it }
-    }
-
-    private fun Schema<*>.applyProperties(descriptor: AbstractDescriptor) = apply {
-        when (descriptor.format) {
-            DataFormat.DATETIME.name.lowercase() -> this.format("date-time")
-            is String -> this.format(descriptor.format)
-            else -> Unit
-        }
-        // TODO(iwaltgen): constraints
-    }
-
-    private fun BooleanSchema.applyDefaultValue(descriptor: AbstractParameterDescriptor?) = apply {
-        this._default(descriptor?.defaultValue?.let { it as Boolean })
-    }
-
-    private fun StringSchema.applyDefaultValue(descriptor: AbstractParameterDescriptor?) = apply {
-        this._default(descriptor?.defaultValue?.let { it as String })
-    }
-
-    private fun NumberSchema.applyDefaultValue(descriptor: AbstractParameterDescriptor?) = apply {
-        this._default(descriptor?.defaultValue?.let { toBigDecimal(it) })
-    }
-
-    private fun IntegerSchema.applyDefaultValue(descriptor: AbstractParameterDescriptor?) = apply {
-        this._default(descriptor?.defaultValue?.let { it as Int })
-    }
-
-    private fun BooleanSchema.applyEnumValues(descriptor: AbstractDescriptor) = apply {
-        descriptor.attributes.enumValues
-            .map { it as Boolean }
-            .forEach { this.addEnumItem(it) }
-    }
-
-    private fun StringSchema.applyEnumValues(descriptor: AbstractDescriptor) = apply {
-        descriptor.attributes.enumValues
-            .map { it as String }
-            .forEach { this.addEnumItem(it) }
-    }
-
-    private fun NumberSchema.applyEnumValues(descriptor: AbstractDescriptor) = apply {
-        descriptor.attributes.enumValues
-            .map { toBigDecimal(it) }
-            .forEach { this.addEnumItem(it) }
-    }
-
-    private fun IntegerSchema.applyEnumValues(descriptor: AbstractDescriptor) = apply {
-        descriptor.attributes.enumValues
-            .map { it as Int }
-            .forEach { this.addEnumItem(it) }
-    }
-
-    private fun ArraySchema.applyItems(descriptor: AbstractDescriptor) = apply {
-        this.items(descriptor.attributes.items?.let { simpleTypeToSchema(it) })
-    }
-
-    private fun toBigDecimal(value: Any) = when (value) {
-        is Int -> value.toBigDecimal()
-        is Double -> value.toBigDecimal()
-        else -> value as BigDecimal
     }
 
     private data class RequestModelWithOperationId(

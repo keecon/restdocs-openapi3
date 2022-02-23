@@ -1,6 +1,5 @@
 package com.keecon.restdocs.apispec.model
 
-import com.fasterxml.jackson.annotation.JsonAnySetter
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class ResourceModel(
@@ -59,6 +58,9 @@ enum class DataType {
     NUMBER,
     BOOLEAN,
     ARRAY,
+    ;
+
+    fun lowercase(): String = name.lowercase()
 }
 
 // https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.1.md#data-types
@@ -78,6 +80,9 @@ enum class DataFormat {
     HOSTNAME,
     IPV4,
     IPV6,
+    ;
+
+    fun lowercase(): String = name.lowercase()
 }
 
 // https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.1.md#schemaObject
@@ -131,7 +136,6 @@ data class Attributes(
     val enumValues: List<Any> = emptyList(),
     val items: AbstractDescriptor? = null,
     val encoding: Encoding? = null,
-    @JsonAnySetter val experimentalProperties: Map<String, Any> = emptyMap()
 )
 
 data class Constraint(
@@ -145,6 +149,9 @@ enum class EncodingStyle {
     LABEL,
     FORM,
     SIMPLE,
+    ;
+
+    fun lowercase(): String = name.lowercase()
 }
 
 // https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.1.md#encoding-object
