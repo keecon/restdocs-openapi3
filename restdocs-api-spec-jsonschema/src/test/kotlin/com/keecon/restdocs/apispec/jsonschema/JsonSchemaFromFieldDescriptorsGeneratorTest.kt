@@ -3,10 +3,10 @@ package com.keecon.restdocs.apispec.jsonschema
 import com.github.fge.jackson.JsonLoader
 import com.github.fge.jsonschema.main.JsonSchemaFactory
 import com.jayway.jsonpath.JsonPath
+import com.keecon.restdocs.apispec.model.AbstractDescriptor
 import com.keecon.restdocs.apispec.model.Attributes
 import com.keecon.restdocs.apispec.model.Constraint
 import com.keecon.restdocs.apispec.model.FieldDescriptor
-import com.keecon.restdocs.apispec.model.SimpleDescriptor
 import org.assertj.core.api.BDDAssertions.then
 import org.assertj.core.api.BDDAssertions.thenThrownBy
 import org.everit.json.schema.ArraySchema
@@ -761,4 +761,12 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
     private fun thenSchemaDoesNotValidateJson(json: String) {
         thenThrownBy { thenSchemaValidatesJson(json) }.isInstanceOf(ValidationException::class.java)
     }
+
+    private data class SimpleDescriptor(
+        override val type: String,
+        override val format: String? = null,
+        override val description: String = "",
+        override val optional: Boolean = false,
+        override val attributes: Attributes = Attributes()
+    ) : AbstractDescriptor
 }

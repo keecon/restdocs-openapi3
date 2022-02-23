@@ -52,7 +52,8 @@ data class ResponseModel(
     val schema: Schema? = null
 )
 
-enum class SimpleType {
+// https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.1.md#data-types
+enum class DataType {
     STRING,
     INTEGER,
     NUMBER,
@@ -60,6 +61,26 @@ enum class SimpleType {
     ARRAY,
 }
 
+// https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.1.md#data-types
+enum class DataFormat {
+    INT32,
+    INT64,
+    FLOAT,
+    DOUBLE,
+    BYTE,
+    BINARY,
+    PASSWORD,
+    DATE,
+    DATE_TIME,
+    EMAIL,
+    UUID,
+    URI,
+    HOSTNAME,
+    IPV4,
+    IPV6,
+}
+
+// https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.1.md#schemaObject
 interface AbstractDescriptor {
     val description: String
     val type: String
@@ -72,14 +93,6 @@ interface AbstractParameterDescriptor : AbstractDescriptor {
     val name: String
     val defaultValue: Any?
 }
-
-data class SimpleDescriptor(
-    override val type: String,
-    override val format: String? = null,
-    override val description: String = "",
-    override val optional: Boolean = false,
-    override val attributes: Attributes = Attributes()
-) : AbstractDescriptor
 
 data class HeaderDescriptor(
     override val name: String,
@@ -117,12 +130,28 @@ data class Attributes(
     val validationConstraints: List<Constraint> = emptyList(),
     val enumValues: List<Any> = emptyList(),
     val items: AbstractDescriptor? = null,
-    @JsonAnySetter val extraFields: Map<String, Any> = emptyMap()
+    val encoding: Encoding? = null,
+    @JsonAnySetter val experimentalProperties: Map<String, Any> = emptyMap()
 )
 
 data class Constraint(
     val name: String,
     val configuration: Map<String, Any>
+)
+
+// https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.1.md#style-examples
+enum class EncodingStyle {
+    MATRIX,
+    LABEL,
+    FORM,
+    SIMPLE,
+}
+
+// https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.1.md#encoding-object
+data class Encoding(
+    val style: String,
+    val explode: Boolean?,
+    val allowReserved: Boolean?,
 )
 
 data class SecurityRequirements(

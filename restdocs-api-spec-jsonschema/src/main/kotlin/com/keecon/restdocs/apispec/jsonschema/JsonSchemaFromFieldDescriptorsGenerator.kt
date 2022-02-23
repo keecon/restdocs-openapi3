@@ -12,6 +12,7 @@ import com.keecon.restdocs.apispec.jsonschema.ConstraintResolver.minLengthString
 import com.keecon.restdocs.apispec.jsonschema.ConstraintResolver.minNumber
 import com.keecon.restdocs.apispec.model.AbstractDescriptor
 import com.keecon.restdocs.apispec.model.Attributes
+import com.keecon.restdocs.apispec.model.DataFormat
 import com.keecon.restdocs.apispec.model.FieldDescriptor
 import org.everit.json.schema.ArraySchema
 import org.everit.json.schema.BooleanSchema
@@ -200,7 +201,7 @@ class JsonSchemaFromFieldDescriptorsGenerator {
         ignored: Boolean,
         attributes: Attributes,
         private val schemaBuilders: Set<Schema.Builder<*>> = setOf(
-            typeSchemaBuilder(
+            toSchemaBuilder(
                 jsonSchemaType(type),
                 FieldDescriptor(path, description, type, format, optional, ignored, attributes)
             ),
@@ -225,7 +226,7 @@ class JsonSchemaFromFieldDescriptorsGenerator {
                 optional = this.optional || other.optional, // optional if one it optional
                 ignored = this.ignored && other.optional, // ignored if both are optional
                 attributes = this.attributes,
-                schemaBuilders = this.schemaBuilders + typeSchemaBuilder(jsonSchemaType(other.type), other)
+                schemaBuilders = this.schemaBuilders + toSchemaBuilder(jsonSchemaType(other.type), other)
             )
         }
 
@@ -244,7 +245,7 @@ class JsonSchemaFromFieldDescriptorsGenerator {
                     attributes = fieldDescriptor.attributes
                 )
 
-            private fun typeSchemaBuilder(type: String, descriptor: AbstractDescriptor): Schema.Builder<*> =
+            private fun toSchemaBuilder(type: String, descriptor: AbstractDescriptor): Schema.Builder<*> =
                 when (type) {
                     "null" -> NullSchema.builder()
                     "empty" -> EmptySchema.builder()
@@ -270,7 +271,7 @@ class JsonSchemaFromFieldDescriptorsGenerator {
 
             private fun arrayItemsSchema(descriptor: AbstractDescriptor): Schema {
                 return descriptor.attributes.items
-                    ?.let { typeSchemaBuilder(jsonSchemaType(it.type.lowercase()), it).build() }
+                    ?.let { toSchemaBuilder(jsonSchemaType(it.type.lowercase()), it).build() }
                     ?: CombinedSchema.oneOf(
                         listOf(
                             ObjectSchema.builder().build(),
@@ -311,9 +312,9 @@ private fun StringSchema.Builder.applyFormat(descriptor: AbstractDescriptor) = a
 }
 
 private fun NumberSchema.Builder.applyFormat(descriptor: AbstractDescriptor) = apply {
-    descriptor.format?.let {
-        if (it == "int32" || it == "int64") {
-            requiresInteger(true)
-        }
+    when (descriptor.format) {
+        DataFormat.INT32.name.lowercase() -> requiresInteger(true)
+        DataFormat.INT64.name.lowercase() -> requiresInteger(true)
+        else -> Unit
     }
 }

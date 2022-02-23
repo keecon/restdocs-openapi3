@@ -108,7 +108,7 @@ fun buildFullResourceSnippet(): ResourceSnippet {
             )
             .pathParameters(
                 parameterWithName("someId").description("some id"),
-                parameterWithName("otherId").description("otherId id").type(SimpleType.INTEGER)
+                parameterWithName("otherId").description("otherId id").type(DataType.INTEGER)
             )
             .links(
                 linkWithRel("self").description("some"),

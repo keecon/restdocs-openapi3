@@ -2,7 +2,9 @@ package com.keecon.restdocs.apispec.openapi3
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.keecon.restdocs.apispec.jsonschema.JsonSchemaFromFieldDescriptorsGenerator
+import com.keecon.restdocs.apispec.model.AbstractDescriptor
 import com.keecon.restdocs.apispec.model.AbstractParameterDescriptor
+import com.keecon.restdocs.apispec.model.DataType
 import com.keecon.restdocs.apispec.model.FieldDescriptor
 import com.keecon.restdocs.apispec.model.HTTPMethod
 import com.keecon.restdocs.apispec.model.HeaderDescriptor
@@ -11,7 +13,6 @@ import com.keecon.restdocs.apispec.model.ParameterDescriptor
 import com.keecon.restdocs.apispec.model.RequestModel
 import com.keecon.restdocs.apispec.model.ResourceModel
 import com.keecon.restdocs.apispec.model.ResponseModel
-import com.keecon.restdocs.apispec.model.SimpleType
 import com.keecon.restdocs.apispec.model.groupByPath
 import com.keecon.restdocs.apispec.openapi3.SecuritySchemeGenerator.addSecurityDefinitions
 import com.keecon.restdocs.apispec.openapi3.SecuritySchemeGenerator.addSecurityItemFromSecurityRequirements
@@ -24,6 +25,7 @@ import io.swagger.v3.oas.models.Paths
 import io.swagger.v3.oas.models.examples.Example
 import io.swagger.v3.oas.models.headers.Header
 import io.swagger.v3.oas.models.info.Info
+import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.BooleanSchema
 import io.swagger.v3.oas.models.media.Content
 import io.swagger.v3.oas.models.media.IntegerSchema
@@ -465,43 +467,91 @@ object OpenApi3Generator {
         }
     }
 
-    private fun simpleTypeToSchema(parameterDescriptor: AbstractParameterDescriptor): Schema<*>? {
-        return when (parameterDescriptor.type.lowercase()) {
-            SimpleType.BOOLEAN.name.lowercase() -> BooleanSchema().apply {
-                this._default(parameterDescriptor.defaultValue?.let { it as Boolean })
-                parameterDescriptor.attributes.enumValues
-                    .map { it as Boolean }
-                    .forEach { this.addEnumItem(it) }
+    private fun simpleTypeToSchema(descriptor: AbstractDescriptor): Schema<*>? {
+        return when (descriptor.type.lowercase()) {
+            DataType.BOOLEAN.name.lowercase() -> BooleanSchema().apply {
+                applyProperties(descriptor)
+                applyDefaultValue(descriptor as? AbstractParameterDescriptor)
+                applyEnumValues(descriptor)
             }
-            SimpleType.STRING.name.lowercase() -> StringSchema().apply {
-                this._default(parameterDescriptor.defaultValue?.let { it as String })
-                parameterDescriptor.format?.let { this.format = it }
-                parameterDescriptor.attributes.enumValues
-                    .map { it as String }
-                    .forEach { this.addEnumItem(it) }
+            DataType.STRING.name.lowercase() -> StringSchema().apply {
+                applyProperties(descriptor)
+                applyDefaultValue(descriptor as? AbstractParameterDescriptor)
+                applyEnumValues(descriptor)
             }
-            SimpleType.NUMBER.name.lowercase() -> NumberSchema().apply {
-                this._default(parameterDescriptor.defaultValue?.let { it as BigDecimal })
-                parameterDescriptor.format?.let { this.format = it }
-                parameterDescriptor.attributes.enumValues
-                    .map {
-                        when (it) {
-                            is Int -> it.toBigDecimal()
-                            is Double -> it.toBigDecimal()
-                            else -> it as BigDecimal
-                        }
-                    }
-                    .forEach { this.addEnumItem(it) }
+            DataType.NUMBER.name.lowercase() -> NumberSchema().apply {
+                applyProperties(descriptor)
+                applyDefaultValue(descriptor as? AbstractParameterDescriptor)
+                applyEnumValues(descriptor)
             }
-            SimpleType.INTEGER.name.lowercase() -> IntegerSchema().apply {
-                this._default(parameterDescriptor.defaultValue?.let { it as Int })
-                parameterDescriptor.format?.let { this.format = it }
-                parameterDescriptor.attributes.enumValues
-                    .map { it as Int }
-                    .forEach { this.addEnumItem(it) }
+            DataType.INTEGER.name.lowercase() -> IntegerSchema().apply {
+                applyProperties(descriptor)
+                applyDefaultValue(descriptor as? AbstractParameterDescriptor)
+                applyEnumValues(descriptor)
             }
-            else -> throw IllegalArgumentException("Unknown type '${parameterDescriptor.type}'")
+            DataType.ARRAY.name.lowercase() -> ArraySchema().apply {
+                applyProperties(descriptor)
+                applyItems(descriptor)
+            }
+            else -> throw IllegalArgumentException("Unknown type '${descriptor.type}'")
         }
+    }
+
+    private fun Schema<*>.applyProperties(descriptor: AbstractDescriptor) = apply {
+        descriptor.format?.let { this.format(it) }
+        // TODO(iwaltgen): constraints
+
+        // this.not(descriptor.attributes.extraFields)
+    }
+
+    private fun BooleanSchema.applyDefaultValue(descriptor: AbstractParameterDescriptor?) = apply {
+        this._default(descriptor?.defaultValue?.let { it as Boolean })
+    }
+
+    private fun StringSchema.applyDefaultValue(descriptor: AbstractParameterDescriptor?) = apply {
+        this._default(descriptor?.defaultValue?.let { it as String })
+    }
+
+    private fun NumberSchema.applyDefaultValue(descriptor: AbstractParameterDescriptor?) = apply {
+        this._default(descriptor?.defaultValue?.let { toBigDecimal(it) })
+    }
+
+    private fun IntegerSchema.applyDefaultValue(descriptor: AbstractParameterDescriptor?) = apply {
+        this._default(descriptor?.defaultValue?.let { it as Int })
+    }
+
+    private fun BooleanSchema.applyEnumValues(descriptor: AbstractDescriptor) = apply {
+        descriptor.attributes.enumValues
+            .map { it as Boolean }
+            .forEach { this.addEnumItem(it) }
+    }
+
+    private fun StringSchema.applyEnumValues(descriptor: AbstractDescriptor) = apply {
+        descriptor.attributes.enumValues
+            .map { it as String }
+            .forEach { this.addEnumItem(it) }
+    }
+
+    private fun NumberSchema.applyEnumValues(descriptor: AbstractDescriptor) = apply {
+        descriptor.attributes.enumValues
+            .map { toBigDecimal(it) }
+            .forEach { this.addEnumItem(it) }
+    }
+
+    private fun IntegerSchema.applyEnumValues(descriptor: AbstractDescriptor) = apply {
+        descriptor.attributes.enumValues
+            .map { it as Int }
+            .forEach { this.addEnumItem(it) }
+    }
+
+    private fun ArraySchema.applyItems(descriptor: AbstractDescriptor) = apply {
+        this.items(descriptor.attributes.items?.let { simpleTypeToSchema(it) })
+    }
+
+    private fun toBigDecimal(value: Any) = when (value) {
+        is Int -> value.toBigDecimal()
+        is Double -> value.toBigDecimal()
+        else -> value as BigDecimal
     }
 
     private data class RequestModelWithOperationId(

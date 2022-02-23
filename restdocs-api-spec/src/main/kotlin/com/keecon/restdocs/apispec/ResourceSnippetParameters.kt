@@ -1,7 +1,7 @@
 package com.keecon.restdocs.apispec
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.keecon.restdocs.apispec.SimpleType.STRING
+import com.keecon.restdocs.apispec.DataType.STRING
 import org.springframework.restdocs.headers.HeaderDescriptor
 import org.springframework.restdocs.hypermedia.LinkDescriptor
 import org.springframework.restdocs.payload.FieldDescriptor
@@ -80,12 +80,30 @@ data class ResourceSnippetParameters @JvmOverloads constructor(
     }
 }
 
-enum class SimpleType {
+enum class DataType {
     STRING,
     INTEGER,
     NUMBER,
     BOOLEAN,
     ARRAY,
+}
+
+enum class DataFormat {
+    INT32,
+    INT64,
+    FLOAT,
+    DOUBLE,
+    BYTE,
+    BINARY,
+    PASSWORD,
+    DATE,
+    DATE_TIME,
+    EMAIL,
+    UUID,
+    URI,
+    HOSTNAME,
+    IPV4,
+    IPV6,
 }
 
 /**
@@ -94,7 +112,7 @@ enum class SimpleType {
  */
 class HeaderDescriptorWithType(val name: String) : AbstractDescriptor<HeaderDescriptorWithType>() {
 
-    var type: SimpleType = STRING
+    var type: DataType = STRING
         private set
 
     var optional: Boolean = false
@@ -105,7 +123,7 @@ class HeaderDescriptorWithType(val name: String) : AbstractDescriptor<HeaderDesc
 
     var example: String? = null
 
-    fun type(type: SimpleType) = apply { this.type = type }
+    fun type(type: DataType) = apply { this.type = type }
 
     fun defaultValue(defaultValue: Any) = apply { this.defaultValue = defaultValue }
 
@@ -128,7 +146,7 @@ class HeaderDescriptorWithType(val name: String) : AbstractDescriptor<HeaderDesc
  */
 class ParameterDescriptorWithType(val name: String) : IgnorableDescriptor<ParameterDescriptorWithType>() {
 
-    var type: SimpleType = STRING
+    var type: DataType = STRING
         private set
 
     var optional: Boolean = false
@@ -137,7 +155,7 @@ class ParameterDescriptorWithType(val name: String) : IgnorableDescriptor<Parame
     @JsonProperty("default")
     var defaultValue: Any? = null
 
-    fun type(type: SimpleType) = apply { this.type = type }
+    fun type(type: DataType) = apply { this.type = type }
 
     fun defaultValue(defaultValue: Any) = apply { this.defaultValue = defaultValue }
 
