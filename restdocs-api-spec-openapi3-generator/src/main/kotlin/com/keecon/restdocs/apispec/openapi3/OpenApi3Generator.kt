@@ -4,7 +4,9 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.keecon.restdocs.apispec.jsonschema.JsonSchemaFromFieldDescriptorsGenerator
 import com.keecon.restdocs.apispec.model.AbstractDescriptor
 import com.keecon.restdocs.apispec.model.AbstractParameterDescriptor
+import com.keecon.restdocs.apispec.model.DataFormat
 import com.keecon.restdocs.apispec.model.DataType
+import com.keecon.restdocs.apispec.model.EncodingStyle
 import com.keecon.restdocs.apispec.model.FieldDescriptor
 import com.keecon.restdocs.apispec.model.HTTPMethod
 import com.keecon.restdocs.apispec.model.HeaderDescriptor
@@ -34,6 +36,7 @@ import io.swagger.v3.oas.models.media.NumberSchema
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.media.StringSchema
 import io.swagger.v3.oas.models.parameters.HeaderParameter
+import io.swagger.v3.oas.models.parameters.Parameter
 import io.swagger.v3.oas.models.parameters.PathParameter
 import io.swagger.v3.oas.models.parameters.QueryParameter
 import io.swagger.v3.oas.models.parameters.RequestBody
@@ -437,6 +440,7 @@ object OpenApi3Generator {
             name = parameterDescriptor.name
             description = parameterDescriptor.description
             schema = simpleTypeToSchema(parameterDescriptor)
+            applyProperties(parameterDescriptor)
         }
     }
 
@@ -454,6 +458,7 @@ object OpenApi3Generator {
             description = parameterDescriptor.description
             required = parameterDescriptor.optional.not()
             schema = simpleTypeToSchema(parameterDescriptor)
+            applyProperties(parameterDescriptor)
         }
     }
 
@@ -464,6 +469,7 @@ object OpenApi3Generator {
             required = headerDescriptor.optional.not()
             schema = simpleTypeToSchema(headerDescriptor)
             example = headerDescriptor.example
+            applyProperties(headerDescriptor)
         }
     }
 
@@ -497,11 +503,25 @@ object OpenApi3Generator {
         }
     }
 
-    private fun Schema<*>.applyProperties(descriptor: AbstractDescriptor) = apply {
-        descriptor.format?.let { this.format(it) }
-        // TODO(iwaltgen): constraints
+    private fun Parameter.applyProperties(descriptor: AbstractDescriptor) = apply {
+        when (descriptor.attributes.encoding?.style) {
+            EncodingStyle.MATRIX.name.lowercase() -> this.style = Parameter.StyleEnum.MATRIX
+            EncodingStyle.LABEL.name.lowercase() -> this.style = Parameter.StyleEnum.LABEL
+            EncodingStyle.FORM.name.lowercase() -> this.style = Parameter.StyleEnum.FORM
+            EncodingStyle.SIMPLE.name.lowercase() -> this.style = Parameter.StyleEnum.SIMPLE
+            else -> Unit
+        }
+        descriptor.attributes.encoding?.explode?.let { this.explode = it }
+        descriptor.attributes.encoding?.allowReserved?.let { this.allowReserved = it }
+    }
 
-        // this.not(descriptor.attributes.extraFields)
+    private fun Schema<*>.applyProperties(descriptor: AbstractDescriptor) = apply {
+        when (descriptor.format) {
+            DataFormat.DATETIME.name.lowercase() -> this.format("date-time")
+            is String -> this.format(descriptor.format)
+            else -> Unit
+        }
+        // TODO(iwaltgen): constraints
     }
 
     private fun BooleanSchema.applyDefaultValue(descriptor: AbstractParameterDescriptor?) = apply {

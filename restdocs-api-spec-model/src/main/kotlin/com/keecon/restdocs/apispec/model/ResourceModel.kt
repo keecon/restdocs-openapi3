@@ -71,7 +71,7 @@ enum class DataFormat {
     BINARY,
     PASSWORD,
     DATE,
-    DATE_TIME,
+    DATETIME,
     EMAIL,
     UUID,
     URI,
