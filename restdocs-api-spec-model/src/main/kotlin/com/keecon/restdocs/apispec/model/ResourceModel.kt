@@ -55,16 +55,19 @@ enum class SimpleType {
     STRING,
     INTEGER,
     NUMBER,
-    BOOLEAN
+    BOOLEAN,
 }
 
-interface AbstractParameterDescriptor {
-    val name: String
-    val description: String
+interface AbstractDescriptor {
     val type: String
-    val defaultValue: Any?
+    val description: String
     val optional: Boolean
     val attributes: Attributes
+}
+
+interface AbstractParameterDescriptor : AbstractDescriptor {
+    val name: String
+    val defaultValue: Any?
 }
 
 data class HeaderDescriptor(
@@ -79,23 +82,12 @@ data class HeaderDescriptor(
 
 open class FieldDescriptor(
     val path: String,
-    val description: String,
-    val type: String,
-    val optional: Boolean = false,
+    override val description: String,
+    override val type: String,
+    override val optional: Boolean = false,
     val ignored: Boolean = false,
-    val attributes: Attributes = Attributes()
-)
-
-data class Attributes(
-    val validationConstraints: List<Constraint> = emptyList(),
-    val enumValues: List<Any> = emptyList(),
-    val itemsType: String? = null
-)
-
-data class Constraint(
-    val name: String,
-    val configuration: Map<String, Any>
-)
+    override val attributes: Attributes = Attributes()
+) : AbstractDescriptor
 
 data class ParameterDescriptor(
     override val name: String,
@@ -106,6 +98,17 @@ data class ParameterDescriptor(
     val ignored: Boolean,
     override val attributes: Attributes = Attributes()
 ) : AbstractParameterDescriptor
+
+data class Attributes(
+    val validationConstraints: List<Constraint> = emptyList(),
+    val enumValues: List<Any> = emptyList(),
+    val itemsType: String? = null,
+)
+
+data class Constraint(
+    val name: String,
+    val configuration: Map<String, Any>
+)
 
 data class SecurityRequirements(
     val type: SecurityType,

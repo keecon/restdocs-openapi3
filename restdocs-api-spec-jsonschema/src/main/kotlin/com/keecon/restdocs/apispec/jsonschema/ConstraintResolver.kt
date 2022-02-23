@@ -66,28 +66,16 @@ internal object ConstraintResolver {
             ?.let { it.configuration["max"] as Int }
     }
 
-    internal fun minInteger(fieldDescriptor: FieldDescriptor): Int? {
+    internal fun minNumber(fieldDescriptor: FieldDescriptor): Int? {
         return findConstraints(fieldDescriptor)
-            .mapNotNull {
-                when (it.name) {
-                    MIN_CONSTRAINT -> it.configuration["value"] as Int
-                    SIZE_CONSTRAINT -> it.configuration["min"] as? Int
-                    else -> null
-                }
-            }
-            .maxOrNull()
+            .firstOrNull { MIN_CONSTRAINT == it.name }
+            ?.let { it.configuration["value"] as? Int }
     }
 
-    internal fun maxInteger(fieldDescriptor: FieldDescriptor): Int? {
+    internal fun maxNumber(fieldDescriptor: FieldDescriptor): Int? {
         return findConstraints(fieldDescriptor)
-            .mapNotNull {
-                when (it.name) {
-                    MAX_CONSTRAINT -> it.configuration["value"] as Int
-                    SIZE_CONSTRAINT -> it.configuration["max"] as? Int
-                    else -> null
-                }
-            }
-            .minOrNull()
+            .firstOrNull { MAX_CONSTRAINT == it.name }
+            ?.let { it.configuration["value"] as? Int }
     }
 
     internal fun isRequired(fieldDescriptor: FieldDescriptor): Boolean =

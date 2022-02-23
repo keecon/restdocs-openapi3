@@ -3,13 +3,13 @@ package com.keecon.restdocs.apispec.jsonschema
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.keecon.restdocs.apispec.jsonschema.ConstraintResolver.isRequired
-import com.keecon.restdocs.apispec.jsonschema.ConstraintResolver.maxInteger
 import com.keecon.restdocs.apispec.jsonschema.ConstraintResolver.maxLengthString
+import com.keecon.restdocs.apispec.jsonschema.ConstraintResolver.maxNumber
 import com.keecon.restdocs.apispec.jsonschema.ConstraintResolver.maybeMaxSizeArray
 import com.keecon.restdocs.apispec.jsonschema.ConstraintResolver.maybeMinSizeArray
 import com.keecon.restdocs.apispec.jsonschema.ConstraintResolver.maybePattern
-import com.keecon.restdocs.apispec.jsonschema.ConstraintResolver.minInteger
 import com.keecon.restdocs.apispec.jsonschema.ConstraintResolver.minLengthString
+import com.keecon.restdocs.apispec.jsonschema.ConstraintResolver.minNumber
 import com.keecon.restdocs.apispec.model.Attributes
 import com.keecon.restdocs.apispec.model.FieldDescriptor
 import org.everit.json.schema.ArraySchema
@@ -259,10 +259,7 @@ class JsonSchemaFromFieldDescriptorsGenerator {
         }
 
         fun equalsOnPathAndType(f: FieldDescriptorWithSchemaType): Boolean =
-            (
-                this.path == f.path &&
-                    this.type == f.type
-                )
+            (this.path == f.path && this.type == f.type)
 
         companion object {
             fun fromFieldDescriptor(fieldDescriptor: FieldDescriptor) =
@@ -294,12 +291,6 @@ private fun ArraySchema.Builder.applyConstraints(fieldDescriptor: FieldDescripto
 }
 
 private fun NumberSchema.Builder.applyConstraints(fieldDescriptor: FieldDescriptor) = apply {
-    minInteger(fieldDescriptor)?.let {
-        minimum(it)
-        requiresInteger(true)
-    }
-    maxInteger(fieldDescriptor)?.let {
-        maximum(it)
-        requiresInteger(true)
-    }
+    minNumber(fieldDescriptor)?.let { minimum(it) }
+    maxNumber(fieldDescriptor)?.let { maximum(it) }
 }

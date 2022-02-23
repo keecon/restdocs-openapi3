@@ -496,8 +496,7 @@ object OpenApi3Generator {
                     .map { it as Int }
                     .forEach { this.addEnumItem(it) }
             }
-            else ->
-                throw IllegalArgumentException("Unknown type '${parameterDescriptor.type}'")
+            else -> throw IllegalArgumentException("Unknown type '${parameterDescriptor.type}'")
         }
     }
 

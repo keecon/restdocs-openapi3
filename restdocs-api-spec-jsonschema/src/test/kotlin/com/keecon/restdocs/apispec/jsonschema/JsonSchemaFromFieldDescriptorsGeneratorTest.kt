@@ -19,6 +19,7 @@ import org.everit.json.schema.Schema
 import org.everit.json.schema.StringSchema
 import org.everit.json.schema.ValidationException
 import org.everit.json.schema.loader.SchemaLoader
+import org.hibernate.validator.constraints.Length
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.jupiter.api.Test
@@ -26,7 +27,9 @@ import java.io.IOException
 import java.util.Collections.emptyMap
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
+import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.NotNull
+import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 
 class JsonSchemaFromFieldDescriptorsGeneratorTest {
@@ -48,7 +51,7 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
 
         then(schema).isInstanceOf(ObjectSchema::class.java)
         val objectSchema = schema as ObjectSchema?
-        then(objectSchema!!.definesProperty("id")).isTrue()
+        then(objectSchema!!.definesProperty("id")).isTrue
         then(objectSchema.propertySchemas["id"]).isInstanceOf(StringSchema::class.java)
         then(objectSchema.requiredProperties).contains("id")
 
@@ -57,35 +60,35 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
         val patternSchema = objectSchema.propertySchemas["pattern"] as StringSchema
         then(patternSchema.pattern.pattern()).isEqualTo("[a-z]")
 
-        then(objectSchema.definesProperty("shippingAddress")).isTrue()
+        then(objectSchema.definesProperty("shippingAddress")).isTrue
         val shippingAddressSchema = objectSchema.propertySchemas["shippingAddress"]!!
         then(shippingAddressSchema).isInstanceOf(ObjectSchema::class.java)
-        then(shippingAddressSchema.description).isNotEmpty()
+        then(shippingAddressSchema.description).isNotEmpty
 
-        then(objectSchema.definesProperty("billingAddress")).isTrue()
+        then(objectSchema.definesProperty("billingAddress")).isTrue
         val billingAddressSchema = objectSchema.propertySchemas["billingAddress"] as ObjectSchema
         then(billingAddressSchema).isInstanceOf(ObjectSchema::class.java)
-        then(billingAddressSchema.description).isNotEmpty()
-        then(billingAddressSchema.definesProperty("firstName")).isTrue()
-        then(billingAddressSchema.requiredProperties.contains("firstName")).isTrue()
+        then(billingAddressSchema.description).isNotEmpty
+        then(billingAddressSchema.definesProperty("firstName")).isTrue
+        then(billingAddressSchema.requiredProperties.contains("firstName")).isTrue
         val firstNameSchema = billingAddressSchema.propertySchemas["firstName"] as StringSchema
         then(firstNameSchema.minLength).isEqualTo(1)
         @Suppress("USELESS_CAST") // needed because Int becomes a primitive and cannot be checked isNull then
         then(firstNameSchema.maxLength as Int?).isNull()
 
-        then(billingAddressSchema.definesProperty("valid")).isTrue()
+        then(billingAddressSchema.definesProperty("valid")).isTrue
 
         then(objectSchema.propertySchemas["lineItems"]).isInstanceOf(ArraySchema::class.java)
         val lineItemSchema = objectSchema.propertySchemas["lineItems"] as ArraySchema
         then(lineItemSchema.description).isNull()
 
-        then(lineItemSchema.allItemSchema.definesProperty("name")).isTrue()
+        then(lineItemSchema.allItemSchema.definesProperty("name")).isTrue
         val nameSchema = (lineItemSchema.allItemSchema as ObjectSchema).propertySchemas["name"] as StringSchema
         then(nameSchema.minLength).isEqualTo(2)
         then(nameSchema.maxLength).isEqualTo(255)
 
-        then(lineItemSchema.allItemSchema.definesProperty("_id")).isTrue()
-        then(lineItemSchema.allItemSchema.definesProperty("quantity")).isTrue()
+        then(lineItemSchema.allItemSchema.definesProperty("_id")).isTrue
+        then(lineItemSchema.allItemSchema.definesProperty("quantity")).isTrue
         val quantitySchema = (lineItemSchema.allItemSchema as ObjectSchema).propertySchemas["quantity"] as ObjectSchema
         then(quantitySchema.requiredProperties).contains("value")
 
@@ -98,35 +101,25 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
         val lineItemsTaxesSchema = paymentLineItem.propertySchemas["lineItemTaxes"] as ArraySchema
         then(lineItemsTaxesSchema.minItems).isEqualTo(1)
         then(lineItemsTaxesSchema.maxItems).isEqualTo(255)
-        then(lineItemsTaxesSchema.requiresArray()).isTrue()
+        then(lineItemsTaxesSchema.requiresArray()).isTrue
 
         then(objectSchema.definesProperty("pageIndex")).isTrue
         then(objectSchema.propertySchemas["pageIndex"]).isInstanceOf(NumberSchema::class.java)
         val pageIndexSchema = objectSchema.propertySchemas["pageIndex"] as NumberSchema
         then(pageIndexSchema.minimum.toInt()).isEqualTo(1)
         then(pageIndexSchema.maximum.toInt()).isEqualTo(100)
-        then(pageIndexSchema.requiresInteger()).isTrue
 
         then(objectSchema.definesProperty("pageSize")).isTrue
         then(objectSchema.propertySchemas["pageSize"]).isInstanceOf(NumberSchema::class.java)
         val pageSizeSchema = objectSchema.propertySchemas["pageSize"] as NumberSchema
-        then(pageSizeSchema.minimum.toInt()).isEqualTo(1)
-        then(pageSizeSchema.maximum.toInt()).isEqualTo(255)
-        then(pageSizeSchema.requiresInteger()).isTrue
+        then(pageSizeSchema.minimum.toInt()).isEqualTo(10)
+        then(pageSizeSchema.maximum.toInt()).isEqualTo(100)
 
         then(objectSchema.definesProperty("pagePositive")).isTrue
         then(objectSchema.propertySchemas["pagePositive"]).isInstanceOf(NumberSchema::class.java)
         val pagePositiveSchema = objectSchema.propertySchemas["pagePositive"] as NumberSchema
         then(pagePositiveSchema.minimum.toInt()).isEqualTo(1)
         then(pagePositiveSchema.maximum).isNull()
-        then(pagePositiveSchema.requiresInteger()).isTrue
-
-        then(objectSchema.definesProperty("page100_200")).isTrue
-        then(objectSchema.propertySchemas["page100_200"]).isInstanceOf(NumberSchema::class.java)
-        val page100to200Schema = objectSchema.propertySchemas["page100_200"] as NumberSchema
-        then(page100to200Schema.minimum.toInt()).isEqualTo(100)
-        then(page100to200Schema.maximum.toInt()).isEqualTo(200)
-        then(page100to200Schema.requiresInteger()).isTrue
 
         // language=JSON
         thenSchemaValidatesJson(
@@ -155,9 +148,8 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
                 },
                 "pattern": "a",
                 "pageIndex": 1,
-                "pageSize": 255,
-                "pageHalf": 100,
-                "page100_200": 200
+                "pageSize": 25,
+                "pagePositive": 100
             }
             """.trimIndent()
         )
@@ -170,7 +162,7 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
         whenSchemaGenerated()
 
         then(schema).isInstanceOf(ArraySchema::class.java)
-        then((schema as ArraySchema).allItemSchema.definesProperty("id")).isTrue()
+        then((schema as ArraySchema).allItemSchema.definesProperty("id")).isTrue
         thenSchemaIsValid()
         thenSchemaValidatesJson("""[{"id": "some"}]""")
     }
@@ -279,7 +271,7 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
         thenSchemaValidatesJson("""{"id": null}""")
         thenSchemaValidatesJson("""{"id": true}""")
         thenSchemaDoesNotValidateJson("""{"id": 12}""")
-        then(JsonPath.read<String>(schemaString, "properties.id.description")).isNotEmpty()
+        then(JsonPath.read<String>(schemaString, "properties.id.description")).isNotEmpty
     }
 
     @Test
@@ -441,7 +433,7 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
         val report = JsonSchemaFactory.byDefault()
             .syntaxValidator
             .validateSchema(JsonLoader.fromString(schemaString!!))
-        then(report.isSuccess).describedAs("schema invalid - validation failures: %s", report).isTrue()
+        then(report.isSuccess).describedAs("schema invalid - validation failures: %s", report).isTrue
     }
 
     private fun whenSchemaGenerated() {
@@ -543,7 +535,7 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
                 attributes = Attributes(
                     listOf(
                         Constraint(
-                            "javax.validation.constraints.Size",
+                            Size::class.java.name,
                             mapOf("min" to 1, "max" to 255)
                         )
                     )
@@ -559,7 +551,7 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
                 "some",
                 "ARRAY",
                 attributes = Attributes(
-                    listOf(Constraint("javax.validation.constraints.Size", mapOf("min" to 1, "max" to 255)))
+                    listOf(Constraint(Size::class.java.name, mapOf("min" to 1, "max" to 255)))
                 )
             )
         )
@@ -572,7 +564,7 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
                 "some",
                 "ARRAY",
                 attributes = Attributes(
-                    listOf(Constraint("javax.validation.constraints.Size", mapOf("min" to 1, "max" to 255)))
+                    listOf(Constraint(Size::class.java.name, mapOf("min" to 1, "max" to 255)))
                 )
             )
         )
@@ -612,7 +604,7 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
             Attributes(
                 listOf(
                     Constraint(
-                        "org.hibernate.validator.constraints.Length",
+                        Length::class.java.name,
                         mapOf(
                             "min" to 2,
                             "max" to 255
@@ -625,7 +617,7 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
             Attributes(
                 listOf(
                     Constraint(
-                        "javax.validation.constraints.Pattern",
+                        Pattern::class.java.name,
                         mapOf("pattern" to "[a-z]")
                     )
                 )
@@ -664,7 +656,7 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
                 attributes = Attributes(
                     listOf(
                         Constraint(
-                            "javax.validation.constraints.NotEmpty",
+                            NotEmpty::class.java.name,
                             emptyMap()
                         )
                     )
@@ -678,7 +670,7 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
                 attributes = Attributes(
                     listOf(
                         Constraint(
-                            "javax.validation.constraints.Size",
+                            Size::class.java.name,
                             mapOf(
                                 "min" to 1,
                                 "max" to 255
@@ -721,11 +713,12 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
                 attributes = Attributes(
                     listOf(
                         Constraint(
-                            Size::class.java.name,
-                            mapOf(
-                                "min" to 1,
-                                "max" to 255
-                            )
+                            Min::class.java.name,
+                            mapOf("value" to 10)
+                        ),
+                        Constraint(
+                            Max::class.java.name,
+                            mapOf("value" to 100)
                         )
                     )
                 )
@@ -737,36 +730,12 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
                 attributes = Attributes(
                     listOf(
                         Constraint(
-                            Size::class.java.name,
-                            mapOf("min" to 1)
+                            Min::class.java.name,
+                            mapOf("value" to 1)
                         )
                     )
                 )
             ),
-            FieldDescriptor(
-                "page100_200",
-                "some",
-                "NUMBER",
-                attributes = Attributes(
-                    listOf(
-                        Constraint(
-                            Size::class.java.name,
-                            mapOf(
-                                "min" to 1,
-                                "max" to 255
-                            )
-                        ),
-                        Constraint(
-                            Min::class.java.name,
-                            mapOf("value" to 100)
-                        ),
-                        Constraint(
-                            Max::class.java.name,
-                            mapOf("value" to 200)
-                        )
-                    )
-                )
-            )
         )
     }
 
