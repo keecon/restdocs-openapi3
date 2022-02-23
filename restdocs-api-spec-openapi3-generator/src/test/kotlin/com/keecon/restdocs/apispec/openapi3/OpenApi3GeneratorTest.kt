@@ -44,6 +44,24 @@ class OpenApi3GeneratorTest {
     }
 
     @Test
+    fun `should convert resource model with Basic SecurityRequirements to openapi`() {
+        givenGetProductResourceModelWithBasicSecurityRequirement()
+
+        whenOpenApiObjectGeneratedWithoutOAuth2()
+
+        thenBasicSecuritySchemesPresent()
+    }
+
+    @Test
+    fun `should convert resource model with API Key SecurityRequirements to openapi`() {
+        givenGetProductResourceModelWithAPIKeySecurityRequirement()
+
+        whenOpenApiObjectGeneratedWithoutOAuth2()
+
+        thenAPIKeySecuritySchemesPresent()
+    }
+
+    @Test
     fun `should convert resource model with JWT Bearer SecurityRequirements to openapi`() {
         givenGetProductResourceModelWithJWTSecurityRequirement()
 
@@ -617,18 +635,36 @@ class OpenApi3GeneratorTest {
         ).containsKeys("prod:r")
     }
 
-    private fun thenJWTSecuritySchemesPresent() {
+    private fun thenBasicSecuritySchemesPresent() {
         then(
-            openApiJsonPathContext
-                .read<String>("components.securitySchemes.bearerAuthJWT.type")
+            openApiJsonPathContext.read<String>("components.securitySchemes.basic.type")
         ).isEqualTo("http")
         then(
-            openApiJsonPathContext
-                .read<String>("components.securitySchemes.bearerAuthJWT.scheme")
+            openApiJsonPathContext.read<String>("components.securitySchemes.basic.scheme")
+        ).isEqualTo("basic")
+    }
+
+    private fun thenAPIKeySecuritySchemesPresent() {
+        then(
+            openApiJsonPathContext.read<String>("components.securitySchemes.api_key.type")
+        ).isEqualTo("apiKey")
+        then(
+            openApiJsonPathContext.read<String>("components.securitySchemes.api_key.in")
+        ).isEqualTo("header")
+        then(
+            openApiJsonPathContext.read<String>("components.securitySchemes.api_key.name")
+        ).isEqualTo("Authorization")
+    }
+
+    private fun thenJWTSecuritySchemesPresent() {
+        then(
+            openApiJsonPathContext.read<String>("components.securitySchemes.bearerAuthJWT.type")
+        ).isEqualTo("http")
+        then(
+            openApiJsonPathContext.read<String>("components.securitySchemes.bearerAuthJWT.scheme")
         ).isEqualTo("bearer")
         then(
-            openApiJsonPathContext
-                .read<String>("components.securitySchemes.bearerAuthJWT.bearerFormat")
+            openApiJsonPathContext.read<String>("components.securitySchemes.bearerAuthJWT.bearerFormat")
         ).isEqualTo("JWT")
     }
 
@@ -1031,6 +1067,36 @@ class OpenApi3GeneratorTest {
         )
     }
 
+    private fun givenGetProductResourceModelWithBasicSecurityRequirement() {
+        resources = listOf(
+            ResourceModel(
+                operationId = "test",
+                summary = "summary",
+                description = "description",
+                privateResource = false,
+                deprecated = false,
+                tags = setOf("tag1", "tag2"),
+                request = getProductRequest(::getBasicSecurityRequirement),
+                response = getProductResponse()
+            )
+        )
+    }
+
+    private fun givenGetProductResourceModelWithAPIKeySecurityRequirement() {
+        resources = listOf(
+            ResourceModel(
+                operationId = "test",
+                summary = "summary",
+                description = "description",
+                privateResource = false,
+                deprecated = false,
+                tags = setOf("tag1", "tag2"),
+                request = getProductRequest(::getAPIKeySecurityRequirement),
+                response = getProductResponse()
+            )
+        )
+    }
+
     private fun givenGetProductResourceModelWithJWTSecurityRequirement() {
         resources = listOf(
             ResourceModel(
@@ -1321,6 +1387,14 @@ class OpenApi3GeneratorTest {
     private fun getOAuth2SecurityRequirement() = SecurityRequirements(
         type = SecurityType.OAUTH2,
         requiredScopes = listOf("prod:r")
+    )
+
+    private fun getBasicSecurityRequirement() = SecurityRequirements(
+        type = SecurityType.BASIC
+    )
+
+    private fun getAPIKeySecurityRequirement() = SecurityRequirements(
+        type = SecurityType.API_KEY
     )
 
     private fun getJWTSecurityRequirement() = SecurityRequirements(
