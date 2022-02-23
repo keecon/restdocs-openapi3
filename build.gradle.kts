@@ -41,6 +41,15 @@ allprojects {
         google()
         mavenCentral()
     }
+
+    tasks.test {
+        useJUnitPlatform()
+        finalizedBy(tasks.jacocoTestReport)
+
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
+    }
 }
 
 subprojects {
@@ -73,15 +82,6 @@ subprojects {
                     from(components["java"])
                 }
             }
-        }
-    }
-
-    tasks.test {
-        useJUnitPlatform()
-        finalizedBy(tasks.jacocoTestReport)
-
-        testLogging {
-            events("passed", "skipped", "failed")
         }
     }
 
@@ -138,4 +138,24 @@ subprojects {
 
 jacoco {
     toolVersion = "0.8.7"
+}
+
+val jacocoMergeData = tasks.create<JacocoMerge>("jacocoMergeData") {
+    dependsOn(subprojects.map { it.tasks.jacocoTestReport })
+    destinationFile = file("$buildDir/jacoco/all-tests.exec")
+    executionData(files(subprojects.map { it.tasks.jacocoTestReport.get().executionData }).filter { it.exists() })
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test, jacocoMergeData)
+    description = "Generates an aggregate report from all subprojects"
+
+    sourceSets(*subprojects.map { it.sourceSets.main.get() }.toTypedArray())
+    executionData(jacocoMergeData.executionData)
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        html.outputLocation.set(file("$buildDir/jacocoHtml"))
+    }
 }

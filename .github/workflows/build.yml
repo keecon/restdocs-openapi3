@@ -33,11 +33,6 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           token: ${{secrets.CODECOV_TOKEN}}
-          files: >-
-            ./restdocs-api-spec/build/reports/jacoco/test/jacocoTestReport.xml,
-            ./restdocs-api-spec-gradle-plugin/build/reports/jacoco/test/jacocoTestReport.xml,
-            ./restdocs-api-spec-jsonschema/build/reports/jacoco/test/jacocoTestReport.xml,
-            ./restdocs-api-spec-mockmvc/build/reports/jacoco/test/jacocoTestReport.xml,
-            ./restdocs-api-spec-openapi3-generator/build/reports/jacoco/test/jacocoTestReport.xml
+          files: ./build/reports/jacoco/test/jacocoTestReport.xml
           flags: tests
           name: main-tests
