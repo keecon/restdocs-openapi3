@@ -1,5 +1,6 @@
 package com.keecon.restdocs.apispec.model
 
+import com.fasterxml.jackson.annotation.JsonAnySetter
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class ResourceModel(
@@ -51,16 +52,39 @@ data class ResponseModel(
     val schema: Schema? = null
 )
 
-enum class SimpleType {
+// https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.1.md#data-types
+enum class DataType {
     STRING,
     INTEGER,
     NUMBER,
     BOOLEAN,
+    ARRAY,
 }
 
+// https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.1.md#data-types
+enum class DataFormat {
+    INT32,
+    INT64,
+    FLOAT,
+    DOUBLE,
+    BYTE,
+    BINARY,
+    PASSWORD,
+    DATE,
+    DATETIME,
+    EMAIL,
+    UUID,
+    URI,
+    HOSTNAME,
+    IPV4,
+    IPV6,
+}
+
+// https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.1.md#schemaObject
 interface AbstractDescriptor {
-    val type: String
     val description: String
+    val type: String
+    val format: String?
     val optional: Boolean
     val attributes: Attributes
 }
@@ -74,6 +98,7 @@ data class HeaderDescriptor(
     override val name: String,
     override val description: String,
     override val type: String,
+    override val format: String? = null,
     @JsonProperty("default") override val defaultValue: Any? = null,
     override val optional: Boolean,
     val example: String? = null,
@@ -84,6 +109,7 @@ open class FieldDescriptor(
     val path: String,
     override val description: String,
     override val type: String,
+    override val format: String? = null,
     override val optional: Boolean = false,
     val ignored: Boolean = false,
     override val attributes: Attributes = Attributes()
@@ -93,6 +119,7 @@ data class ParameterDescriptor(
     override val name: String,
     override val description: String,
     override val type: String,
+    override val format: String? = null,
     @JsonProperty("default") override val defaultValue: Any? = null,
     override val optional: Boolean,
     val ignored: Boolean,
@@ -102,12 +129,29 @@ data class ParameterDescriptor(
 data class Attributes(
     val validationConstraints: List<Constraint> = emptyList(),
     val enumValues: List<Any> = emptyList(),
-    val itemsType: String? = null,
+    val items: AbstractDescriptor? = null,
+    val encoding: Encoding? = null,
+    @JsonAnySetter val experimentalProperties: Map<String, Any> = emptyMap()
 )
 
 data class Constraint(
     val name: String,
     val configuration: Map<String, Any>
+)
+
+// https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.1.md#style-examples
+enum class EncodingStyle {
+    MATRIX,
+    LABEL,
+    FORM,
+    SIMPLE,
+}
+
+// https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.1.md#encoding-object
+data class Encoding(
+    val style: String,
+    val explode: Boolean?,
+    val allowReserved: Boolean?,
 )
 
 data class SecurityRequirements(

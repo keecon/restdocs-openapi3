@@ -1,7 +1,7 @@
 package com.keecon.restdocs.apispec.jsonschema
 
+import com.keecon.restdocs.apispec.model.AbstractDescriptor
 import com.keecon.restdocs.apispec.model.Constraint
-import com.keecon.restdocs.apispec.model.FieldDescriptor
 
 internal object ConstraintResolver {
 
@@ -30,22 +30,22 @@ internal object ConstraintResolver {
 
     private const val MAX_CONSTRAINT = "javax.validation.constraints.Max"
 
-    internal fun maybeMinSizeArray(fieldDescriptor: FieldDescriptor?) =
+    internal fun maybeMinSizeArray(fieldDescriptor: AbstractDescriptor?) =
         fieldDescriptor?.maybeSizeConstraint()?.let { it.configuration["min"] as? Int }
 
-    internal fun maybeMaxSizeArray(fieldDescriptor: FieldDescriptor?) =
+    internal fun maybeMaxSizeArray(fieldDescriptor: AbstractDescriptor?) =
         fieldDescriptor?.maybeSizeConstraint()?.let { it.configuration["max"] as? Int }
 
-    private fun FieldDescriptor.maybeSizeConstraint() =
+    private fun AbstractDescriptor.maybeSizeConstraint() =
         findConstraints(this).firstOrNull { SIZE_CONSTRAINT == it.name }
 
-    internal fun maybePattern(fieldDescriptor: FieldDescriptor?) =
+    internal fun maybePattern(fieldDescriptor: AbstractDescriptor?) =
         fieldDescriptor?.maybePatternConstraint()?.let { it.configuration["pattern"] as? String }
 
-    private fun FieldDescriptor.maybePatternConstraint() =
+    private fun AbstractDescriptor.maybePatternConstraint() =
         findConstraints(this).firstOrNull { PATTERN_CONSTRAINT == it.name }
 
-    internal fun minLengthString(fieldDescriptor: FieldDescriptor): Int? {
+    internal fun minLengthString(fieldDescriptor: AbstractDescriptor): Int? {
         return findConstraints(fieldDescriptor)
             .firstOrNull { constraint ->
                 (
@@ -60,28 +60,28 @@ internal object ConstraintResolver {
             }
     }
 
-    internal fun maxLengthString(fieldDescriptor: FieldDescriptor): Int? {
+    internal fun maxLengthString(fieldDescriptor: AbstractDescriptor): Int? {
         return findConstraints(fieldDescriptor)
             .firstOrNull { LENGTH_CONSTRAINT == it.name }
             ?.let { it.configuration["max"] as Int }
     }
 
-    internal fun minNumber(fieldDescriptor: FieldDescriptor): Int? {
+    internal fun minNumber(fieldDescriptor: AbstractDescriptor): Int? {
         return findConstraints(fieldDescriptor)
             .firstOrNull { MIN_CONSTRAINT == it.name }
             ?.let { it.configuration["value"] as? Int }
     }
 
-    internal fun maxNumber(fieldDescriptor: FieldDescriptor): Int? {
+    internal fun maxNumber(fieldDescriptor: AbstractDescriptor): Int? {
         return findConstraints(fieldDescriptor)
             .firstOrNull { MAX_CONSTRAINT == it.name }
             ?.let { it.configuration["value"] as? Int }
     }
 
-    internal fun isRequired(fieldDescriptor: FieldDescriptor): Boolean =
+    internal fun isRequired(fieldDescriptor: AbstractDescriptor): Boolean =
         findConstraints(fieldDescriptor)
             .any { constraint -> REQUIRED_CONSTRAINTS.contains(constraint.name) }
 
-    private fun findConstraints(fieldDescriptor: FieldDescriptor): List<Constraint> =
+    private fun findConstraints(fieldDescriptor: AbstractDescriptor): List<Constraint> =
         fieldDescriptor.attributes.validationConstraints
 }

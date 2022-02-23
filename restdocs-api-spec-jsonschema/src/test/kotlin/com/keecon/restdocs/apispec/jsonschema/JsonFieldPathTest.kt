@@ -13,7 +13,7 @@ class JsonFieldPathTest {
         with(
             compile(
                 JsonSchemaFromFieldDescriptorsGenerator.FieldDescriptorWithSchemaType(
-                    "a.b.c", "", "", false, false,
+                    "a.b.c", "", "string", null, false, false,
                     Attributes()
                 )
             )

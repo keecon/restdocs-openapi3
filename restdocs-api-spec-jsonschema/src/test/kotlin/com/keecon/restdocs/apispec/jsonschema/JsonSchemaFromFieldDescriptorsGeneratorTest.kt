@@ -3,6 +3,7 @@ package com.keecon.restdocs.apispec.jsonschema
 import com.github.fge.jackson.JsonLoader
 import com.github.fge.jsonschema.main.JsonSchemaFactory
 import com.jayway.jsonpath.JsonPath
+import com.keecon.restdocs.apispec.model.AbstractDescriptor
 import com.keecon.restdocs.apispec.model.Attributes
 import com.keecon.restdocs.apispec.model.Constraint
 import com.keecon.restdocs.apispec.model.FieldDescriptor
@@ -346,7 +347,7 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
     }
 
     @Test
-    fun should_specify_accurate_items_type_in_array_when_descriptor_contains_itemsType_in_additionalParameters() {
+    fun should_specify_accurate_items_type_in_array_when_descriptor_contains_items_type_in_additionalParameters() {
         givenFieldDescriptorWithArrayOfSingleType()
 
         whenSchemaGenerated()
@@ -357,7 +358,7 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
     }
 
     @Test
-    fun should_specify_accurate_items_type_in_array_of_array_when_descriptor_contains_itemsType_in_addParameters() {
+    fun should_specify_accurate_items_type_in_array_of_array_when_descriptor_contains_items_type_in_addParameters() {
         givenFieldDescriptorWithTopLevelArrayOfArrayOfSingleType()
 
         whenSchemaGenerated()
@@ -476,7 +477,9 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
                 "[]",
                 "some",
                 "ARRAY",
-                attributes = Attributes(itemsType = "string")
+                attributes = Attributes(
+                    items = SimpleDescriptor("string"),
+                )
             )
         )
     }
@@ -491,7 +494,9 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
                 "[][]",
                 "some",
                 "ARRAY",
-                attributes = Attributes(itemsType = "string")
+                attributes = Attributes(
+                    items = SimpleDescriptor("string"),
+                )
             )
         )
     }
@@ -756,4 +761,12 @@ class JsonSchemaFromFieldDescriptorsGeneratorTest {
     private fun thenSchemaDoesNotValidateJson(json: String) {
         thenThrownBy { thenSchemaValidatesJson(json) }.isInstanceOf(ValidationException::class.java)
     }
+
+    private data class SimpleDescriptor(
+        override val type: String,
+        override val format: String? = null,
+        override val description: String = "",
+        override val optional: Boolean = false,
+        override val attributes: Attributes = Attributes()
+    ) : AbstractDescriptor
 }
