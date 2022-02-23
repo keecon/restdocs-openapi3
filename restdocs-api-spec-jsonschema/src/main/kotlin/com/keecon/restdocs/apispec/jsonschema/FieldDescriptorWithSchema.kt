@@ -20,17 +20,16 @@ internal class FieldDescriptorWithSchema(
     path: String,
     description: String,
     type: String,
-    format: String?,
     optional: Boolean,
     ignored: Boolean,
     attributes: Attributes,
     private val schemaBuilders: Set<Schema.Builder<*>> = setOf(
         toSchemaBuilder(
             jsonSchemaType(type),
-            FieldDescriptor(path, description, type, format, optional, ignored, attributes)
+            FieldDescriptor(path, description, type, optional, ignored, attributes)
         ),
     )
-) : FieldDescriptor(path, description, type, format, optional, ignored, attributes) {
+) : FieldDescriptor(path, description, type, optional, ignored, attributes) {
 
     fun jsonSchemaType(): Schema {
         val builder = if (schemaBuilders.size == 1) schemaBuilders.first()
@@ -46,7 +45,6 @@ internal class FieldDescriptorWithSchema(
             path = this.path,
             description = this.description,
             type = this.type,
-            format = this.format ?: other.format,
             optional = this.optional || other.optional, // optional if one it optional
             ignored = this.ignored && other.optional, // ignored if both are optional
             attributes = this.attributes,
@@ -63,7 +61,6 @@ internal class FieldDescriptorWithSchema(
                 path = fieldDescriptor.path,
                 description = fieldDescriptor.description,
                 type = fieldDescriptor.type,
-                format = fieldDescriptor.format,
                 optional = fieldDescriptor.optional,
                 ignored = fieldDescriptor.ignored,
                 attributes = fieldDescriptor.attributes

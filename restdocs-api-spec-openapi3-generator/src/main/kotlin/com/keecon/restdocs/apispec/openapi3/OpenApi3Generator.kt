@@ -430,7 +430,6 @@ object OpenApi3Generator {
             path = parameterDescriptor.name,
             description = parameterDescriptor.description,
             type = parameterDescriptor.type,
-            format = parameterDescriptor.format,
             optional = parameterDescriptor.optional,
             ignored = parameterDescriptor.ignored,
             attributes = parameterDescriptor.attributes

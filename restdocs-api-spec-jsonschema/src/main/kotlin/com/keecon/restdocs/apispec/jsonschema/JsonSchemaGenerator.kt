@@ -130,10 +130,7 @@ class JsonSchemaGenerator {
         if (propertyField?.fieldDescriptor?.let { isRequired(it) } == true) {
             builder.addRequiredProperty(propertyName)
         }
-        if (remainingSegments.isNotEmpty() && JsonFieldPath.isArraySegment(
-                remainingSegments[0]
-            )
-        ) {
+        if (remainingSegments.isNotEmpty() && JsonFieldPath.isArraySegment(remainingSegments[0])) {
             traversedSegments.add(remainingSegments[0])
             builder.addPropertySchema(
                 propertyName,

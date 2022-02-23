@@ -14,9 +14,9 @@ import java.math.BigDecimal
 internal object SchemaExtensions {
 
     internal fun Schema<*>.applyProperties(descriptor: AbstractDescriptor) = apply {
-        when (descriptor.format) {
+        when (descriptor.attributes.format) {
             DataFormat.DATETIME.lowercase() -> format("date-time")
-            is String -> format(descriptor.format)
+            is String -> format(descriptor.attributes.format)
             else -> Unit
         }
     }

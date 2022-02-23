@@ -89,10 +89,16 @@ enum class DataFormat {
 interface AbstractDescriptor {
     val description: String
     val type: String
-    val format: String?
     val optional: Boolean
     val attributes: Attributes
 }
+
+data class TypeDescriptor(
+    override val type: String,
+    override val description: String = "",
+    override val optional: Boolean = false,
+    override val attributes: Attributes = Attributes()
+) : AbstractDescriptor
 
 interface AbstractParameterDescriptor : AbstractDescriptor {
     val name: String
@@ -103,7 +109,6 @@ data class HeaderDescriptor(
     override val name: String,
     override val description: String,
     override val type: String,
-    override val format: String? = null,
     @JsonProperty("default") override val defaultValue: Any? = null,
     override val optional: Boolean,
     val example: String? = null,
@@ -114,7 +119,6 @@ open class FieldDescriptor(
     val path: String,
     override val description: String,
     override val type: String,
-    override val format: String? = null,
     override val optional: Boolean = false,
     val ignored: Boolean = false,
     override val attributes: Attributes = Attributes()
@@ -124,7 +128,6 @@ data class ParameterDescriptor(
     override val name: String,
     override val description: String,
     override val type: String,
-    override val format: String? = null,
     @JsonProperty("default") override val defaultValue: Any? = null,
     override val optional: Boolean,
     val ignored: Boolean,
@@ -134,6 +137,7 @@ data class ParameterDescriptor(
 data class Attributes(
     val validationConstraints: List<Constraint> = emptyList(),
     val enumValues: List<Any> = emptyList(),
+    val format: String? = null,
     val items: AbstractDescriptor? = null,
     val encoding: Encoding? = null,
 )

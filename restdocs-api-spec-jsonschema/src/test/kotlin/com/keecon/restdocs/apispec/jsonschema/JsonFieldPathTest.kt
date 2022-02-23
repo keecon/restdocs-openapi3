@@ -13,7 +13,7 @@ class JsonFieldPathTest {
         with(
             compile(
                 FieldDescriptorWithSchema(
-                    "a.b.c", "", "string", null, false, false,
+                    "a.b.c", "", "string", false, false,
                     Attributes()
                 )
             )
