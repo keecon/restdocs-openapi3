@@ -423,6 +423,7 @@ object OpenApi3Generator {
             path = parameterDescriptor.name,
             description = parameterDescriptor.description,
             type = parameterDescriptor.type,
+            format = parameterDescriptor.format,
             optional = parameterDescriptor.optional,
             ignored = parameterDescriptor.ignored,
             attributes = parameterDescriptor.attributes
@@ -474,12 +475,14 @@ object OpenApi3Generator {
             }
             SimpleType.STRING.name.lowercase() -> StringSchema().apply {
                 this._default(parameterDescriptor.defaultValue?.let { it as String })
+                parameterDescriptor.format?.let { this.format = it }
                 parameterDescriptor.attributes.enumValues
                     .map { it as String }
                     .forEach { this.addEnumItem(it) }
             }
             SimpleType.NUMBER.name.lowercase() -> NumberSchema().apply {
                 this._default(parameterDescriptor.defaultValue?.let { it as BigDecimal })
+                parameterDescriptor.format?.let { this.format = it }
                 parameterDescriptor.attributes.enumValues
                     .map {
                         when (it) {
@@ -492,6 +495,7 @@ object OpenApi3Generator {
             }
             SimpleType.INTEGER.name.lowercase() -> IntegerSchema().apply {
                 this._default(parameterDescriptor.defaultValue?.let { it as Int })
+                parameterDescriptor.format?.let { this.format = it }
                 parameterDescriptor.attributes.enumValues
                     .map { it as Int }
                     .forEach { this.addEnumItem(it) }

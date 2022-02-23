@@ -172,12 +172,16 @@ class ResourceSnippetTest {
         thenSnippetFileExists()
         then(resourceSnippetJson.read<List<*>>("request.pathParameters")).hasSize(2)
         then(resourceSnippetJson.read<String>("request.pathParameters[0].name")).isEqualTo("no")
-        then(resourceSnippetJson.read<String>("request.pathParameters[0].type")).isEqualTo(SimpleType.INTEGER.name)
-        then(resourceSnippetJson.read<String>("request.pathParameters[0].description")).isEqualTo("number")
+        then(resourceSnippetJson.read<String>("request.pathParameters[0].type"))
+            .isEqualTo(SimpleType.INTEGER.name)
+        then(resourceSnippetJson.read<String>("request.pathParameters[0].description"))
+            .isEqualTo("number description")
         then(resourceSnippetJson.read<Boolean>("request.pathParameters[0].optional")).isFalse
         then(resourceSnippetJson.read<String>("request.pathParameters[1].name")).isEqualTo("type")
-        then(resourceSnippetJson.read<String>("request.pathParameters[1].type")).isEqualTo(SimpleType.STRING.name)
-        then(resourceSnippetJson.read<String>("request.pathParameters[1].description")).isEqualTo("type enum string")
+        then(resourceSnippetJson.read<String>("request.pathParameters[1].type"))
+            .isEqualTo(SimpleType.STRING.name)
+        then(resourceSnippetJson.read<String>("request.pathParameters[1].description"))
+            .isEqualTo("type enum description")
         then(resourceSnippetJson.read<Boolean>("request.pathParameters[1].optional")).isFalse
         then(resourceSnippetJson.read<List<String>>("request.pathParameters[1].attributes.enumValues"))
             .isEqualTo(listOf("T1", "T2", "T3"))
@@ -186,13 +190,14 @@ class ResourceSnippetTest {
         then(resourceSnippetJson.read<String>("request.requestParameters[0].name")).isEqualTo("numberParameter")
         then(resourceSnippetJson.read<String>("request.requestParameters[0].type"))
             .isEqualTo(SimpleType.INTEGER.name)
-        then(resourceSnippetJson.read<String>("request.requestParameters[0].description")).isEqualTo("number")
+        then(resourceSnippetJson.read<String>("request.requestParameters[0].description"))
+            .isEqualTo("number description")
         then(resourceSnippetJson.read<Boolean>("request.requestParameters[0].optional")).isFalse
         then(resourceSnippetJson.read<String>("request.requestParameters[1].name")).isEqualTo("categoryParameter")
         then(resourceSnippetJson.read<String>("request.requestParameters[1].type"))
             .isEqualTo(SimpleType.STRING.name)
         then(resourceSnippetJson.read<String>("request.requestParameters[1].description"))
-            .isEqualTo("category enum string")
+            .isEqualTo("category enum description")
         then(resourceSnippetJson.read<Boolean>("request.requestParameters[1].optional")).isFalse
         then(resourceSnippetJson.read<List<String>>("request.requestParameters[1].attributes.enumValues"))
             .isEqualTo(listOf("C1", "C2", "C3"))
@@ -271,9 +276,10 @@ class ResourceSnippetTest {
     }
 
     private fun givenRequestAndResponseHeaderDescriptors() {
-        val headerDescriptor =
-            ResourceDocumentation.headerWithName("X-SOME").type(SimpleType.STRING).defaultValue("default-value")
-                .description("some")
+        val headerDescriptor = ResourceDocumentation.headerWithName("X-SOME")
+            .type(SimpleType.STRING)
+            .defaultValue("default-value")
+            .description("some")
         parametersBuilder.requestHeaders(headerDescriptor)
         parametersBuilder.responseHeaders(HeaderDocumentation.headerWithName("X-SOME").description("some"))
     }
@@ -427,8 +433,8 @@ class ResourceSnippetTest {
 
     private fun givenPathParameterDescriptorsHasAttributes() {
         parametersBuilder.pathParameters(
-            parameterWithName("no").type(SimpleType.INTEGER).description("number"),
-            parameterWithName("type").description("type enum string").attributes(
+            parameterWithName("no").type(SimpleType.INTEGER).description("number description"),
+            parameterWithName("type").description("type enum description").attributes(
                 Attributes.key("enumValues").value(arrayOf("T1", "T2", "T3"))
             )
         )
@@ -436,8 +442,8 @@ class ResourceSnippetTest {
 
     private fun givenRequestParameterDescriptorsHasAttributes() {
         parametersBuilder.requestParameters(
-            parameterWithName("numberParameter").type(SimpleType.INTEGER).description("number"),
-            parameterWithName("categoryParameter").description("category enum string").attributes(
+            parameterWithName("numberParameter").type(SimpleType.INTEGER).description("number description"),
+            parameterWithName("categoryParameter").description("category enum description").attributes(
                 Attributes.key("enumValues").value(arrayOf("C1", "C2", "C3"))
             )
         )

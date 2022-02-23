@@ -84,7 +84,8 @@ enum class SimpleType {
     STRING,
     INTEGER,
     NUMBER,
-    BOOLEAN
+    BOOLEAN,
+    ARRAY,
 }
 
 /**

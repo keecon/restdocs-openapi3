@@ -10,6 +10,7 @@ import com.keecon.restdocs.apispec.jsonschema.ConstraintResolver.maybeMinSizeArr
 import com.keecon.restdocs.apispec.jsonschema.ConstraintResolver.maybePattern
 import com.keecon.restdocs.apispec.jsonschema.ConstraintResolver.minLengthString
 import com.keecon.restdocs.apispec.jsonschema.ConstraintResolver.minNumber
+import com.keecon.restdocs.apispec.model.AbstractDescriptor
 import com.keecon.restdocs.apispec.model.Attributes
 import com.keecon.restdocs.apispec.model.FieldDescriptor
 import org.everit.json.schema.ArraySchema
@@ -17,6 +18,7 @@ import org.everit.json.schema.BooleanSchema
 import org.everit.json.schema.CombinedSchema
 import org.everit.json.schema.EmptySchema
 import org.everit.json.schema.EnumSchema
+import org.everit.json.schema.FormatValidator
 import org.everit.json.schema.NullSchema
 import org.everit.json.schema.NumberSchema
 import org.everit.json.schema.ObjectSchema
@@ -158,7 +160,6 @@ class JsonSchemaFromFieldDescriptorsGenerator {
             traversedSegments.add(remainingSegments[0])
             builder.addPropertySchema(
                 propertyName,
-
                 ArraySchema.builder()
                     .allItemSchema(traverse(traversedSegments, fields, ObjectSchema.builder()))
                     .applyConstraints(propertyField?.fieldDescriptor)
@@ -194,68 +195,38 @@ class JsonSchemaFromFieldDescriptorsGenerator {
         path: String,
         description: String,
         type: String,
+        format: String?,
         optional: Boolean,
         ignored: Boolean,
         attributes: Attributes,
-        private val jsonSchemaPrimitiveTypes: Set<String> = setOf(
-            jsonSchemaPrimitiveTypeFromDescriptorType(
-                type
-            )
+        private val schemaBuilders: Set<Schema.Builder<*>> = setOf(
+            typeSchemaBuilder(
+                jsonSchemaType(type),
+                FieldDescriptor(path, description, type, format, optional, ignored, attributes)
+            ),
         )
-    ) : FieldDescriptor(path, description, type, optional, ignored, attributes) {
+    ) : FieldDescriptor(path, description, type, format, optional, ignored, attributes) {
 
         fun jsonSchemaType(): Schema {
-            val schemaBuilders = jsonSchemaPrimitiveTypes.map { typeToSchema(it) }
-            return if (schemaBuilders.size == 1) schemaBuilders.first().description(description).build()
-            else CombinedSchema.oneOf(schemaBuilders.map { it.build() }).description(description).build()
+            val builder = if (schemaBuilders.size == 1) schemaBuilders.first()
+            else CombinedSchema.oneOf(schemaBuilders.map { it.build() })
+            return builder.description(description).build()
         }
 
-        fun merge(fieldDescriptor: FieldDescriptor): FieldDescriptorWithSchemaType {
-            if (this.path != fieldDescriptor.path)
+        fun merge(other: FieldDescriptor): FieldDescriptorWithSchemaType {
+            if (this.path != other.path)
                 throw IllegalArgumentException("path of fieldDescriptor is not equal to ${this.path}")
 
             return FieldDescriptorWithSchemaType(
-                path = path,
-                description = description,
-                type = type,
-                optional = this.optional || fieldDescriptor.optional, // optional if one it optional
-                ignored = this.ignored && fieldDescriptor.optional, // ignored if both are optional
-                attributes = attributes,
-                jsonSchemaPrimitiveTypes = jsonSchemaPrimitiveTypes + jsonSchemaPrimitiveTypeFromDescriptorType(
-                    fieldDescriptor.type
-                )
+                path = this.path,
+                description = this.description,
+                type = this.type,
+                format = this.format ?: other.format,
+                optional = this.optional || other.optional, // optional if one it optional
+                ignored = this.ignored && other.optional, // ignored if both are optional
+                attributes = this.attributes,
+                schemaBuilders = this.schemaBuilders + typeSchemaBuilder(jsonSchemaType(other.type), other)
             )
-        }
-
-        private fun typeToSchema(type: String): Schema.Builder<*> =
-            when (type) {
-                "null" -> NullSchema.builder()
-                "empty" -> EmptySchema.builder()
-                "object" -> ObjectSchema.builder()
-                "array" -> ArraySchema.builder().applyConstraints(this).allItemSchema(arrayItemsSchema())
-                "boolean" -> BooleanSchema.builder()
-                "number" -> NumberSchema.builder().applyConstraints(this)
-                "string" -> StringSchema.builder().applyConstraints(this)
-                "enum" -> CombinedSchema.oneOf(
-                    listOf(
-                        StringSchema.builder().build(),
-                        EnumSchema.builder().possibleValues(this.attributes.enumValues).build()
-                    )
-                ).isSynthetic(true)
-                else -> throw IllegalArgumentException("unknown field type $type")
-            }
-
-        private fun arrayItemsSchema(): Schema {
-            return attributes.itemsType
-                ?.let { typeToSchema(it.lowercase()).build() }
-                ?: CombinedSchema.oneOf(
-                    listOf(
-                        ObjectSchema.builder().build(),
-                        BooleanSchema.builder().build(),
-                        StringSchema.builder().build(),
-                        NumberSchema.builder().build()
-                    )
-                ).build()
         }
 
         fun equalsOnPathAndType(f: FieldDescriptorWithSchemaType): Boolean =
@@ -267,30 +238,82 @@ class JsonSchemaFromFieldDescriptorsGenerator {
                     path = fieldDescriptor.path,
                     description = fieldDescriptor.description,
                     type = fieldDescriptor.type,
+                    format = fieldDescriptor.format,
                     optional = fieldDescriptor.optional,
                     ignored = fieldDescriptor.ignored,
                     attributes = fieldDescriptor.attributes
                 )
 
-            private fun jsonSchemaPrimitiveTypeFromDescriptorType(fieldDescriptorType: String) =
-                fieldDescriptorType.lowercase()
-                    .let { if (it == "varies") "empty" else it } // varies are used by spring rest docs if the type is ambiguous - in json schema we want to represent as empty
+            private fun typeSchemaBuilder(type: String, descriptor: AbstractDescriptor): Schema.Builder<*> =
+                when (type) {
+                    "null" -> NullSchema.builder()
+                    "empty" -> EmptySchema.builder()
+                    "object" -> ObjectSchema.builder()
+                    "array" -> ArraySchema.builder()
+                        .applyConstraints(descriptor)
+                        .allItemSchema(arrayItemsSchema(descriptor))
+                    "boolean" -> BooleanSchema.builder()
+                    "number" -> NumberSchema.builder()
+                        .applyConstraints(descriptor)
+                        .applyFormat(descriptor)
+                    "string" -> StringSchema.builder()
+                        .applyConstraints(descriptor)
+                        .applyFormat(descriptor)
+                    "enum" -> CombinedSchema.oneOf(
+                        listOf(
+                            StringSchema.builder().build(),
+                            EnumSchema.builder().possibleValues(descriptor.attributes.enumValues).build()
+                        )
+                    ).isSynthetic(true)
+                    else -> throw IllegalArgumentException("unknown field type $type")
+                }
+
+            private fun arrayItemsSchema(descriptor: AbstractDescriptor): Schema {
+                return descriptor.attributes.items
+                    ?.let { typeSchemaBuilder(jsonSchemaType(it.type.lowercase()), it).build() }
+                    ?: CombinedSchema.oneOf(
+                        listOf(
+                            ObjectSchema.builder().build(),
+                            BooleanSchema.builder().build(),
+                            StringSchema.builder().build(),
+                            NumberSchema.builder().build()
+                        )
+                    ).build()
+            }
+
+            private fun jsonSchemaType(descriptorType: String) =
+                // varies are used by spring rest docs if the type is ambiguous - in json schema we want to represent as empty
+                descriptorType.lowercase().let { if (it == "varies") "empty" else it }
         }
     }
 }
 
-private fun StringSchema.Builder.applyConstraints(fieldDescriptor: FieldDescriptor) = apply {
-    minLength(minLengthString(fieldDescriptor))
-    maxLength(maxLengthString(fieldDescriptor))
-    maybePattern(fieldDescriptor)?.let { pattern(it) }
+private fun ArraySchema.Builder.applyConstraints(descriptor: AbstractDescriptor?) = apply {
+    minItems(maybeMinSizeArray(descriptor))
+    maxItems(maybeMaxSizeArray(descriptor))
 }
 
-private fun ArraySchema.Builder.applyConstraints(fieldDescriptor: FieldDescriptor?) = apply {
-    minItems(maybeMinSizeArray(fieldDescriptor))
-    maxItems(maybeMaxSizeArray(fieldDescriptor))
+private fun StringSchema.Builder.applyConstraints(descriptor: AbstractDescriptor) = apply {
+    minLength(minLengthString(descriptor))
+    maxLength(maxLengthString(descriptor))
+    maybePattern(descriptor)?.let { pattern(it) }
 }
 
-private fun NumberSchema.Builder.applyConstraints(fieldDescriptor: FieldDescriptor) = apply {
-    minNumber(fieldDescriptor)?.let { minimum(it) }
-    maxNumber(fieldDescriptor)?.let { maximum(it) }
+private fun NumberSchema.Builder.applyConstraints(descriptor: AbstractDescriptor) = apply {
+    minNumber(descriptor)?.let { minimum(it) }
+    maxNumber(descriptor)?.let { maximum(it) }
+}
+
+private fun StringSchema.Builder.applyFormat(descriptor: AbstractDescriptor) = apply {
+    formatValidator(
+        descriptor.format?.let { FormatValidator.forFormat(it) } ?: FormatValidator.NONE
+    )
+}
+
+private fun NumberSchema.Builder.applyFormat(descriptor: AbstractDescriptor) = apply {
+    descriptor.format?.let {
+        if (it == "int32" || it == "int64") {
+            requiresInteger(true)
+        }
+    }
 }
