@@ -161,8 +161,8 @@ enum class EncodingStyle {
 // https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.1.md#encoding-object
 data class Encoding(
     val style: String,
-    val explode: Boolean?,
-    val allowReserved: Boolean?,
+    val explode: Boolean? = null,
+    val allowReserved: Boolean? = null,
 )
 
 data class SecurityRequirements(

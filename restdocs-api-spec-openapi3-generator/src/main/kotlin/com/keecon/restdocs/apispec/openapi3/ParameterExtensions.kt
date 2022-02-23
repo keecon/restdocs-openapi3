@@ -8,7 +8,7 @@ import io.swagger.v3.oas.models.parameters.Parameter
 internal object ParameterExtensions {
 
     internal fun Parameter.applyProperties(descriptor: AbstractDescriptor) = apply {
-        when (descriptor.attributes.encoding?.style) {
+        when (descriptor.attributes.encoding?.style?.lowercase()) {
             EncodingStyle.MATRIX.lowercase() -> style = Parameter.StyleEnum.MATRIX
             EncodingStyle.LABEL.lowercase() -> style = Parameter.StyleEnum.LABEL
             EncodingStyle.FORM.lowercase() -> style = Parameter.StyleEnum.FORM

@@ -5,6 +5,7 @@ import com.jayway.jsonpath.DocumentContext
 import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.Option
 import com.keecon.restdocs.apispec.model.Attributes
+import com.keecon.restdocs.apispec.model.Encoding
 import com.keecon.restdocs.apispec.model.FieldDescriptor
 import com.keecon.restdocs.apispec.model.HTTPMethod
 import com.keecon.restdocs.apispec.model.HeaderDescriptor
@@ -445,6 +446,8 @@ class OpenApi3GeneratorTest {
         }
         then(params).anyMatch {
             it["name"] == "X-SOME-ARRAY" &&
+                it["style"] == "simple" &&
+                it["explode"] == false &&
                 (it["schema"] as LinkedHashMap<*, *>)["type"] == "array" &&
                 ((it["schema"] as LinkedHashMap<*, *>)["items"] as LinkedHashMap<*, *>)["type"] == "integer" &&
                 ((it["schema"] as LinkedHashMap<*, *>)["items"] as LinkedHashMap<*, *>)["enum"] == listOf(1, 2, 3, 4, 5)
@@ -471,6 +474,8 @@ class OpenApi3GeneratorTest {
         }
         then(params).anyMatch {
             it["name"] == "arrayParameter" &&
+                it["style"] == "form" &&
+                it["explode"] == true &&
                 (it["schema"] as LinkedHashMap<*, *>)["type"] == "array" &&
                 ((it["schema"] as LinkedHashMap<*, *>)["items"] as LinkedHashMap<*, *>)["type"] == "string" &&
                 ((it["schema"] as LinkedHashMap<*, *>)["items"] as LinkedHashMap<*, *>)["enum"] ==
@@ -1537,7 +1542,7 @@ class OpenApi3GeneratorTest {
                     name = "X-SOME-BOOLEAN",
                     description = "a header boolean parameter",
                     type = "BOOLEAN",
-                    optional = true,
+                    optional = false,
                     attributes = Attributes(
                         enumValues = listOf(true, false)
                     )
@@ -1546,7 +1551,7 @@ class OpenApi3GeneratorTest {
                     name = "X-SOME-STRING",
                     description = "a header string parameter",
                     type = "STRING",
-                    optional = true,
+                    optional = false,
                     attributes = Attributes(
                         enumValues = listOf("HV1", "HV2")
                     )
@@ -1581,6 +1586,10 @@ class OpenApi3GeneratorTest {
                                 enumValues = listOf(1, 2, 3, 4, 5),
                             )
                         ),
+                        encoding = Encoding(
+                            style = "SIMPLE",
+                            explode = false,
+                        ),
                     )
                 ),
             ),
@@ -1589,7 +1598,7 @@ class OpenApi3GeneratorTest {
                     name = "booleanParameter",
                     description = "a boolean parameter",
                     type = "BOOLEAN",
-                    optional = true,
+                    optional = false,
                     ignored = false,
                     attributes = Attributes(
                         enumValues = listOf(true, false)
@@ -1599,7 +1608,7 @@ class OpenApi3GeneratorTest {
                     name = "stringParameter",
                     description = "a string parameter",
                     type = "STRING",
-                    optional = true,
+                    optional = false,
                     ignored = false,
                     attributes = Attributes(
                         enumValues = listOf("PV1", "PV2", "PV3")
@@ -1637,6 +1646,10 @@ class OpenApi3GeneratorTest {
                             attributes = Attributes(
                                 enumValues = listOf("LV1", "LV2", "LV3")
                             )
+                        ),
+                        encoding = Encoding(
+                            style = "FORM",
+                            explode = true,
                         ),
                     )
                 ),
