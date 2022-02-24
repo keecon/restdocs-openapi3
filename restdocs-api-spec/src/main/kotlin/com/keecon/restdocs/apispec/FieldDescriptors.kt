@@ -15,10 +15,10 @@ class FieldDescriptors {
         this.fieldDescriptors = fieldDescriptors
     }
 
-    fun and(vararg additionalDescriptors: FieldDescriptor): FieldDescriptors =
+    fun and(vararg additionalDescriptors: FieldDescriptor) =
         andWithPrefix("", *additionalDescriptors)
 
-    fun andWithPrefix(pathPrefix: String, vararg additionalDescriptors: FieldDescriptor): FieldDescriptors =
+    fun andWithPrefix(pathPrefix: String, vararg additionalDescriptors: FieldDescriptor) =
         FieldDescriptors(
             fieldDescriptors + applyPathPrefix(
                 pathPrefix,

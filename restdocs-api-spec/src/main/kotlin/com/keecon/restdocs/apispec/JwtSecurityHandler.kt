@@ -17,14 +17,11 @@ internal class JwtSecurityHandler : SecurityRequirementsExtractor {
         if (!hasJWTBearer(operation)) return null
 
         val scopes = extractScopes(operation)
-        return if (scopes.isNotEmpty()) {
-            Oauth2(scopes)
-        } else JWTBearer
+        return if (scopes.isNotEmpty()) Oauth2(scopes) else JWTBearer
     }
 
     private fun hasJWTBearer(operation: Operation): Boolean {
-        return getJWT(operation)
-            .any { isJWT(it) }
+        return getJWT(operation).any { isJWT(it) }
     }
 
     private fun getJWT(operation: Operation) = operation.request.headers
@@ -39,8 +36,7 @@ internal class JwtSecurityHandler : SecurityRequirementsExtractor {
             val jwtHeader = jwtParts[0]
             val decodedJwtHeader = String(Base64.getDecoder().decode(jwtHeader))
             try {
-                return ObjectMapper().readValue<Map<String, Any>>(decodedJwtHeader)
-                    .containsKey("alg")
+                return ObjectMapper().readValue<Map<String, Any>>(decodedJwtHeader).containsKey("alg")
             } catch (e: IOException) {
                 // probably not JWT
             }
@@ -49,8 +45,7 @@ internal class JwtSecurityHandler : SecurityRequirementsExtractor {
     }
 
     private fun extractScopes(operation: Operation): List<String> {
-        return getJWT(operation)
-            .flatMap { jwt2scopes(it) }
+        return getJWT(operation).flatMap { jwt2scopes(it) }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -62,9 +57,8 @@ internal class JwtSecurityHandler : SecurityRequirementsExtractor {
             try {
                 val jwtMap = ObjectMapper().readValue<Map<String, Any>>(decodedPayload)
                 val scope = jwtMap["scope"]
-                if (scope is List<*>) {
+                if (scope is List<*>)
                     return scope as List<String>
-                }
             } catch (e: IOException) {
                 // probably not JWT
             }

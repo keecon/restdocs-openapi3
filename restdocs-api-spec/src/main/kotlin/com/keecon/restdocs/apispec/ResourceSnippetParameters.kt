@@ -38,7 +38,6 @@ data class ResourceSnippetParameters @JvmOverloads constructor(
         fun builder() = ResourceSnippetParametersBuilder()
 
         private fun toFieldDescriptor(linkDescriptor: LinkDescriptor): FieldDescriptor {
-
             var descriptor = createLinkFieldDescriptor(linkDescriptor.rel)
                 .description(linkDescriptor.description)
                 .type(JsonDataType.VARIES)
@@ -54,7 +53,6 @@ data class ResourceSnippetParameters @JvmOverloads constructor(
             if (linkDescriptor.isIgnored) {
                 descriptor = descriptor.ignored()
             }
-
             return descriptor
         }
 
@@ -133,12 +131,11 @@ class HeaderDescriptorWithType(val name: String) : AbstractDescriptor<HeaderDesc
 
     companion object {
         fun fromHeaderDescriptor(headerDescriptor: HeaderDescriptor) =
-            HeaderDescriptorWithType(headerDescriptor.name)
-                .apply {
-                    description(headerDescriptor.description)
-                    attributes.putAll(headerDescriptor.attributes)
-                    if (headerDescriptor.isOptional) optional()
-                }
+            HeaderDescriptorWithType(headerDescriptor.name).apply {
+                description(headerDescriptor.description)
+                attributes.putAll(headerDescriptor.attributes)
+                if (headerDescriptor.isOptional) optional()
+            }
     }
 }
 
@@ -165,13 +162,12 @@ class ParameterDescriptorWithType(val name: String) : IgnorableDescriptor<Parame
 
     companion object {
         fun fromParameterDescriptor(parameterDescriptor: ParameterDescriptor) =
-            ParameterDescriptorWithType(parameterDescriptor.name)
-                .apply {
-                    description(parameterDescriptor.description)
-                    attributes.putAll(parameterDescriptor.attributes)
-                    if (parameterDescriptor.isOptional) optional()
-                    if (parameterDescriptor.isIgnored) ignored()
-                }
+            ParameterDescriptorWithType(parameterDescriptor.name).apply {
+                description(parameterDescriptor.description)
+                attributes.putAll(parameterDescriptor.attributes)
+                if (parameterDescriptor.isOptional) optional()
+                if (parameterDescriptor.isIgnored) ignored()
+            }
     }
 }
 
@@ -259,8 +255,9 @@ class ResourceSnippetParametersBuilder : ResourceSnippetDetails() {
     fun requestParameters(vararg requestParameters: ParameterDescriptorWithType) =
         requestParameters(requestParameters.toList())
 
-    fun requestParameters(requestParameters: List<ParameterDescriptorWithType>) =
-        apply { this.requestParameters = requestParameters }
+    fun requestParameters(requestParameters: List<ParameterDescriptorWithType>) = apply {
+        this.requestParameters = requestParameters
+    }
 
     fun requestParameters(vararg requestParameters: ParameterDescriptor) = requestParameters(
         requestParameters.map {
@@ -277,8 +274,9 @@ class ResourceSnippetParametersBuilder : ResourceSnippetDetails() {
             }
         )
 
-    fun responseHeaders(responseHeaders: List<HeaderDescriptorWithType>) =
-        apply { this.responseHeaders = responseHeaders }
+    fun responseHeaders(responseHeaders: List<HeaderDescriptorWithType>) = apply {
+        this.responseHeaders = responseHeaders
+    }
 
     fun responseHeaders(vararg responseHeaders: HeaderDescriptorWithType) = responseHeaders(responseHeaders.toList())
     fun responseHeaders(vararg responseHeaders: HeaderDescriptor) = responseHeaders(

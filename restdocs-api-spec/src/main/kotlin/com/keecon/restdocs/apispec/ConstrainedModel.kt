@@ -21,42 +21,37 @@ class ConstrainedModel(private val rootType: Class<*>) {
      * Create a field description with constraints for bean property with the same name
      * @param path json path of the field
      */
-    fun withPath(path: String): FieldDescriptor = withMappedPath(path, path)
+    fun withPath(path: String) = withMappedPath(path, path)
 
     /**
      * Create a parameter description with constraints for bean property with the same name
      * @param name name of the parameter
      */
-    fun withName(name: String): ParameterDescriptor = withMappedName(name, name)
+    fun withName(name: String) = withMappedName(name, name)
 
     /**
      * Create a field description with constraints for bean property with a name differing from the path
      * @param path json path of the field
      * @param propsPath name of the property of the bean that is used to get the field constraints
      */
-    fun withMappedPath(path: String, propsPath: String): FieldDescriptor =
-        addConstraints(fieldWithPath(path), propsPath)
+    fun withMappedPath(path: String, propsPath: String) = addConstraints(fieldWithPath(path), propsPath)
 
     /**
      * Create a parameter description with constraints for bean property with a name differing from the name
      * @param name name of the parameter
      * @param propsPath name of the property of the bean that is used to get the parameter constraints
      */
-    fun withMappedName(name: String, propsPath: String): ParameterDescriptor =
-        addConstraints(parameterWithName(name), propsPath)
+    fun withMappedName(name: String, propsPath: String) = addConstraints(parameterWithName(name), propsPath)
 
     private fun <T : AbstractDescriptor<T>> addConstraints(descriptor: T, propsPath: String): T {
         val (propName, objectType) = propertyWithObjectType(propsPath)
-        if (objectType == null) {
-            return descriptor
-        }
+        if (objectType == null) return descriptor
 
         val propType = propertyType(objectType, propName)
         if (propType?.isEnum == true) {
-            // TODO(iwaltgen): array type?
-            if (descriptor is FieldDescriptor) {
-                descriptor.type(ENUM_TYPE)
-            }
+            // TODO(iwaltgen): array type possible?
+            if (descriptor is FieldDescriptor) descriptor.type(ENUM_TYPE)
+
             descriptor.attributes(
                 Attributes.key(ENUM_VALUES_KEY).value(propType.enumConstants.map(Any::toString))
             )

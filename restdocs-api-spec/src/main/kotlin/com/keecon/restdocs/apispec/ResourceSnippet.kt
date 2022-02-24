@@ -33,12 +33,7 @@ class ResourceSnippet(private val resourceSnippetParameters: ResourceSnippetPara
 
         val model = createModel(operation, placeholderResolverFactory, context)
 
-        (
-            StandardWriterResolver(
-                placeholderResolverFactory, Charsets.UTF_8.name(),
-                JsonTemplateFormat
-            )
-            )
+        StandardWriterResolver(placeholderResolverFactory, Charsets.UTF_8.name(), JsonTemplateFormat)
             .resolve(operation.name, "resource", context)
             .use { it.append(objectMapper.writeValueAsString(model)) }
     }
@@ -97,14 +92,12 @@ class ResourceSnippet(private val resourceSnippetParameters: ResourceSnippetPara
         )
     }
 
-    private fun List<HeaderDescriptorWithType>.withExampleValues(headers: HttpHeaders): List<HeaderDescriptorWithType> {
+    private fun List<HeaderDescriptorWithType>.withExampleValues(headers: HttpHeaders) = apply {
         this.map { it.withExample(headers) }
-        return this
     }
 
-    private fun HeaderDescriptorWithType.withExample(headers: HttpHeaders): HeaderDescriptorWithType {
+    private fun HeaderDescriptorWithType.withExample(headers: HttpHeaders) = apply {
         headers.getFirst(name)?.also { example = it }
-        return this
     }
 
     private fun getUriComponents(operation: Operation) =
@@ -112,10 +105,9 @@ class ResourceSnippet(private val resourceSnippetParameters: ResourceSnippetPara
             .map { UriComponentsBuilder.fromUriString(it).build() }
             .orElseThrow { MissingUrlTemplateException() }
 
-    private fun getUriPath(operation: Operation) =
-        getUriComponents(operation).path
+    private fun getUriPath(operation: Operation) = getUriComponents(operation).path
 
-    private fun getContentTypeOrDefault(headers: HttpHeaders): String =
+    private fun getContentTypeOrDefault(headers: HttpHeaders) =
         Optional.ofNullable(headers.contentType)
             .map { MediaType(it.type, it.subtype, it.parameters) }
             .orElse(APPLICATION_JSON)

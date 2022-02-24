@@ -10,10 +10,9 @@ internal class SecurityRequirementsHandler {
         JwtSecurityHandler()
     )
 
-    fun extractSecurityRequirements(operation: Operation): SecurityRequirements? {
-        return handlers.map { it.extractSecurityRequirements(operation) }
-            .firstOrNull { it != null }
-    }
+    fun extractSecurityRequirements(operation: Operation) = handlers
+        .map { it.extractSecurityRequirements(operation) }
+        .firstOrNull { it != null }
 }
 
 internal interface SecurityRequirementsExtractor {
@@ -21,26 +20,21 @@ internal interface SecurityRequirementsExtractor {
 }
 
 internal class BasicSecurityHandler : SecurityRequirementsExtractor {
-    override fun extractSecurityRequirements(operation: Operation): SecurityRequirements? {
-        return if (isBasicSecurity(operation)) {
-            Basic
-        } else null
-    }
+    override fun extractSecurityRequirements(operation: Operation) =
+        if (isBasicSecurity(operation)) Basic
+        else null
 
-    private fun isBasicSecurity(operation: Operation): Boolean {
-        return operation.request.headers
-            .filterKeys { it == HttpHeaders.AUTHORIZATION }
-            .flatMap { it.value }
-            .any { it.startsWith("Basic ") }
-    }
+    private fun isBasicSecurity(operation: Operation) = operation.request.headers
+        .filterKeys { it == HttpHeaders.AUTHORIZATION }
+        .flatMap { it.value }
+        .any { it.startsWith("Basic ") }
 }
 
 internal interface SecurityRequirements {
     val type: SecurityType
 }
 
-internal data class Oauth2(val requiredScopes: List<String>) :
-    SecurityRequirements {
+internal data class Oauth2(val requiredScopes: List<String>) : SecurityRequirements {
     override val type = SecurityType.OAUTH2
 }
 

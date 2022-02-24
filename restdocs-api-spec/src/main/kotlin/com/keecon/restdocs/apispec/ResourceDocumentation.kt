@@ -17,9 +17,7 @@ object ResourceDocumentation {
     @JvmStatic
     fun resource(description: String): ResourceSnippet {
         return ResourceSnippet(
-            ResourceSnippetParameters.builder().description(
-                description
-            ).build()
+            ResourceSnippetParameters.builder().description(description).build()
         )
     }
 
