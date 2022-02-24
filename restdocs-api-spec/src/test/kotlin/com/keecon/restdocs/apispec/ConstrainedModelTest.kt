@@ -147,6 +147,20 @@ internal class ConstrainedModelTest {
             .containsExactly(NotBlank::class.java.name)
     }
 
+    @Test
+    @Suppress("UNCHECKED_CAST")
+    fun `should resolve possible enum values`() {
+        val model = ConstrainedModel(EnumConstrains::class.java)
+
+        var descriptor = model.withPath("someEnum")
+        then(descriptor.attributes).containsKey("validationConstraints")
+        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+            .containsExactly(NotBlank::class.java.name)
+        then((descriptor.attributes["enumValues"] as? List<String>)).isEqualTo(
+            listOf("FIRST_VALUE", "SECOND_VALUE", "THIRD_VALUE")
+        )
+    }
+
     private data class NonEmptyConstraints(
         @field:NotEmpty val nonEmpty: String,
         @field:Valid val nested: NonEmptyConstraints?,
@@ -165,4 +179,15 @@ internal class ConstrainedModelTest {
         @field:Valid @field:NotEmpty val nonEmptyList: List<NonEmptyConstraints>?,
         @field:Valid @field:NotEmpty val nonZeroNestedList: List<List<NonZeroConstrains>>?,
     )
+
+    private data class EnumConstrains(
+        @field:NotBlank val someEnum: SomeEnum,
+        // @field:NotEmpty val enumList: List<EnumValue>?,
+    )
+
+    private enum class SomeEnum {
+        FIRST_VALUE,
+        SECOND_VALUE,
+        THIRD_VALUE
+    }
 }

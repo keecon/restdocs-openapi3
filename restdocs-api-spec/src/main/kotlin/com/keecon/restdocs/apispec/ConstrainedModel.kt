@@ -14,7 +14,7 @@ import java.lang.reflect.ParameterizedType
  * ConstrainedModel can be used to add constraint information to a [FieldDescriptor], [ParameterDescriptor]
  * If these are present in the descriptor they are used to enrich the generated type information (e.g. JsonSchema)
  */
-class ConstrainedModel(private val rootClass: Class<*>) {
+class ConstrainedModel(private val rootType: Class<*>) {
     private val validatorConstraintResolver = ValidatorConstraintResolver()
 
     /**
@@ -32,62 +32,85 @@ class ConstrainedModel(private val rootClass: Class<*>) {
     /**
      * Create a field description with constraints for bean property with a name differing from the path
      * @param path json path of the field
-     * @param propertyPath name of the property of the bean that is used to get the field constraints
+     * @param propsPath name of the property of the bean that is used to get the field constraints
      */
-    fun withMappedPath(path: String, propertyPath: String): FieldDescriptor =
-        addConstraints(fieldWithPath(path), propertyPath)
+    fun withMappedPath(path: String, propsPath: String): FieldDescriptor =
+        addConstraints(fieldWithPath(path), propsPath)
 
     /**
      * Create a parameter description with constraints for bean property with a name differing from the name
      * @param name name of the parameter
-     * @param propertyPath name of the property of the bean that is used to get the parameter constraints
+     * @param propsPath name of the property of the bean that is used to get the parameter constraints
      */
-    fun withMappedName(name: String, propertyPath: String): ParameterDescriptor =
-        addConstraints(parameterWithName(name), propertyPath)
+    fun withMappedName(name: String, propsPath: String): ParameterDescriptor =
+        addConstraints(parameterWithName(name), propsPath)
 
-    private fun <T : AbstractDescriptor<T>> addConstraints(descriptor: T, propertyPath: String): T {
-        val (propertyName, targetClass) = propertyNameWithClass(propertyPath)
-        if (targetClass == null) return descriptor
+    private fun <T : AbstractDescriptor<T>> addConstraints(descriptor: T, propsPath: String): T {
+        val (propName, objectType) = propertyWithObjectType(propsPath)
+        if (objectType == null) {
+            return descriptor
+        }
+
+        val propType = propertyType(objectType, propName)
+        if (propType?.isEnum == true) {
+            // TODO(iwaltgen): array type?
+            if (descriptor is FieldDescriptor) {
+                descriptor.type(ENUM_TYPE)
+            }
+            descriptor.attributes(
+                Attributes.key(ENUM_VALUES_KEY).value(propType.enumConstants.map(Any::toString))
+            )
+        }
 
         return descriptor.attributes(
             Attributes.key(CONSTRAINTS_KEY)
-                .value(this.validatorConstraintResolver.resolveForProperty(propertyName, targetClass))
+                .value(this.validatorConstraintResolver.resolveForProperty(actualPropName(propName), objectType))
         )
     }
 
-    private fun propertyNameWithClass(path: String): Pair<String, Class<*>?> {
-        val hierarchyPropertyNames = path.split(DOT_NOTATION_DELIMITER)
-        if (hierarchyPropertyNames.size == 1) return Pair(removeArraySymbol(path), rootClass)
+    private fun propertyWithObjectType(path: String): Pair<String, Class<*>?> {
+        val propNames = path.split(DOT_NOTATION_DELIMITER)
+        if (propNames.size == 1) return Pair(path, rootType)
 
-        var targetClass: Class<*>? = rootClass
-        for (name in hierarchyPropertyNames.filter { removeArraySymbol(it).isNotEmpty() }.dropLast(1)) {
-            var hierarchyClass = targetClass
-            val propertyName = removeArraySymbol(name)
-            while (hierarchyClass != null) {
-                val field = hierarchyClass.declaredFields.firstOrNull { it.name == propertyName }
-                if (field == null) hierarchyClass = hierarchyClass.superclass
-                else {
-                    targetClass = getFieldType(name, field)
-                    break
-                }
-            }
+        var objectType: Class<*>? = rootType
+        for (name in propNames.filter { actualPropName(it).isNotEmpty() }.dropLast(1)) {
+            propertyType(objectType, name)?.let { objectType = it }
         }
-        return Pair(removeArraySymbol(hierarchyPropertyNames.last()), targetClass)
+        return Pair(propNames.last(), objectType)
     }
 
-    private fun removeArraySymbol(name: String) = name.substringBefore(ARRAY_SYMBOL)
+    private fun propertyType(objectType: Class<*>?, name: String): Class<*>? {
+        var currentType = objectType
+        val propName = actualPropName(name)
+        while (currentType != null) {
+            val field = currentType.declaredFields.firstOrNull { it.name == propName }
+            if (field == null) currentType = currentType.superclass
+            else {
+                return fieldType(field, name)
+            }
+        }
+        return null
+    }
 
-    private fun getFieldType(name: String, field: Field) =
-        if (name.lastIndexOf(ARRAY_SYMBOL) == -1) field.type
-        else getArrayItemType(field)
+    private fun actualPropName(name: String) = name.substringBefore(ARRAY_SYMBOL)
 
-    private fun getArrayItemType(field: Field): Class<*>? {
+    private fun isArrayType(name: String) = name.lastIndexOf(ARRAY_SYMBOL) != -1
+
+    private fun fieldType(field: Field, name: String) =
+        if (!isArrayType(name)) field.type
+        else genericFirstItemType(field)
+
+    private fun genericFirstItemType(field: Field): Class<*>? {
         val type = field.genericType as? ParameterizedType
         return type?.actualTypeArguments?.first() as? Class<*>
     }
 
     companion object {
         private const val CONSTRAINTS_KEY = "validationConstraints"
+        private const val ENUM_VALUES_KEY = "enumValues"
+        // private const val ITEMS_KEY = "items"
+
+        private const val ENUM_TYPE = "enum"
         private const val DOT_NOTATION_DELIMITER = "."
         private const val ARRAY_SYMBOL = "[]"
     }
