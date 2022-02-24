@@ -45,7 +45,7 @@ internal class FieldDescriptorWithSchema(
             path = this.path,
             description = this.description,
             type = this.type,
-            optional = this.optional || other.optional, // optional if one it optional
+            optional = this.optional || other.optional, // optional if one is optional
             ignored = this.ignored && other.optional, // ignored if both are optional
             attributes = this.attributes,
             schemaBuilders = this.schemaBuilders + toSchemaBuilder(jsonSchemaType(other.type), other)

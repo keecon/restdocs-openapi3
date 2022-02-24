@@ -1,10 +1,9 @@
 package com.keecon.restdocs.apispec
 
+import com.keecon.restdocs.apispec.ResourceDocumentation.parameterWithName
 import org.springframework.restdocs.constraints.ValidatorConstraintResolver
 import org.springframework.restdocs.payload.FieldDescriptor
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.restdocs.request.ParameterDescriptor
-import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 import org.springframework.restdocs.snippet.AbstractDescriptor
 import org.springframework.restdocs.snippet.Attributes
 import java.lang.reflect.Field
@@ -34,14 +33,16 @@ class ConstrainedModel(private val rootType: Class<*>) {
      * @param path json path of the field
      * @param propsPath name of the property of the bean that is used to get the field constraints
      */
-    fun withMappedPath(path: String, propsPath: String) = addConstraints(fieldWithPath(path), propsPath)
+    fun withMappedPath(path: String, propsPath: String): FieldDescriptor =
+        addConstraints(fieldWithPath(path), propsPath)
 
     /**
      * Create a parameter description with constraints for bean property with a name differing from the name
      * @param name name of the parameter
      * @param propsPath name of the property of the bean that is used to get the parameter constraints
      */
-    fun withMappedName(name: String, propsPath: String) = addConstraints(parameterWithName(name), propsPath)
+    fun withMappedName(name: String, propsPath: String): ParameterDescriptorWithType =
+        addConstraints(parameterWithName(name), propsPath)
 
     private fun <T : AbstractDescriptor<T>> addConstraints(descriptor: T, propsPath: String): T {
         val (propName, objectType) = propertyWithObjectType(propsPath)
@@ -49,7 +50,6 @@ class ConstrainedModel(private val rootType: Class<*>) {
 
         val propType = propertyType(objectType, propName)
         if (propType?.isEnum == true) {
-            // TODO(iwaltgen): array type possible?
             if (descriptor is FieldDescriptor) descriptor.type(ENUM_TYPE)
 
             descriptor.attributes(
@@ -79,17 +79,18 @@ class ConstrainedModel(private val rootType: Class<*>) {
         val propName = actualPropName(name)
         while (currentType != null) {
             val field = currentType.declaredFields.firstOrNull { it.name == propName }
-            if (field == null) currentType = currentType.superclass
-            else {
+            if (field == null) {
+                currentType = currentType.superclass
+            } else {
                 return fieldType(field, name)
             }
         }
         return null
     }
 
-    private fun actualPropName(name: String) = name.substringBefore(ARRAY_SYMBOL)
+    private fun actualPropName(name: String) = name.substringBefore("[]")
 
-    private fun isArrayType(name: String) = name.lastIndexOf(ARRAY_SYMBOL) != -1
+    private fun isArrayType(name: String) = name.lastIndexOf("[]") != -1
 
     private fun fieldType(field: Field, name: String) =
         if (!isArrayType(name)) field.type
@@ -102,11 +103,8 @@ class ConstrainedModel(private val rootType: Class<*>) {
 
     companion object {
         private const val CONSTRAINTS_KEY = "validationConstraints"
-        private const val ENUM_VALUES_KEY = "enumValues"
-        // private const val ITEMS_KEY = "items"
-
-        private const val ENUM_TYPE = "enum"
         private const val DOT_NOTATION_DELIMITER = "."
-        private const val ARRAY_SYMBOL = "[]"
+        private const val ENUM_TYPE = "enum"
+        private const val ENUM_VALUES_KEY = "enumValues"
     }
 }

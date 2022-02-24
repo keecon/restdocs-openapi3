@@ -19,8 +19,8 @@ fun List<ResourceModel>.groupByPath(): Map<String, List<ResourceModel>> {
         Comparator.comparing<ResourceModel, String> {
             it.request.path.split("/").firstOrNull { s -> s.isNotEmpty() }.orEmpty()
         }
-            .thenComparing(Comparator.comparingInt<ResourceModel> { it.request.path.count { c -> c == '/' } })
-            .thenComparing(Comparator.comparing<ResourceModel, String> { it.request.path })
+            .thenComparing(Comparator.comparingInt { it.request.path.count { c -> c == '/' } })
+            .thenComparing(Comparator.comparing { it.request.path })
     )
         .groupBy { it.request.path }
 }
@@ -92,13 +92,6 @@ interface AbstractDescriptor {
     val optional: Boolean
     val attributes: Attributes
 }
-
-data class TypeDescriptor(
-    override val type: String,
-    override val description: String = "",
-    override val optional: Boolean = false,
-    override val attributes: Attributes = Attributes()
-) : AbstractDescriptor
 
 interface AbstractParameterDescriptor : AbstractDescriptor {
     val name: String

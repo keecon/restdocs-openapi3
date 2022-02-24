@@ -31,7 +31,7 @@ import java.io.File
 
 @ExtendWith(SpringExtension::class)
 @WebMvcTest
-class MockMvcRestDocumentationWrapperIntegrationTest(
+class DoSomethingIntegrationTest(
     @Autowired private val mockMvc: MockMvc
 ) : ResourceSnippetIntegrationTest() {
 
@@ -66,7 +66,9 @@ class MockMvcRestDocumentationWrapperIntegrationTest(
     fun should_value_ignored_fields_and_links() {
         givenEndpointInvoked()
 
-        assertThatCode { this.whenDocumentedWithAllFieldsLinksIgnored() }.doesNotThrowAnyException()
+        assertThatCode {
+            this.whenDocumentedWithAllFieldsLinksIgnored()
+        }.doesNotThrowAnyException()
     }
 
     @Test
@@ -107,28 +109,15 @@ class MockMvcRestDocumentationWrapperIntegrationTest(
 
     @Test
     fun should_document_request_with_null_field() {
-        givenEndpointInvoked("null")
+        givenEndpointInvoked(null)
 
-        assertThatCode { this.whenResourceSnippetDocumentedWithRequestAndResponseFields() }
-            .doesNotThrowAnyException()
+        assertThatCode {
+            this.whenResourceSnippetDocumentedWithRequestAndResponseFields()
+        }.doesNotThrowAnyException()
     }
 
-    private fun whenResourceSnippetDocumentedWithoutParameters() {
-        resultActions
-            .andDo(document(operationName, resource()))
-    }
-
-    private fun whenResourceSnippetDocumentedWithDescription() {
-        resultActions
-            .andDo(document(operationName, resource("A description")))
-    }
-
-    private fun whenResourceSnippetDocumentedWithRequestAndResponseFields() {
-        resultActions
-            .andDo(document(operationName, buildFullResourceSnippet()))
-    }
-
-    private fun givenEndpointInvoked(flagValue: String = "true") {
+    private fun givenEndpointInvoked(flagValue: Boolean? = true) {
+        operationName = "do-something-${System.currentTimeMillis()}"
         resultActions = mockMvc.perform(
             post("/some/{someId}/other/{otherId}", "id", 1)
                 .contentType(APPLICATION_JSON)
@@ -150,7 +139,7 @@ class MockMvcRestDocumentationWrapperIntegrationTest(
         with(generatedSnippetFile()) {
             then(this).exists()
             val contents = readText()
-            then(contents).isNotEmpty()
+            then(contents).isNotEmpty
         }
     }
 
@@ -176,7 +165,7 @@ class MockMvcRestDocumentationWrapperIntegrationTest(
                             fieldWithPath("comment").description("the comment"),
                             fieldWithPath("flag").description("the flag"),
                             fieldWithPath("count").description("the count"),
-                            fieldWithPath("id").description("id"),
+                            fieldWithPath("id").description("the id"),
                             subsectionWithPath("_links").ignored()
                         ),
                         responseHeaders(
@@ -197,7 +186,7 @@ class MockMvcRestDocumentationWrapperIntegrationTest(
             .andDo(
                 MockMvcRestDocumentationWrapper.document(
                     identifier = operationName,
-                    snippets = arrayOf(buildFullResourceSnippet())
+                    snippets = arrayOf(resource(buildResourceSnippetWithRequestFields()))
                 )
             )
     }
@@ -271,7 +260,7 @@ class MockMvcRestDocumentationWrapperIntegrationTest(
                             fieldWithPath("comment").description("the comment"),
                             fieldWithPath("flag").description("the flag"),
                             fieldWithPath("count").description("the count"),
-                            fieldWithPath("id").description("id"),
+                            fieldWithPath("id").description("unique id"),
                             subsectionWithPath("_links").ignored()
                         ),
                         links(
@@ -281,5 +270,17 @@ class MockMvcRestDocumentationWrapperIntegrationTest(
                     )
                 )
             )
+    }
+
+    private fun whenResourceSnippetDocumentedWithoutParameters() {
+        resultActions.andDo(document(operationName, resource()))
+    }
+
+    private fun whenResourceSnippetDocumentedWithDescription() {
+        resultActions.andDo(document(operationName, resource("A description")))
+    }
+
+    private fun whenResourceSnippetDocumentedWithRequestAndResponseFields() {
+        resultActions.doPrintAndDocument(buildResourceSnippetWithRequestFields())
     }
 }

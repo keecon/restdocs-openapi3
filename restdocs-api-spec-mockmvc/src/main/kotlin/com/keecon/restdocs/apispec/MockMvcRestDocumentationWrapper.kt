@@ -80,7 +80,15 @@ object MockMvcRestDocumentationWrapper : RestDocumentationWrapper() {
         requestPreprocessor: OperationRequestPreprocessor,
         vararg snippets: Snippet
     ): RestDocumentationResultHandler {
-        return document(identifier, null, null, false, false, requestPreprocessor, snippets = snippets)
+        return document(
+            identifier,
+            null,
+            null,
+            false,
+            false,
+            requestPreprocessor,
+            snippets = snippets
+        )
     }
 
     @JvmStatic
@@ -91,23 +99,6 @@ object MockMvcRestDocumentationWrapper : RestDocumentationWrapper() {
         vararg snippets: Snippet
     ): RestDocumentationResultHandler {
         return document(identifier, description, null, privateResource, snippets = snippets)
-    }
-
-    @JvmStatic
-    fun document(
-        identifier: String,
-        responsePreprocessor: OperationResponsePreprocessor,
-        vararg snippets: Snippet
-    ): RestDocumentationResultHandler {
-        return document(
-            identifier,
-            null,
-            null,
-            false,
-            false,
-            responsePreprocessor = responsePreprocessor,
-            snippets = snippets
-        )
     }
 
     @JvmStatic
@@ -130,7 +121,7 @@ object MockMvcRestDocumentationWrapper : RestDocumentationWrapper() {
     }
 
     @JvmStatic
-    fun resourceDetails(): ResourceSnippetDetails {
+    fun resourceDetails(): ResourceSnippetParametersBuilder {
         return ResourceSnippetParametersBuilder()
     }
 }
