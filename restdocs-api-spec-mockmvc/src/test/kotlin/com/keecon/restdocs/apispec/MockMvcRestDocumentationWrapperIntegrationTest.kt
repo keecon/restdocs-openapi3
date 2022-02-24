@@ -135,12 +135,13 @@ class MockMvcRestDocumentationWrapperIntegrationTest(
                 .header("X-Custom-Header", "test")
                 .accept(HAL_JSON)
                 .content(
-                    """{
-                            "comment": "some",
-                            "flag": $flagValue,
-                            "count": 1
-                        }
-                    """.trimIndent()
+                    """
+                    {
+                        "comment": "some",
+                        "flag": $flagValue,
+                        "count": 1
+                    }
+                    """
                 )
         ).andExpect(status().isOk)
     }

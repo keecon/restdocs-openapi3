@@ -2,7 +2,6 @@ package com.keecon.restdocs.apispec
 
 import com.keecon.restdocs.apispec.ResourceDocumentation.parameterWithName
 import com.keecon.restdocs.apispec.ResourceDocumentation.resource
-import org.hibernate.validator.constraints.Length
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -27,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 import javax.validation.constraints.NotEmpty
+import javax.validation.constraints.Size
 
 @ExtendWith(SpringExtension::class)
 @WebMvcTest
@@ -55,23 +55,23 @@ open class ResourceSnippetIntegrationTest {
                 @RequestBody testDataHolder: TestDataHolder
             ): ResponseEntity<EntityModel<TestDataHolder>> {
                 val resource = EntityModel.of(testDataHolder.copy(id = UUID.randomUUID().toString()))
-                val link =
-                    BasicLinkBuilder.linkToCurrentMapping().slash("some").slash(someId).slash("other").slash(otherId)
-                        .toUri().toString()
+                val link = BasicLinkBuilder.linkToCurrentMapping()
+                    .slash("some").slash(someId)
+                    .slash("other").slash(otherId)
+                    .toUri().toString()
                 resource.add(Link.of(link).withSelfRel())
                 resource.add(Link.of(link, "multiple"))
                 resource.add(Link.of(link, "multiple"))
 
-                return ResponseEntity
-                    .ok()
+                return ResponseEntity.ok()
                     .header("X-Custom-Header", customHeader)
-                    .body<EntityModel<TestDataHolder>>(resource)
+                    .body(resource)
             }
         }
     }
 
     internal data class TestDataHolder(
-        @field:Length(min = 1, max = 255)
+        @field:Size(min = 1, max = 255)
         val comment: String? = null,
         val flag: Boolean = false,
         val count: Int = 0,
@@ -81,7 +81,7 @@ open class ResourceSnippetIntegrationTest {
 }
 
 fun fieldDescriptors(): FieldDescriptors {
-    val fields = ConstrainedFields(ResourceSnippetIntegrationTest.TestDataHolder::class.java)
+    val fields = ConstrainedModel(ResourceSnippetIntegrationTest.TestDataHolder::class.java)
     return ResourceDocumentation.fields(
         fields.withPath("comment").description("the comment").optional(),
         fields.withPath("flag").description("the flag"),
