@@ -4,6 +4,7 @@ import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
 import org.springframework.restdocs.constraints.Constraint
 import javax.validation.Valid
+import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotEmpty
@@ -16,8 +17,8 @@ internal class ConstrainedModelTest {
         val model = ConstrainedModel(NonEmptyConstraints::class.java)
         val descriptor = model.withPath("nonEmpty")
 
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then(descriptor.attributes).containsKey(Attributes.CONSTRAINTS_KEY)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotEmpty::class.java.name)
     }
 
@@ -27,8 +28,8 @@ internal class ConstrainedModelTest {
         val model = ConstrainedModel(NonEmptyConstraints::class.java)
         val descriptor = model.withPath("nested.nonEmpty")
 
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then(descriptor.attributes).containsKey(Attributes.CONSTRAINTS_KEY)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotEmpty::class.java.name)
     }
 
@@ -38,8 +39,8 @@ internal class ConstrainedModelTest {
         val model = ConstrainedModel(NonEmptyConstraints::class.java)
         val descriptor = model.withPath("nested.nested.nonEmpty")
 
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then(descriptor.attributes).containsKey(Attributes.CONSTRAINTS_KEY)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotEmpty::class.java.name)
     }
 
@@ -49,8 +50,8 @@ internal class ConstrainedModelTest {
         val model = ConstrainedModel(NonEmptyConstraints::class.java)
         val descriptor = model.withName("nonEmpty")
 
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then(descriptor.attributes).containsKey(Attributes.CONSTRAINTS_KEY)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotEmpty::class.java.name)
     }
 
@@ -60,8 +61,8 @@ internal class ConstrainedModelTest {
         val model = ConstrainedModel(NonEmptyConstraints::class.java)
         val descriptor = model.withName("nested.nonEmpty")
 
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then(descriptor.attributes).containsKey(Attributes.CONSTRAINTS_KEY)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotEmpty::class.java.name)
     }
 
@@ -71,8 +72,8 @@ internal class ConstrainedModelTest {
         val model = ConstrainedModel(NonEmptyConstraints::class.java)
         val descriptor = model.withName("nested.nested.nonEmpty")
 
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then(descriptor.attributes).containsKey(Attributes.CONSTRAINTS_KEY)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotEmpty::class.java.name)
     }
 
@@ -82,83 +83,92 @@ internal class ConstrainedModelTest {
         val model = ConstrainedModel(CompositeConstrains::class.java)
 
         var descriptor = model.withPath("nonBlank")
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotBlank::class.java.name)
 
         descriptor = model.withPath("string.nonEmpty")
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotEmpty::class.java.name)
 
         descriptor = model.withPath("number.nonZero")
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(Min::class.java.name)
 
         descriptor = model.withPath("numberList")
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotEmpty::class.java.name)
 
         descriptor = model.withPath("nonEmptyList")
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotEmpty::class.java.name)
 
         descriptor = model.withPath("string.nested.nonEmpty")
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotEmpty::class.java.name)
 
         descriptor = model.withPath("number.nested.number.nonZero")
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(Min::class.java.name)
 
         descriptor = model.withPath("number.nested.numberList")
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotEmpty::class.java.name)
 
         descriptor = model.withPath("nonEmptyList")
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotEmpty::class.java.name)
 
         descriptor = model.withPath("nonEmptyList[].nonEmpty")
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotEmpty::class.java.name)
 
         descriptor = model.withPath("nonEmptyList[][].nonEmpty")
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotEmpty::class.java.name)
 
         descriptor = model.withPath("[].nonBlank")
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotBlank::class.java.name)
 
         descriptor = model.withPath("[][].nonBlank")
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotBlank::class.java.name)
     }
 
     @Test
     @Suppress("UNCHECKED_CAST")
-    fun `should resolve possible enum values`() {
+    fun `should resolve enum values, format and encoding style`() {
         val model = ConstrainedModel(EnumConstrains::class.java)
 
-        var descriptor = model.withPath("someEnum")
-        then(descriptor.attributes).containsKey("validationConstraints")
-        then((descriptor.attributes["validationConstraints"] as List<Constraint>).map { it.name })
+        var descriptor = model.withName("someEnum")
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotBlank::class.java.name)
-        then((descriptor.attributes["enumValues"] as? List<String>)).isEqualTo(
+        then((descriptor.attributes[Attributes.ENUM_VALUES_KEY] as? List<String>)).isEqualTo(
             listOf("FIRST_VALUE", "SECOND_VALUE", "THIRD_VALUE")
         )
+
+        descriptor = model.withName("enumList").attributes(
+            Attributes.items(DataType.STRING, enums = listOf("FIRST_VALUE", "SECOND_VALUE", "THIRD_VALUE")),
+        )
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotEmpty::class.java.name, Max::class.java.name)
+        then((descriptor.attributes[Attributes.ITEMS_KEY] as Map<String, *>))
+            .containsKey("type")
+            .doesNotContainKey("format")
+            .containsKey(Attributes.ENUM_VALUES_KEY)
+            .containsValue(DataType.STRING)
+            .containsValue(listOf("FIRST_VALUE", "SECOND_VALUE", "THIRD_VALUE"))
+
+        descriptor = model.withName("enumList[]")
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotEmpty::class.java.name, Max::class.java.name)
+        // TODO(iwaltgen): array items type?
+        // then((descriptor.attributes[Attributes.ITEMS_KEY] as Map<String, *>))
+        //     .containsKey("type")
+        //     .doesNotContainKey("format")
+        //     .containsKey(Attributes.ENUM_VALUES_KEY)
+        //     .containsValue(DataType.STRING)
+        //     .containsValue(listOf("FIRST_VALUE", "SECOND_VALUE", "THIRD_VALUE"))
     }
 
     private data class NonEmptyConstraints(
@@ -182,7 +192,7 @@ internal class ConstrainedModelTest {
 
     private data class EnumConstrains(
         @field:NotBlank val someEnum: SomeEnum,
-        // @field:NotEmpty val enumList: List<EnumValue>?,
+        @field:Valid @field:NotEmpty @field:Max(10) val enumList: List<SomeEnum>?,
     )
 
     private enum class SomeEnum {

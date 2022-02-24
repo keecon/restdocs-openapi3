@@ -5,12 +5,11 @@ import org.springframework.restdocs.constraints.ValidatorConstraintResolver
 import org.springframework.restdocs.payload.FieldDescriptor
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.snippet.AbstractDescriptor
-import org.springframework.restdocs.snippet.Attributes
 import java.lang.reflect.Field
 import java.lang.reflect.ParameterizedType
 
 /**
- * ConstrainedModel can be used to add constraint information to a [FieldDescriptor], [ParameterDescriptor]
+ * ConstrainedModel can be used to add constraint information to a [FieldDescriptor], [ParameterDescriptorWithType]
  * If these are present in the descriptor they are used to enrich the generated type information (e.g. JsonSchema)
  */
 class ConstrainedModel(private val rootType: Class<*>) {
@@ -50,21 +49,21 @@ class ConstrainedModel(private val rootType: Class<*>) {
 
         val propType = propertyType(objectType, propName)
         if (propType?.isEnum == true) {
-            if (descriptor is FieldDescriptor) descriptor.type(ENUM_TYPE)
+            if (descriptor is FieldDescriptor) descriptor.type("enum")
 
             descriptor.attributes(
-                Attributes.key(ENUM_VALUES_KEY).value(propType.enumConstants.map(Any::toString))
+                Attributes.enum(propType.enumConstants.map(Any::toString))
             )
         }
 
+        val constraints = this.validatorConstraintResolver.resolveForProperty(actualPropName(propName), objectType)
         return descriptor.attributes(
-            Attributes.key(CONSTRAINTS_KEY)
-                .value(this.validatorConstraintResolver.resolveForProperty(actualPropName(propName), objectType))
+            Attributes.constraints(constraints)
         )
     }
 
     private fun propertyWithObjectType(path: String): Pair<String, Class<*>?> {
-        val propNames = path.split(DOT_NOTATION_DELIMITER)
+        val propNames = path.split(".")
         if (propNames.size == 1) return Pair(path, rootType)
 
         var objectType: Class<*>? = rootType
@@ -99,12 +98,5 @@ class ConstrainedModel(private val rootType: Class<*>) {
     private fun genericFirstItemType(field: Field): Class<*>? {
         val type = field.genericType as? ParameterizedType
         return type?.actualTypeArguments?.first() as? Class<*>
-    }
-
-    companion object {
-        private const val CONSTRAINTS_KEY = "validationConstraints"
-        private const val DOT_NOTATION_DELIMITER = "."
-        private const val ENUM_TYPE = "enum"
-        private const val ENUM_VALUES_KEY = "enumValues"
     }
 }
