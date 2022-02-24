@@ -9,7 +9,6 @@ import org.springframework.restdocs.hypermedia.LinkDescriptor
 import org.springframework.restdocs.hypermedia.LinksSnippet
 import org.springframework.restdocs.operation.Operation
 import org.springframework.restdocs.payload.FieldDescriptor
-import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.RequestFieldsSnippet
 import org.springframework.restdocs.payload.ResponseFieldsSnippet
 import org.springframework.restdocs.request.ParameterDescriptor
@@ -148,7 +147,7 @@ internal object DescriptorValidator {
                         .firstOrNull { d.path == it["path"] }
                         ?.get("type")
                         ?.let { it as String }
-                        ?.let { JsonFieldType.valueOf(it.uppercase()) }
+                        ?.let { JsonDataType.valueOf(it.uppercase()) }
                         ?.let { d.type(it) }
                 }
             }

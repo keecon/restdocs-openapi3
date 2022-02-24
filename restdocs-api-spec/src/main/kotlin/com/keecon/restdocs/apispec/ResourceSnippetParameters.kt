@@ -41,7 +41,7 @@ data class ResourceSnippetParameters @JvmOverloads constructor(
 
             var descriptor = createLinkFieldDescriptor(linkDescriptor.rel)
                 .description(linkDescriptor.description)
-                .type(JsonFieldType.VARIES)
+                .type(JsonDataType.VARIES)
                 .attributes(
                     *linkDescriptor.attributes.entries
                         .map { e -> Attributes.Attribute(e.key, e.value) }
@@ -87,6 +87,8 @@ enum class DataType {
     BOOLEAN,
     ARRAY,
 }
+
+typealias JsonDataType = JsonFieldType
 
 enum class DataFormat {
     INT32,

@@ -7,6 +7,8 @@ import org.springframework.restdocs.request.ParameterDescriptor
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 import org.springframework.restdocs.snippet.AbstractDescriptor
 import org.springframework.restdocs.snippet.Attributes
+import java.lang.reflect.Field
+import java.lang.reflect.ParameterizedType
 
 /**
  * ConstrainedModel can be used to add constraint information to a [FieldDescriptor], [ParameterDescriptor]
@@ -43,9 +45,6 @@ class ConstrainedModel(private val rootClass: Class<*>) {
     fun withMappedName(name: String, propertyPath: String): ParameterDescriptor =
         addConstraints(parameterWithName(name), propertyPath)
 
-    /**
-     * Add bean validation constraints for the propertyName to the descriptor
-     */
     private fun <T : AbstractDescriptor<T>> addConstraints(descriptor: T, propertyPath: String): T {
         val (propertyName, targetClass) = propertyNameWithClass(propertyPath)
         if (targetClass == null) return descriptor
@@ -58,29 +57,38 @@ class ConstrainedModel(private val rootClass: Class<*>) {
 
     private fun propertyNameWithClass(path: String): Pair<String, Class<*>?> {
         val hierarchyPropertyNames = path.split(DOT_NOTATION_DELIMITER)
-        if (hierarchyPropertyNames.size == 1) return Pair(path, rootClass)
+        if (hierarchyPropertyNames.size == 1) return Pair(removeArraySymbol(path), rootClass)
 
         var targetClass: Class<*>? = rootClass
-        try {
-            for (name in hierarchyPropertyNames.dropLast(1)) {
-                var hierarchyClass = targetClass
-                while (hierarchyClass != null) {
-                    val field = hierarchyClass?.declaredFields?.firstOrNull { it.name == name }
-                    if (field == null) hierarchyClass = hierarchyClass.superclass
-                    else {
-                        targetClass = field?.type
-                        break
-                    }
+        for (name in hierarchyPropertyNames.filter { removeArraySymbol(it).isNotEmpty() }.dropLast(1)) {
+            var hierarchyClass = targetClass
+            val propertyName = removeArraySymbol(name)
+            while (hierarchyClass != null) {
+                val field = hierarchyClass.declaredFields.firstOrNull { it.name == propertyName }
+                if (field == null) hierarchyClass = hierarchyClass.superclass
+                else {
+                    targetClass = getFieldType(name, field)
+                    break
                 }
             }
-        } catch (e: Throwable) {
-            // no op
         }
-        return Pair(hierarchyPropertyNames.last(), targetClass)
+        return Pair(removeArraySymbol(hierarchyPropertyNames.last()), targetClass)
+    }
+
+    private fun removeArraySymbol(name: String) = name.substringBefore(ARRAY_SYMBOL)
+
+    private fun getFieldType(name: String, field: Field) =
+        if (name.lastIndexOf(ARRAY_SYMBOL) == -1) field.type
+        else getArrayItemType(field)
+
+    private fun getArrayItemType(field: Field): Class<*>? {
+        val type = field.genericType as? ParameterizedType
+        return type?.actualTypeArguments?.first() as? Class<*>
     }
 
     companion object {
         private const val CONSTRAINTS_KEY = "validationConstraints"
         private const val DOT_NOTATION_DELIMITER = "."
+        private const val ARRAY_SYMBOL = "[]"
     }
 }
