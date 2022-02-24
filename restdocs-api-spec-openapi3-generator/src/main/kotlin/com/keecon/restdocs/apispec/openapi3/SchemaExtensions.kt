@@ -66,6 +66,7 @@ internal object SchemaExtensions {
     }
 
     private fun toBigDecimal(value: Any) = when (value) {
+        is String -> BigDecimal(value)
         is Int -> value.toBigDecimal()
         is Double -> value.toBigDecimal()
         else -> value as BigDecimal

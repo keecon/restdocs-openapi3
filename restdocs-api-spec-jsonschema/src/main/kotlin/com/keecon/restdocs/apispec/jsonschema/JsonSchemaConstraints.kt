@@ -11,19 +11,19 @@ import org.everit.json.schema.StringSchema
 internal object JsonSchemaConstraints {
 
     internal fun ArraySchema.Builder.applyConstraints(descriptor: AbstractDescriptor?) = apply {
-        ConstraintResolver.maybeMinSize(descriptor)?.let { minItems(it) }
-        ConstraintResolver.maybeMaxSize(descriptor)?.let { maxItems(it) }
+        ConstraintResolver.maybeMinSize(descriptor)?.let { minItems(it.toInt()) }
+        ConstraintResolver.maybeMaxSize(descriptor)?.let { maxItems(it.toInt()) }
     }
 
     internal fun StringSchema.Builder.applyConstraints(descriptor: AbstractDescriptor) = apply {
-        ConstraintResolver.maybeMinSize(descriptor)?.let { minLength(it) }
-        ConstraintResolver.maybeMaxSize(descriptor)?.let { maxLength(it) }
+        ConstraintResolver.maybeMinSize(descriptor)?.let { minLength(it.toInt()) }
+        ConstraintResolver.maybeMaxSize(descriptor)?.let { maxLength(it.toInt()) }
         ConstraintResolver.maybePattern(descriptor)?.let { pattern(it) }
     }
 
     internal fun NumberSchema.Builder.applyConstraints(descriptor: AbstractDescriptor) = apply {
-        ConstraintResolver.maybeMinInt(descriptor)?.let { minimum(it) }
-        ConstraintResolver.maybeMaxInt(descriptor)?.let { maximum(it) }
+        ConstraintResolver.maybeMinNumber(descriptor)?.let { minimum(it) }
+        ConstraintResolver.maybeMaxNumber(descriptor)?.let { maximum(it) }
     }
 
     internal fun StringSchema.Builder.applyFormat(descriptor: AbstractDescriptor) = apply {

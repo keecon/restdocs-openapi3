@@ -5,6 +5,7 @@ import com.jayway.jsonpath.DocumentContext
 import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.Option
 import com.keecon.restdocs.apispec.model.Attributes
+import com.keecon.restdocs.apispec.model.Constraint
 import com.keecon.restdocs.apispec.model.Encoding
 import com.keecon.restdocs.apispec.model.FieldDescriptor
 import com.keecon.restdocs.apispec.model.HTTPMethod
@@ -24,6 +25,16 @@ import io.swagger.v3.parser.core.models.ParseOptions
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.util.Collections
+import javax.validation.constraints.DecimalMax
+import javax.validation.constraints.DecimalMin
+import javax.validation.constraints.Max
+import javax.validation.constraints.Min
+import javax.validation.constraints.NotBlank
+import javax.validation.constraints.NotEmpty
+import javax.validation.constraints.NotNull
+import javax.validation.constraints.Pattern
+import javax.validation.constraints.Size
 
 class OpenApi3GeneratorTest {
 
@@ -432,16 +443,22 @@ class OpenApi3GeneratorTest {
         then(params).anyMatch {
             it["name"] == "X-SOME-STRING" &&
                 (it["schema"] as LinkedHashMap<*, *>)["type"] == "string" &&
+                (it["schema"] as LinkedHashMap<*, *>)["minLength"] == 1 &&
+                (it["schema"] as LinkedHashMap<*, *>)["maxLength"] == 100 &&
                 (it["schema"] as LinkedHashMap<*, *>)["enum"] == listOf("HV1", "HV2")
         }
         then(params).anyMatch {
             it["name"] == "X-SOME-NUMBER" &&
                 (it["schema"] as LinkedHashMap<*, *>)["type"] == "number" &&
+                (it["schema"] as LinkedHashMap<*, *>)["minimum"] == 1_000_000 &&
+                (it["schema"] as LinkedHashMap<*, *>)["maximum"] == 2_000_000 &&
                 (it["schema"] as LinkedHashMap<*, *>)["enum"] == listOf(1_000_001, 1_000_002, 1_000_003)
         }
         then(params).anyMatch {
             it["name"] == "X-SOME-INTEGER" &&
                 (it["schema"] as LinkedHashMap<*, *>)["type"] == "integer" &&
+                (it["schema"] as LinkedHashMap<*, *>)["minimum"] == 1 &&
+                (it["schema"] as LinkedHashMap<*, *>)["maximum"] == 100 &&
                 (it["schema"] as LinkedHashMap<*, *>)["enum"] == listOf(1, 2, 3)
         }
         then(params).anyMatch {
@@ -449,6 +466,8 @@ class OpenApi3GeneratorTest {
                 it["style"] == "simple" &&
                 it["explode"] == false &&
                 (it["schema"] as LinkedHashMap<*, *>)["type"] == "array" &&
+                (it["schema"] as LinkedHashMap<*, *>)["minItems"] == 1 &&
+                (it["schema"] as LinkedHashMap<*, *>)["maxItems"] == 100 &&
                 ((it["schema"] as LinkedHashMap<*, *>)["items"] as LinkedHashMap<*, *>)["type"] == "integer" &&
                 ((it["schema"] as LinkedHashMap<*, *>)["items"] as LinkedHashMap<*, *>)["enum"] == listOf(1, 2, 3, 4, 5)
         }
@@ -460,16 +479,23 @@ class OpenApi3GeneratorTest {
         then(params).anyMatch {
             it["name"] == "stringParameter" &&
                 (it["schema"] as LinkedHashMap<*, *>)["type"] == "string" &&
+                (it["schema"] as LinkedHashMap<*, *>)["minLength"] == 1 &&
+                (it["schema"] as LinkedHashMap<*, *>)["maxLength"] == 100 &&
+                (it["schema"] as LinkedHashMap<*, *>)["pattern"] == "[a-z]+" &&
                 (it["schema"] as LinkedHashMap<*, *>)["enum"] == listOf("PV1", "PV2", "PV3")
         }
         then(params).anyMatch {
             it["name"] == "numberParameter" &&
                 (it["schema"] as LinkedHashMap<*, *>)["type"] == "number" &&
+                (it["schema"] as LinkedHashMap<*, *>)["minimum"] == 0 &&
+                (it["schema"] as LinkedHashMap<*, *>)["maximum"] == 0.5 &&
                 (it["schema"] as LinkedHashMap<*, *>)["enum"] == listOf(0.1, 0.2, 0.3)
         }
         then(params).anyMatch {
             it["name"] == "integerParameter" &&
                 (it["schema"] as LinkedHashMap<*, *>)["type"] == "integer" &&
+                (it["schema"] as LinkedHashMap<*, *>)["minimum"] == 1 &&
+                (it["schema"] as LinkedHashMap<*, *>)["maximum"] == 100 &&
                 (it["schema"] as LinkedHashMap<*, *>)["enum"] == listOf(1, 2, 3)
         }
         then(params).anyMatch {
@@ -477,6 +503,8 @@ class OpenApi3GeneratorTest {
                 it["style"] == "form" &&
                 it["explode"] == true &&
                 (it["schema"] as LinkedHashMap<*, *>)["type"] == "array" &&
+                (it["schema"] as LinkedHashMap<*, *>)["minItems"] == 1 &&
+                (it["schema"] as LinkedHashMap<*, *>)["maxItems"] == 100 &&
                 ((it["schema"] as LinkedHashMap<*, *>)["items"] as LinkedHashMap<*, *>)["type"] == "string" &&
                 ((it["schema"] as LinkedHashMap<*, *>)["items"] as LinkedHashMap<*, *>)["enum"] ==
                 listOf("LV1", "LV2", "LV3")
@@ -1553,6 +1581,19 @@ class OpenApi3GeneratorTest {
                     type = "STRING",
                     optional = false,
                     attributes = Attributes(
+                        validationConstraints = listOf(
+                            Constraint(
+                                NotBlank::class.java.name,
+                                Collections.emptyMap()
+                            ),
+                            Constraint(
+                                Size::class.java.name,
+                                mapOf(
+                                    "min" to 1,
+                                    "max" to 100,
+                                )
+                            ),
+                        ),
                         enumValues = listOf("HV1", "HV2")
                     )
                 ),
@@ -1562,6 +1603,20 @@ class OpenApi3GeneratorTest {
                     type = "NUMBER",
                     optional = true,
                     attributes = Attributes(
+                        validationConstraints = listOf(
+                            Constraint(
+                                NotNull::class.java.name,
+                                Collections.emptyMap()
+                            ),
+                            Constraint(
+                                Min::class.java.name,
+                                mapOf("value" to 1_000_000)
+                            ),
+                            Constraint(
+                                Max::class.java.name,
+                                mapOf("value" to 2_000_000)
+                            )
+                        ),
                         enumValues = listOf(1_000_001, 1_000_002, 1_000_003)
                     )
                 ),
@@ -1571,6 +1626,16 @@ class OpenApi3GeneratorTest {
                     type = "INTEGER",
                     optional = true,
                     attributes = Attributes(
+                        validationConstraints = listOf(
+                            Constraint(
+                                Min::class.java.name,
+                                mapOf("value" to 1)
+                            ),
+                            Constraint(
+                                Max::class.java.name,
+                                mapOf("value" to 100)
+                            )
+                        ),
                         enumValues = listOf(1, 2, 3)
                     )
                 ),
@@ -1580,6 +1645,19 @@ class OpenApi3GeneratorTest {
                     type = "ARRAY",
                     optional = true,
                     attributes = Attributes(
+                        validationConstraints = listOf(
+                            Constraint(
+                                NotEmpty::class.java.name,
+                                Collections.emptyMap()
+                            ),
+                            Constraint(
+                                Size::class.java.name,
+                                mapOf(
+                                    "min" to 1,
+                                    "max" to 100,
+                                )
+                            ),
+                        ),
                         items = TypeDescriptor(
                             type = "INTEGER",
                             attributes = Attributes(
@@ -1611,6 +1689,23 @@ class OpenApi3GeneratorTest {
                     optional = false,
                     ignored = false,
                     attributes = Attributes(
+                        validationConstraints = listOf(
+                            Constraint(
+                                NotBlank::class.java.name,
+                                Collections.emptyMap()
+                            ),
+                            Constraint(
+                                Size::class.java.name,
+                                mapOf(
+                                    "min" to 1,
+                                    "max" to 100,
+                                )
+                            ),
+                            Constraint(
+                                Pattern::class.java.name,
+                                mapOf("regexp" to "[a-z]+")
+                            ),
+                        ),
                         enumValues = listOf("PV1", "PV2", "PV3")
                     )
                 ),
@@ -1621,6 +1716,20 @@ class OpenApi3GeneratorTest {
                     optional = true,
                     ignored = false,
                     attributes = Attributes(
+                        validationConstraints = listOf(
+                            Constraint(
+                                NotNull::class.java.name,
+                                Collections.emptyMap()
+                            ),
+                            Constraint(
+                                DecimalMin::class.java.name,
+                                mapOf("value" to "0")
+                            ),
+                            Constraint(
+                                DecimalMax::class.java.name,
+                                mapOf("value" to "0.5")
+                            )
+                        ),
                         enumValues = listOf(0.1, 0.2, 0.3)
                     )
                 ),
@@ -1631,6 +1740,16 @@ class OpenApi3GeneratorTest {
                     optional = true,
                     ignored = false,
                     attributes = Attributes(
+                        validationConstraints = listOf(
+                            Constraint(
+                                Min::class.java.name,
+                                mapOf("value" to 1)
+                            ),
+                            Constraint(
+                                Max::class.java.name,
+                                mapOf("value" to 100)
+                            )
+                        ),
                         enumValues = listOf(1, 2, 3)
                     )
                 ),
@@ -1641,6 +1760,19 @@ class OpenApi3GeneratorTest {
                     optional = true,
                     ignored = false,
                     attributes = Attributes(
+                        validationConstraints = listOf(
+                            Constraint(
+                                NotEmpty::class.java.name,
+                                Collections.emptyMap()
+                            ),
+                            Constraint(
+                                Size::class.java.name,
+                                mapOf(
+                                    "min" to 1,
+                                    "max" to 100,
+                                )
+                            ),
+                        ),
                         items = TypeDescriptor(
                             type = "STRING",
                             attributes = Attributes(

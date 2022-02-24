@@ -622,7 +622,7 @@ class JsonSchemaGeneratorTest {
                 listOf(
                     Constraint(
                         Pattern::class.java.name,
-                        mapOf("pattern" to "[a-z]")
+                        mapOf("regexp" to "[a-z]")
                     )
                 )
             )

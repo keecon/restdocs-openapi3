@@ -10,23 +10,23 @@ import io.swagger.v3.oas.models.media.StringSchema
 internal object SchemaConstraints {
 
     internal fun ArraySchema.applyConstraints(descriptor: AbstractDescriptor) = apply {
-        ConstraintResolver.maybeMinSize(descriptor)?.let { minItems = it }
-        ConstraintResolver.maybeMaxSize(descriptor)?.let { maxItems = it }
+        ConstraintResolver.maybeMinSize(descriptor)?.let { minItems = it.toInt() }
+        ConstraintResolver.maybeMaxSize(descriptor)?.let { maxItems = it.toInt() }
     }
 
     internal fun StringSchema.applyConstraints(descriptor: AbstractDescriptor) = apply {
-        ConstraintResolver.maybeMinSize(descriptor)?.let { minLength = it }
-        ConstraintResolver.maybeMaxSize(descriptor)?.let { maxLength = it }
+        ConstraintResolver.maybeMinSize(descriptor)?.let { minLength = it.toInt() }
+        ConstraintResolver.maybeMaxSize(descriptor)?.let { maxLength = it.toInt() }
         ConstraintResolver.maybePattern(descriptor)?.let { pattern = it }
     }
 
     internal fun IntegerSchema.applyConstraints(descriptor: AbstractDescriptor) = apply {
-        ConstraintResolver.maybeMinInt(descriptor)?.let { minimum = it.toBigDecimal() }
-        ConstraintResolver.maybeMaxInt(descriptor)?.let { maximum = it.toBigDecimal() }
+        ConstraintResolver.maybeMinNumber(descriptor)?.let { minimum = it }
+        ConstraintResolver.maybeMaxNumber(descriptor)?.let { maximum = it }
     }
 
     internal fun NumberSchema.applyConstraints(descriptor: AbstractDescriptor) = apply {
-        ConstraintResolver.maybeMinInt(descriptor)?.let { minimum = it.toBigDecimal() }
-        ConstraintResolver.maybeMaxInt(descriptor)?.let { maximum = it.toBigDecimal() }
+        ConstraintResolver.maybeMinNumber(descriptor)?.let { minimum = it }
+        ConstraintResolver.maybeMaxNumber(descriptor)?.let { maximum = it }
     }
 }

@@ -1,10 +1,16 @@
 package com.keecon.restdocs.apispec.model
 
+import java.math.BigDecimal
+
 object ConstraintResolver {
 
     private const val MIN_CONSTRAINT = "javax.validation.constraints.Min"
 
     private const val MAX_CONSTRAINT = "javax.validation.constraints.Max"
+
+    private const val DECIMAL_MIN_CONSTRAINT = "javax.validation.constraints.DecimalMin"
+
+    private const val DECIMAL_MAX_CONSTRAINT = "javax.validation.constraints.DecimalMax"
 
     private const val SIZE_CONSTRAINT = "javax.validation.constraints.Size"
 
@@ -31,27 +37,47 @@ object ConstraintResolver {
 
     private fun AbstractDescriptor.maybePatternConstraint() = maybeConstraint(PATTERN_CONSTRAINT)
 
-    fun maybeMinSize(descriptor: AbstractDescriptor?) =
-        descriptor?.constraints()
-            ?.mapNotNull {
-                when (it.name) {
-                    NOT_EMPTY_CONSTRAINT,
-                    NOT_BLANK_CONSTRAINT -> 1
-                    SIZE_CONSTRAINT -> it.configuration["min"] as? Int
-                    else -> null
-                }
-            }
-            ?.maxOrNull()
+    private fun <T : Comparable<T>> AbstractDescriptor.maybeMinConstraint(transform: (Constraint) -> T?) =
+        constraints().mapNotNull { transform(it) }.maxOrNull()
+
+    private fun <T : Comparable<T>> AbstractDescriptor.maybeMaxConstraint(transform: (Constraint) -> T?) =
+        constraints().mapNotNull { transform(it) }.minOrNull()
+
+    fun maybeMinSize(descriptor: AbstractDescriptor?) = descriptor?.maybeMinConstraint {
+        when (it.name) {
+            NOT_EMPTY_CONSTRAINT,
+            NOT_BLANK_CONSTRAINT -> BigDecimal.ONE
+            SIZE_CONSTRAINT -> toBigDecimal(it.configuration["min"])
+            else -> null
+        }
+    }
 
     fun maybeMaxSize(descriptor: AbstractDescriptor?) =
-        descriptor?.maybeSizeConstraint()?.let { it.configuration["max"] as? Int }
+        descriptor?.maybeSizeConstraint()?.let { toBigDecimal(it.configuration["max"]) }
+
+    fun maybeMinNumber(descriptor: AbstractDescriptor) = descriptor.maybeMinConstraint {
+        when (it.name) {
+            MIN_CONSTRAINT -> toBigDecimal(it.configuration["value"])
+            DECIMAL_MIN_CONSTRAINT -> toBigDecimal(it.configuration["value"])
+            else -> null
+        }
+    }
+
+    fun maybeMaxNumber(descriptor: AbstractDescriptor) = descriptor.maybeMaxConstraint {
+        when (it.name) {
+            MAX_CONSTRAINT -> toBigDecimal(it.configuration["value"])
+            DECIMAL_MAX_CONSTRAINT -> toBigDecimal(it.configuration["value"])
+            else -> null
+        }
+    }
 
     fun maybePattern(descriptor: AbstractDescriptor?) =
-        descriptor?.maybePatternConstraint()?.let { it.configuration["pattern"] as? String }
+        descriptor?.maybePatternConstraint()?.let { it.configuration["regexp"] as? String }
 
-    fun maybeMinInt(descriptor: AbstractDescriptor) =
-        descriptor.maybeConstraint(MIN_CONSTRAINT)?.let { it.configuration["value"] as? Int }
-
-    fun maybeMaxInt(descriptor: AbstractDescriptor) =
-        descriptor.maybeConstraint(MAX_CONSTRAINT)?.let { it.configuration["value"] as? Int }
+    private fun toBigDecimal(value: Any?) = when (value) {
+        is String -> BigDecimal(value)
+        is Int -> value.toBigDecimal()
+        is Double -> value.toBigDecimal()
+        else -> value as? BigDecimal
+    }
 }
