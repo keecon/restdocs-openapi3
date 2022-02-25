@@ -45,8 +45,7 @@ object ConstraintResolver {
 
     fun maybeMinSize(descriptor: AbstractDescriptor?) = descriptor?.maybeMinConstraint {
         when (it.name) {
-            NOT_EMPTY_CONSTRAINT,
-            NOT_BLANK_CONSTRAINT -> BigDecimal.ONE
+            NOT_EMPTY_CONSTRAINT, NOT_BLANK_CONSTRAINT -> BigDecimal.ONE
             SIZE_CONSTRAINT -> toBigDecimal(it.configuration["min"])
             else -> null
         }

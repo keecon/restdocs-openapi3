@@ -1244,7 +1244,7 @@ class OpenApi3GeneratorTest {
                 FieldDescriptor(
                     path = "someEnum",
                     description = "Some enum description",
-                    type = "enum",
+                    type = "string",
                     attributes = Attributes(enumValues = listOf("FIRST_VALUE", "SECOND_VALUE", "THIRD_VALUE"))
                 )
             ),
@@ -1301,7 +1301,7 @@ class OpenApi3GeneratorTest {
                 FieldDescriptor(
                     path = "someEnum",
                     description = "Some enum description",
-                    type = "enum",
+                    type = "string",
                     attributes = Attributes(enumValues = listOf("FIRST_VALUE", "SECOND_VALUE", "THIRD_VALUE"))
                 )
             ),

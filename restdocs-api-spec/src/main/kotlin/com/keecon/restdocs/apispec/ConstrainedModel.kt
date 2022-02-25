@@ -45,21 +45,19 @@ class ConstrainedModel(private val rootType: Class<*>) {
 
     private fun <T : AbstractDescriptor<T>> addConstraints(descriptor: T, propsPath: String): T {
         val (propName, objectType) = propertyWithObjectType(propsPath)
-        if (objectType == null) return descriptor
+        if (objectType == null) {
+            return descriptor
+        }
 
         val propType = propertyType(objectType, propName)
-        if (propType?.isEnum == true) {
-            if (descriptor is FieldDescriptor) descriptor.type("enum")
-
-            descriptor.attributes(
-                Attributes.enum(propType.enumConstants.map(Any::toString))
-            )
+        if (isArrayType(propName)) {
+            applyArrayPropAttributes(descriptor, propType)
+        } else {
+            applyPropAttributes(descriptor, propType)
         }
 
         val constraints = this.validatorConstraintResolver.resolveForProperty(actualPropName(propName), objectType)
-        return descriptor.attributes(
-            Attributes.constraints(constraints)
-        )
+        return descriptor.attributes(Attributes.constraints(constraints))
     }
 
     private fun propertyWithObjectType(path: String): Pair<String, Class<*>?> {
@@ -85,6 +83,79 @@ class ConstrainedModel(private val rootType: Class<*>) {
             }
         }
         return null
+    }
+
+    private fun <T : AbstractDescriptor<T>> applyArrayPropAttributes(descriptor: T, type: Class<*>?): T {
+        if (descriptor is ParameterDescriptorWithType) {
+            descriptor.type = DataType.ARRAY
+        }
+
+        return when (type) {
+            Boolean::class.javaObjectType,
+            Boolean::class.javaPrimitiveType -> descriptor.apply {
+                attributes(Attributes.items(DataType.BOOLEAN))
+            }
+            Float::class.javaObjectType,
+            Float::class.javaPrimitiveType,
+            Double::class.javaObjectType,
+            Double::class.javaPrimitiveType -> descriptor.apply {
+                attributes(Attributes.items(DataType.NUMBER))
+            }
+            Int::class.javaObjectType,
+            Int::class.javaPrimitiveType -> descriptor.apply {
+                if (descriptor is FieldDescriptor) attributes(Attributes.items(DataType.NUMBER, DataFormat.INT32))
+                else attributes(Attributes.items(DataType.INTEGER, DataFormat.INT32))
+            }
+            Long::class.javaObjectType,
+            Long::class.javaPrimitiveType -> descriptor.apply {
+                if (descriptor is FieldDescriptor) attributes(Attributes.items(DataType.NUMBER, DataFormat.INT64))
+                else attributes(Attributes.items(DataType.INTEGER, DataFormat.INT64))
+            }
+            String::class.java -> descriptor.apply {
+                attributes(Attributes.items(DataType.STRING))
+            }
+            else -> descriptor.apply {
+                if (type?.isEnum == true) {
+                    attributes(Attributes.items(DataType.STRING, enums = type.enumConstants.map(Any::toString)))
+                }
+            }
+        }
+    }
+
+    private fun <T : AbstractDescriptor<T>> applyPropAttributes(descriptor: T, type: Class<*>?) {
+        if (descriptor is ParameterDescriptorWithType) {
+            when (type) {
+                Boolean::class.javaObjectType,
+                Boolean::class.javaPrimitiveType -> descriptor.apply {
+                    this.type = DataType.BOOLEAN
+                }
+                Float::class.javaObjectType,
+                Float::class.javaPrimitiveType,
+                Double::class.javaObjectType,
+                Double::class.javaPrimitiveType -> descriptor.apply {
+                    this.type = DataType.NUMBER
+                }
+                Int::class.javaObjectType,
+                Int::class.javaPrimitiveType -> descriptor.apply {
+                    this.type = DataType.INTEGER
+                    attributes(Attributes.format(DataFormat.INT32))
+                }
+                Long::class.javaObjectType,
+                Long::class.javaPrimitiveType -> descriptor.apply {
+                    this.type = DataType.INTEGER
+                    attributes(Attributes.format(DataFormat.INT64))
+                }
+                String::class.java -> descriptor.apply {
+                    this.type = DataType.STRING
+                }
+            }
+        }
+
+        if (type?.isEnum == true) {
+            descriptor.attributes(
+                Attributes.enum(type.enumConstants.map(Any::toString))
+            )
+        }
     }
 
     private fun actualPropName(name: String) = name.substringBefore("[]")

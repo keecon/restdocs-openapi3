@@ -74,19 +74,19 @@ internal class FieldDescriptorWithSchema(
                 "array" -> ArraySchema.builder()
                     .applyConstraints(descriptor)
                     .allItemSchema(arrayItemsSchema(descriptor))
-                "boolean" -> BooleanSchema.builder()
-                "number" -> NumberSchema.builder()
-                    .applyConstraints(descriptor)
-                    .applyFormat(descriptor)
-                "string" -> StringSchema.builder()
-                    .applyConstraints(descriptor)
-                    .applyFormat(descriptor)
-                "enum" -> CombinedSchema.oneOf(
-                    listOf(
-                        StringSchema.builder().build(),
-                        EnumSchema.builder().possibleValues(descriptor.attributes.enumValues).build()
-                    )
-                ).isSynthetic(true)
+                "boolean" -> descriptor.enumCombinedSchema(
+                    BooleanSchema.builder()
+                )
+                "number" -> descriptor.enumCombinedSchema(
+                    NumberSchema.builder()
+                        .applyConstraints(descriptor)
+                        .applyFormat(descriptor)
+                )
+                "string" -> descriptor.enumCombinedSchema(
+                    StringSchema.builder()
+                        .applyConstraints(descriptor)
+                        .applyFormat(descriptor)
+                )
                 else -> throw IllegalArgumentException("unknown field type $type")
             }
 
@@ -102,6 +102,15 @@ internal class FieldDescriptorWithSchema(
                     )
                 ).build()
         }
+
+        private fun AbstractDescriptor.enumCombinedSchema(builder: Schema.Builder<*>) =
+            if (attributes.enumValues.isEmpty()) builder
+            else CombinedSchema.oneOf(
+                listOf(
+                    builder.build(),
+                    EnumSchema.builder().possibleValues(attributes.enumValues).build(),
+                )
+            ).isSynthetic(true)
 
         private fun jsonSchemaType(descriptorType: String) =
             // varies are used by spring rest docs if the type is ambiguous - in json schema we want to represent as empty

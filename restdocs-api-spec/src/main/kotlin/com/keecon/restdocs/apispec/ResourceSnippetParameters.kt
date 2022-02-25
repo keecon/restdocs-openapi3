@@ -111,10 +111,10 @@ enum class DataFormat {
 class HeaderDescriptorWithType(val name: String) : AbstractDescriptor<HeaderDescriptorWithType>() {
 
     var type: DataType = STRING
-        private set
+        internal set
 
     var optional: Boolean = false
-        private set
+        internal set
 
     @JsonProperty("default")
     var defaultValue: Any? = null
@@ -144,10 +144,10 @@ class HeaderDescriptorWithType(val name: String) : AbstractDescriptor<HeaderDesc
 class ParameterDescriptorWithType(val name: String) : IgnorableDescriptor<ParameterDescriptorWithType>() {
 
     var type: DataType = STRING
-        private set
+        internal set
 
     var optional: Boolean = false
-        private set
+        internal set
 
     @JsonProperty("default")
     var defaultValue: Any? = null

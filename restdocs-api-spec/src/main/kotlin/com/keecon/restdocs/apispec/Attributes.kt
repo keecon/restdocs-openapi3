@@ -20,8 +20,8 @@ object Attributes {
     fun items(type: DataType, format: DataFormat? = null, enums: List<*>? = null) =
         key(ITEMS_KEY).value(
             mapOf(
-                "type" to type,
-                "format" to format,
+                TYPE_KEY to type,
+                FORMAT_KEY to format,
                 ENUM_VALUES_KEY to enums,
             ).filter { it.value != null }
         )
@@ -30,17 +30,21 @@ object Attributes {
     fun encoding(style: EncodingStyle, explode: Boolean? = null, allowReserved: Boolean? = null) =
         key(ENCODING_KEY).value(
             mapOf(
-                "style" to style,
-                "explode" to explode,
-                "allowReserved" to allowReserved,
+                ENCODING_STYLE_KEY to style,
+                ENCODING_EXPLODE_KEY to explode,
+                ENCODING_ALLOW_RESERVED_KEY to allowReserved,
             ).filter { it.value != null }
         )
 
     internal const val CONSTRAINTS_KEY = "validationConstraints"
     internal const val ENUM_VALUES_KEY = "enumValues"
-    internal const val FORMAT_KEY = "format"
     internal const val ITEMS_KEY = "items"
+    internal const val TYPE_KEY = "type"
+    internal const val FORMAT_KEY = "format"
     internal const val ENCODING_KEY = "encoding"
+    internal const val ENCODING_STYLE_KEY = "style"
+    internal const val ENCODING_EXPLODE_KEY = "explode"
+    internal const val ENCODING_ALLOW_RESERVED_KEY = "allowReserved"
 
     enum class EncodingStyle {
         MATRIX,

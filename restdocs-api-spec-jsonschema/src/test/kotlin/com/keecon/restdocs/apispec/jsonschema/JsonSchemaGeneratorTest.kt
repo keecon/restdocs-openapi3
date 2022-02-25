@@ -748,7 +748,7 @@ class JsonSchemaGeneratorTest {
             FieldDescriptor(
                 "some",
                 "some",
-                "enum", attributes = Attributes(enumValues = listOf("ENUM_VALUE_1", "ENUM_VALUE_2"))
+                "string", attributes = Attributes(enumValues = listOf("ENUM_VALUE_1", "ENUM_VALUE_2"))
             )
         )
     }

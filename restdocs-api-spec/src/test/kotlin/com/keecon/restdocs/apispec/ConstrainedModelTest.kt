@@ -8,6 +8,7 @@ import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotEmpty
+import javax.validation.constraints.NotNull
 
 internal class ConstrainedModelTest {
 
@@ -80,7 +81,7 @@ internal class ConstrainedModelTest {
     @Test
     @Suppress("UNCHECKED_CAST")
     fun `should resolve composite field constraints`() {
-        val model = ConstrainedModel(CompositeConstrains::class.java)
+        val model = ConstrainedModel(CompositeConstraints::class.java)
 
         var descriptor = model.withPath("nonBlank")
         then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
@@ -137,8 +138,113 @@ internal class ConstrainedModelTest {
 
     @Test
     @Suppress("UNCHECKED_CAST")
-    fun `should resolve enum values, format and encoding style`() {
-        val model = ConstrainedModel(EnumConstrains::class.java)
+    fun `should resolve array parameter constraints, items attributes`() {
+        val model = ConstrainedModel(ArrayConstraints::class.java)
+
+        var descriptor = model.withName("booleanList[]")
+        then(descriptor.type).isEqualTo(DataType.ARRAY)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotEmpty::class.java.name)
+        then((descriptor.attributes[Attributes.ITEMS_KEY] as? Map<String, *>)).isEqualTo(
+            mapOf(Attributes.TYPE_KEY to DataType.BOOLEAN)
+        )
+
+        descriptor = model.withName("intList[]")
+        then(descriptor.type).isEqualTo(DataType.ARRAY)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotEmpty::class.java.name)
+        then((descriptor.attributes[Attributes.ITEMS_KEY] as? Map<String, *>)).isEqualTo(
+            mapOf(
+                Attributes.TYPE_KEY to DataType.INTEGER,
+                Attributes.FORMAT_KEY to DataFormat.INT32,
+            )
+        )
+
+        descriptor = model.withName("longList[]")
+        then(descriptor.type).isEqualTo(DataType.ARRAY)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotEmpty::class.java.name)
+        then((descriptor.attributes[Attributes.ITEMS_KEY] as? Map<String, *>)).isEqualTo(
+            mapOf(
+                Attributes.TYPE_KEY to DataType.INTEGER,
+                Attributes.FORMAT_KEY to DataFormat.INT64,
+            )
+        )
+
+        descriptor = model.withName("floatList[]")
+        then(descriptor.type).isEqualTo(DataType.ARRAY)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotEmpty::class.java.name)
+        then((descriptor.attributes[Attributes.ITEMS_KEY] as? Map<String, *>)).isEqualTo(
+            mapOf(Attributes.TYPE_KEY to DataType.NUMBER)
+        )
+
+        descriptor = model.withName("doubleList[]")
+        then(descriptor.type).isEqualTo(DataType.ARRAY)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotEmpty::class.java.name)
+        then((descriptor.attributes[Attributes.ITEMS_KEY] as? Map<String, *>)).isEqualTo(
+            mapOf(Attributes.TYPE_KEY to DataType.NUMBER)
+        )
+
+        descriptor = model.withName("stringList[]")
+        then(descriptor.type).isEqualTo(DataType.ARRAY)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotEmpty::class.java.name)
+        then((descriptor.attributes[Attributes.ITEMS_KEY] as? Map<String, *>)).isEqualTo(
+            mapOf(Attributes.TYPE_KEY to DataType.STRING)
+        )
+    }
+
+    @Test
+    @Suppress("UNCHECKED_CAST")
+    fun `should resolve parameter type and constraints`() {
+        val model = ConstrainedModel(TypeConstraints::class.java)
+
+        var descriptor = model.withName("someBoolean")
+        then(descriptor.type).isEqualTo(DataType.BOOLEAN)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotNull::class.java.name)
+
+        descriptor = model.withName("someInt")
+        then(descriptor.type).isEqualTo(DataType.INTEGER)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotNull::class.java.name, Min::class.java.name)
+        then((descriptor.attributes[Attributes.FORMAT_KEY] as DataFormat)).isEqualTo(DataFormat.INT32)
+
+        descriptor = model.withName("someLong")
+        then(descriptor.type).isEqualTo(DataType.INTEGER)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotNull::class.java.name, Min::class.java.name)
+        then((descriptor.attributes[Attributes.FORMAT_KEY] as DataFormat)).isEqualTo(DataFormat.INT64)
+
+        descriptor = model.withName("someFloat")
+        then(descriptor.type).isEqualTo(DataType.NUMBER)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotNull::class.java.name, Min::class.java.name)
+
+        descriptor = model.withName("someDouble")
+        then(descriptor.type).isEqualTo(DataType.NUMBER)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotNull::class.java.name, Min::class.java.name)
+
+        descriptor = model.withName("someString")
+        then(descriptor.type).isEqualTo(DataType.STRING)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotBlank::class.java.name)
+
+        descriptor = model.withName("someEnum")
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotBlank::class.java.name)
+        then((descriptor.attributes[Attributes.ENUM_VALUES_KEY] as? List<String>)).isEqualTo(
+            listOf("FIRST_VALUE", "SECOND_VALUE", "THIRD_VALUE")
+        )
+    }
+
+    @Test
+    @Suppress("UNCHECKED_CAST")
+    fun `should resolve attributes enum values, format and encoding style`() {
+        val model = ConstrainedModel(EnumConstraints::class.java)
 
         var descriptor = model.withName("someEnum")
         then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
@@ -147,28 +253,45 @@ internal class ConstrainedModelTest {
             listOf("FIRST_VALUE", "SECOND_VALUE", "THIRD_VALUE")
         )
 
-        descriptor = model.withName("enumList").attributes(
-            Attributes.items(DataType.STRING, enums = listOf("FIRST_VALUE", "SECOND_VALUE", "THIRD_VALUE")),
-        )
+        descriptor = model.withName("enumList[]")
         then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotEmpty::class.java.name, Max::class.java.name)
         then((descriptor.attributes[Attributes.ITEMS_KEY] as Map<String, *>))
-            .containsKey("type")
-            .doesNotContainKey("format")
+            .containsKey(Attributes.TYPE_KEY)
+            .doesNotContainKey(Attributes.FORMAT_KEY)
             .containsKey(Attributes.ENUM_VALUES_KEY)
             .containsValue(DataType.STRING)
             .containsValue(listOf("FIRST_VALUE", "SECOND_VALUE", "THIRD_VALUE"))
 
-        descriptor = model.withName("enumList[]")
+        descriptor = model.withName("enumList[]").attributes(
+            Attributes.encoding(Attributes.EncodingStyle.FORM, explode = true)
+        )
         then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
             .containsExactly(NotEmpty::class.java.name, Max::class.java.name)
-        // TODO(iwaltgen): array items type?
-        // then((descriptor.attributes[Attributes.ITEMS_KEY] as Map<String, *>))
-        //     .containsKey("type")
-        //     .doesNotContainKey("format")
-        //     .containsKey(Attributes.ENUM_VALUES_KEY)
-        //     .containsValue(DataType.STRING)
-        //     .containsValue(listOf("FIRST_VALUE", "SECOND_VALUE", "THIRD_VALUE"))
+        then((descriptor.attributes[Attributes.ITEMS_KEY] as Map<String, *>))
+            .containsKey(Attributes.TYPE_KEY)
+            .doesNotContainKey(Attributes.FORMAT_KEY)
+            .containsKey(Attributes.ENUM_VALUES_KEY)
+            .containsValue(DataType.STRING)
+            .containsValue(listOf("FIRST_VALUE", "SECOND_VALUE", "THIRD_VALUE"))
+        then((descriptor.attributes[Attributes.ENCODING_KEY] as Map<String, *>))
+            .containsKey(Attributes.ENCODING_STYLE_KEY)
+            .containsKey(Attributes.ENCODING_EXPLODE_KEY)
+            .doesNotContainKey(Attributes.ENCODING_ALLOW_RESERVED_KEY)
+            .containsValue(Attributes.EncodingStyle.FORM)
+            .containsValue(true)
+
+        descriptor = model.withName("stringList[]").attributes(
+            Attributes.encoding(Attributes.EncodingStyle.SIMPLE, explode = false, allowReserved = true)
+        )
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotEmpty::class.java.name, Max::class.java.name)
+        then((descriptor.attributes[Attributes.ENCODING_KEY] as Map<String, *>))
+            .containsKey(Attributes.ENCODING_STYLE_KEY)
+            .containsKey(Attributes.ENCODING_EXPLODE_KEY)
+            .containsKey(Attributes.ENCODING_ALLOW_RESERVED_KEY)
+            .containsValue(Attributes.EncodingStyle.SIMPLE)
+            .containsValues(true, false)
     }
 
     private data class NonEmptyConstraints(
@@ -176,23 +299,43 @@ internal class ConstrainedModelTest {
         @field:Valid val nested: NonEmptyConstraints?,
     )
 
-    private data class NonZeroConstrains(
+    private data class NonZeroConstraints(
         @field:Min(1) val nonZero: Int,
-        val nested: CompositeConstrains?
+        val nested: CompositeConstraints?
     )
 
-    private data class CompositeConstrains(
+    private data class CompositeConstraints(
         @field:NotBlank val nonBlank: String,
         @field:Valid val string: NonEmptyConstraints?,
-        @field:Valid val number: NonZeroConstrains?,
+        @field:Valid val number: NonZeroConstraints?,
         @field:NotEmpty val numberList: List<Int>?,
         @field:Valid @field:NotEmpty val nonEmptyList: List<NonEmptyConstraints>?,
-        @field:Valid @field:NotEmpty val nonZeroNestedList: List<List<NonZeroConstrains>>?,
+        @field:Valid @field:NotEmpty val nonZeroNestedList: List<List<NonZeroConstraints>>?,
     )
 
-    private data class EnumConstrains(
+    private data class ArrayConstraints(
+        @field:Valid @field:NotEmpty val booleanList: List<Boolean>?,
+        @field:Valid @field:NotEmpty val intList: List<Int>?,
+        @field:Valid @field:NotEmpty val longList: List<Long>?,
+        @field:Valid @field:NotEmpty val floatList: List<Float>?,
+        @field:Valid @field:NotEmpty val doubleList: List<Double>?,
+        @field:Valid @field:NotEmpty val stringList: List<String>?,
+    )
+
+    private data class TypeConstraints(
+        @field:NotNull val someBoolean: Boolean,
+        @field:NotNull @field:Min(1) val someInt: Int,
+        @field:NotNull @field:Min(1) val someLong: Long,
+        @field:NotNull @field:Min(1) val someFloat: Float,
+        @field:NotNull @field:Min(1) val someDouble: Double,
+        @field:NotBlank val someString: String,
+        @field:NotBlank val someEnum: SomeEnum,
+    )
+
+    private data class EnumConstraints(
         @field:NotBlank val someEnum: SomeEnum,
         @field:Valid @field:NotEmpty @field:Max(10) val enumList: List<SomeEnum>?,
+        @field:Valid @field:NotEmpty @field:Max(10) val stringList: List<String>?,
     )
 
     private enum class SomeEnum {

@@ -34,8 +34,7 @@ internal object JsonSchemaConstraints {
 
     internal fun NumberSchema.Builder.applyFormat(descriptor: AbstractDescriptor) = apply {
         when (descriptor.attributes.format) {
-            DataFormat.INT32.lowercase(),
-            DataFormat.INT64.lowercase() -> requiresInteger(true)
+            DataFormat.INT32.lowercase(), DataFormat.INT64.lowercase() -> requiresInteger(true)
             else -> Unit
         }
     }
