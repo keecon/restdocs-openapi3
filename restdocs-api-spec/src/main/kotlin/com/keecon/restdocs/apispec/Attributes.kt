@@ -1,23 +1,25 @@
 package com.keecon.restdocs.apispec
 
 import org.springframework.restdocs.constraints.Constraint
+import org.springframework.restdocs.snippet.Attributes.Attribute
+import org.springframework.restdocs.snippet.Attributes.AttributeBuilder
 
 object Attributes {
 
     @JvmStatic
-    fun key(key: String) = org.springframework.restdocs.snippet.Attributes.key(key)
+    fun key(key: String): AttributeBuilder = org.springframework.restdocs.snippet.Attributes.key(key)
 
     @JvmStatic
-    fun constraints(constraints: List<Constraint>) = key(CONSTRAINTS_KEY).value(constraints)
+    fun constraints(constraints: List<Constraint>): Attribute = key(CONSTRAINTS_KEY).value(constraints)
 
     @JvmStatic
-    fun enum(values: List<*>) = key(ENUM_VALUES_KEY).value(values)
+    fun enum(values: List<*>): Attribute = key(ENUM_VALUES_KEY).value(values)
 
     @JvmStatic
-    fun format(format: DataFormat) = key(FORMAT_KEY).value(format)
+    fun format(format: DataFormat): Attribute = key(FORMAT_KEY).value(format)
 
     @JvmStatic
-    fun items(type: DataType, format: DataFormat? = null, enums: List<*>? = null) =
+    fun items(type: DataType, format: DataFormat? = null, enums: List<*>? = null): Attribute =
         key(ITEMS_KEY).value(
             mapOf(
                 TYPE_KEY to type,
@@ -27,7 +29,7 @@ object Attributes {
         )
 
     @JvmStatic
-    fun encoding(style: EncodingStyle, explode: Boolean? = null, allowReserved: Boolean? = null) =
+    fun encoding(style: EncodingStyle, explode: Boolean? = null, allowReserved: Boolean? = null): Attribute =
         key(ENCODING_KEY).value(
             mapOf(
                 ENCODING_STYLE_KEY to style,

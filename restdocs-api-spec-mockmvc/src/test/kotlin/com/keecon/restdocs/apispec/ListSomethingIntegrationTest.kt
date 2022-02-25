@@ -18,7 +18,6 @@ import org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithP
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 import org.springframework.restdocs.request.RequestDocumentation.pathParameters
 import org.springframework.restdocs.request.RequestDocumentation.requestParameters
-import org.springframework.restdocs.snippet.Attributes
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
@@ -77,7 +76,7 @@ class ListSomethingIntegrationTest(
             get("/some/select")
                 .contentType(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
-                .param("codes", *params.map(Int::toString).toTypedArray())
+                .param("code", *params.map(Int::toString).toTypedArray())
         resultActions = mockMvc.perform(builder).andExpect(status().isOk)
     }
 
@@ -93,7 +92,7 @@ class ListSomethingIntegrationTest(
 
     @Throws(Exception::class)
     private fun whenDocumentedWithRestdocsAndResource() {
-        val model = ConstrainedModel(TestDataHolder::class.java)
+        val model = Constraints.model(TestDataHolder::class.java)
         resultActions
             .andDo(print())
             .andDo(
@@ -138,25 +137,16 @@ class ListSomethingIntegrationTest(
 
     @Throws(Exception::class)
     private fun whenResourceSnippetDocumentedWithArrayRequestParameter() {
-        val model = ConstrainedModel(TestSelect::class.java)
+        val model = Constraints.model(TestSelect::class.java)
         resultActions.doPrintAndDocument(
             ResourceSnippetParameters.builder()
                 .description("description")
                 .summary("summary")
                 .requestParameters(
-                    model.withName("codes").description("the code list")
-                        .type(DataType.ARRAY)
-                        .attributes(
-                            Attributes.key("items").value(
-                                mapOf(
-                                    "type" to DataType.INTEGER,
-                                    "format" to DataFormat.INT32
-                                )
-                            )
-                        ),
+                    model.withMappedName("code", "code[]").description("the code list")
                 )
                 .responseFields(
-                    model.withPath("codes").description("the code list"),
+                    model.withPath("code[]").description("the code list"),
                     model.withPath("id").description("the id"),
                 )
                 .build()

@@ -118,7 +118,7 @@ open class ResourceSnippetIntegrationTest {
     internal data class TestSelect(
         @field:NotEmpty
         @field:Size(min = 1, max = 16)
-        val codes: List<Int>,
+        val code: List<Int>,
 
         val id: String?
     )
@@ -127,7 +127,7 @@ open class ResourceSnippetIntegrationTest {
         andDo(print()).andDo(document(operationName, resource(snippet)))
 
     fun fieldDescriptors(): FieldDescriptors {
-        val model = ConstrainedModel(TestDataHolder::class.java)
+        val model = Constraints.model(TestDataHolder::class.java)
         return ResourceDocumentation.fields(
             model.withPath("comment").description("the comment").optional(),
             model.withPath("flag").description("the flag"),
@@ -136,7 +136,7 @@ open class ResourceSnippetIntegrationTest {
     }
 
     fun buildResourceSnippetWithRequestFields(): ResourceSnippetParameters {
-        val model = ConstrainedModel(TestDataHolder::class.java)
+        val model = Constraints.model(TestDataHolder::class.java)
         return ResourceSnippetParameters.builder()
             .description("description")
             .summary("summary")
@@ -154,7 +154,7 @@ open class ResourceSnippetIntegrationTest {
             )
             .pathParameters(
                 parameterWithName("someId").description("some id"),
-                parameterWithName("otherId").description("otherId id").type(DataType.INTEGER)
+                parameterWithName("otherId").description("otherId id")
             )
             .links(
                 linkWithRel("self").description("some"),
@@ -164,7 +164,7 @@ open class ResourceSnippetIntegrationTest {
     }
 
     fun buildResourceSnippetWithRequestParameters(): ResourceSnippetParameters {
-        val model = ConstrainedModel(TestDataHolder::class.java)
+        val model = Constraints.model(TestDataHolder::class.java)
         return ResourceSnippetParameters.builder()
             .description("description")
             .summary("summary")
@@ -173,7 +173,7 @@ open class ResourceSnippetIntegrationTest {
             .requestParameters(
                 model.withName("comment").description("the comment").optional(),
                 model.withName("flag").description("the flag").type(DataType.BOOLEAN),
-                model.withMappedName("count", "count").description("the count").type(DataType.INTEGER)
+                model.withMappedName("count", "count").description("the count")
             )
             .responseFields(fieldDescriptors().and(model.withPath("id").description("the id")))
             .requestHeaders(
@@ -186,7 +186,7 @@ open class ResourceSnippetIntegrationTest {
             )
             .pathParameters(
                 parameterWithName("someId").description("some id"),
-                parameterWithName("otherId").description("otherId id").type(DataType.INTEGER)
+                parameterWithName("otherId").description("otherId id")
             )
             .links(
                 linkWithRel("self").description("some"),

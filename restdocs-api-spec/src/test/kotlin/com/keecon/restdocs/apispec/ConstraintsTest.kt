@@ -10,12 +10,12 @@ import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.NotNull
 
-internal class ConstrainedModelTest {
+internal class ConstraintsTest {
 
     @Test
     @Suppress("UNCHECKED_CAST")
     fun `should resolve field constraints`() {
-        val model = ConstrainedModel(NonEmptyConstraints::class.java)
+        val model = Constraints.model(NonEmptyConstraints::class.java)
         val descriptor = model.withPath("nonEmpty")
 
         then(descriptor.attributes).containsKey(Attributes.CONSTRAINTS_KEY)
@@ -26,7 +26,7 @@ internal class ConstrainedModelTest {
     @Test
     @Suppress("UNCHECKED_CAST")
     fun `should resolve one level nested field constraints`() {
-        val model = ConstrainedModel(NonEmptyConstraints::class.java)
+        val model = Constraints.model(NonEmptyConstraints::class.java)
         val descriptor = model.withPath("nested.nonEmpty")
 
         then(descriptor.attributes).containsKey(Attributes.CONSTRAINTS_KEY)
@@ -37,7 +37,7 @@ internal class ConstrainedModelTest {
     @Test
     @Suppress("UNCHECKED_CAST")
     fun `should resolve two level nested field constraints`() {
-        val model = ConstrainedModel(NonEmptyConstraints::class.java)
+        val model = Constraints.model(NonEmptyConstraints::class.java)
         val descriptor = model.withPath("nested.nested.nonEmpty")
 
         then(descriptor.attributes).containsKey(Attributes.CONSTRAINTS_KEY)
@@ -48,7 +48,7 @@ internal class ConstrainedModelTest {
     @Test
     @Suppress("UNCHECKED_CAST")
     fun `should resolve parameter constraints`() {
-        val model = ConstrainedModel(NonEmptyConstraints::class.java)
+        val model = Constraints.model(NonEmptyConstraints::class.java)
         val descriptor = model.withName("nonEmpty")
 
         then(descriptor.attributes).containsKey(Attributes.CONSTRAINTS_KEY)
@@ -59,7 +59,7 @@ internal class ConstrainedModelTest {
     @Test
     @Suppress("UNCHECKED_CAST")
     fun `should resolve one level nested parameter constraints`() {
-        val model = ConstrainedModel(NonEmptyConstraints::class.java)
+        val model = Constraints.model(NonEmptyConstraints::class.java)
         val descriptor = model.withName("nested.nonEmpty")
 
         then(descriptor.attributes).containsKey(Attributes.CONSTRAINTS_KEY)
@@ -70,7 +70,7 @@ internal class ConstrainedModelTest {
     @Test
     @Suppress("UNCHECKED_CAST")
     fun `should resolve two level nested parameter constraints`() {
-        val model = ConstrainedModel(NonEmptyConstraints::class.java)
+        val model = Constraints.model(NonEmptyConstraints::class.java)
         val descriptor = model.withName("nested.nested.nonEmpty")
 
         then(descriptor.attributes).containsKey(Attributes.CONSTRAINTS_KEY)
@@ -81,7 +81,7 @@ internal class ConstrainedModelTest {
     @Test
     @Suppress("UNCHECKED_CAST")
     fun `should resolve composite field constraints`() {
-        val model = ConstrainedModel(CompositeConstraints::class.java)
+        val model = Constraints.model(CompositeConstraints::class.java)
 
         var descriptor = model.withPath("nonBlank")
         then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
@@ -139,7 +139,7 @@ internal class ConstrainedModelTest {
     @Test
     @Suppress("UNCHECKED_CAST")
     fun `should resolve array parameter constraints, items attributes`() {
-        val model = ConstrainedModel(ArrayConstraints::class.java)
+        val model = Constraints.model(ArrayConstraints::class.java)
 
         var descriptor = model.withName("booleanList[]")
         then(descriptor.type).isEqualTo(DataType.ARRAY)
@@ -199,7 +199,7 @@ internal class ConstrainedModelTest {
     @Test
     @Suppress("UNCHECKED_CAST")
     fun `should resolve parameter type and constraints`() {
-        val model = ConstrainedModel(TypeConstraints::class.java)
+        val model = Constraints.model(TypeConstraints::class.java)
 
         var descriptor = model.withName("someBoolean")
         then(descriptor.type).isEqualTo(DataType.BOOLEAN)
@@ -244,7 +244,7 @@ internal class ConstrainedModelTest {
     @Test
     @Suppress("UNCHECKED_CAST")
     fun `should resolve attributes enum values, format and encoding style`() {
-        val model = ConstrainedModel(EnumConstraints::class.java)
+        val model = Constraints.model(EnumConstraints::class.java)
 
         var descriptor = model.withName("someEnum")
         then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
