@@ -259,9 +259,13 @@ internal class ConstraintsTest {
         then((descriptor.attributes[Attributes.ITEMS_KEY] as Map<String, *>))
             .containsKey(Attributes.TYPE_KEY)
             .doesNotContainKey(Attributes.FORMAT_KEY)
-            .containsKey(Attributes.ENUM_VALUES_KEY)
+            .containsKey(Attributes.ATTRIBUTES_KEY)
             .containsValue(DataType.STRING)
-            .containsValue(listOf("FIRST_VALUE", "SECOND_VALUE", "THIRD_VALUE"))
+            .containsValue(
+                mapOf(
+                    Attributes.ENUM_VALUES_KEY to listOf("FIRST_VALUE", "SECOND_VALUE", "THIRD_VALUE")
+                )
+            )
 
         descriptor = model.withName("enumList[]").attributes(
             Attributes.encoding(Attributes.EncodingStyle.FORM, explode = true)
@@ -271,9 +275,13 @@ internal class ConstraintsTest {
         then((descriptor.attributes[Attributes.ITEMS_KEY] as Map<String, *>))
             .containsKey(Attributes.TYPE_KEY)
             .doesNotContainKey(Attributes.FORMAT_KEY)
-            .containsKey(Attributes.ENUM_VALUES_KEY)
+            .containsKey(Attributes.ATTRIBUTES_KEY)
             .containsValue(DataType.STRING)
-            .containsValue(listOf("FIRST_VALUE", "SECOND_VALUE", "THIRD_VALUE"))
+            .containsValue(
+                mapOf(
+                    Attributes.ENUM_VALUES_KEY to listOf("FIRST_VALUE", "SECOND_VALUE", "THIRD_VALUE")
+                )
+            )
         then((descriptor.attributes[Attributes.ENCODING_KEY] as Map<String, *>))
             .containsKey(Attributes.ENCODING_STYLE_KEY)
             .containsKey(Attributes.ENCODING_EXPLODE_KEY)
