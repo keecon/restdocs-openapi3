@@ -51,9 +51,9 @@ class Constraints private constructor(private val rootType: Class<*>) {
 
         val propType = propertyType(objectType, propName)
         if (isArrayType(propName)) {
-            applyArrayPropAttributes(descriptor, propType)
+            applyArrayAttributes(descriptor, propType)
         } else {
-            applyPropAttributes(descriptor, propType)
+            applyAttributes(descriptor, propType)
         }
 
         val constraints = this.validatorConstraintResolver.resolveForProperty(actualPropName(propName), objectType)
@@ -92,38 +92,38 @@ class Constraints private constructor(private val rootType: Class<*>) {
         }
 
         @JvmStatic
-        fun <T : AbstractDescriptor<T>> applyArrayPropAttributes(descriptor: T, type: Class<*>?): T {
-            if (descriptor is ParameterDescriptorWithType) {
-                descriptor.type = DataType.ARRAY
+        fun <T : AbstractDescriptor<T>> applyArrayAttributes(descriptor: T, type: Class<*>?) = descriptor.apply {
+            if (this is ParameterDescriptorWithType) {
+                this.type = DataType.ARRAY
             }
 
             return when (type) {
                 Boolean::class.javaObjectType,
-                Boolean::class.javaPrimitiveType -> descriptor.apply {
+                Boolean::class.javaPrimitiveType -> this.apply {
                     attributes(Attributes.items(DataType.BOOLEAN))
                 }
                 Float::class.javaObjectType,
                 Float::class.javaPrimitiveType,
                 Double::class.javaObjectType,
-                Double::class.javaPrimitiveType -> descriptor.apply {
+                Double::class.javaPrimitiveType -> this.apply {
                     attributes(Attributes.items(DataType.NUMBER))
                 }
                 Int::class.javaObjectType,
-                Int::class.javaPrimitiveType -> descriptor.apply {
-                    if (descriptor is FieldDescriptor)
+                Int::class.javaPrimitiveType -> this.apply {
+                    if (this is FieldDescriptor)
                         attributes(Attributes.items(DataType.NUMBER, DataFormat.INT32))
                     else attributes(Attributes.items(DataType.INTEGER, DataFormat.INT32))
                 }
                 Long::class.javaObjectType,
-                Long::class.javaPrimitiveType -> descriptor.apply {
-                    if (descriptor is FieldDescriptor)
+                Long::class.javaPrimitiveType -> this.apply {
+                    if (this is FieldDescriptor)
                         attributes(Attributes.items(DataType.NUMBER, DataFormat.INT64))
                     else attributes(Attributes.items(DataType.INTEGER, DataFormat.INT64))
                 }
-                String::class.java -> descriptor.apply {
+                String::class.java -> this.apply {
                     attributes(Attributes.items(DataType.STRING))
                 }
-                else -> descriptor.apply {
+                else -> this.apply {
                     if (type?.isEnum == true) {
                         attributes(Attributes.items(DataType.STRING, enums = type.enumConstants.map(Any::toString)))
                     }
@@ -132,55 +132,55 @@ class Constraints private constructor(private val rootType: Class<*>) {
         }
 
         @JvmStatic
-        fun <T : AbstractDescriptor<T>> applyPropAttributes(descriptor: T, type: Class<*>?) {
-            if (descriptor is ParameterDescriptorWithType) {
+        fun <T : AbstractDescriptor<T>> applyAttributes(descriptor: T, type: Class<*>?) = descriptor.apply {
+            if (this is ParameterDescriptorWithType) {
                 when (type) {
                     Boolean::class.javaObjectType,
-                    Boolean::class.javaPrimitiveType -> descriptor.apply {
+                    Boolean::class.javaPrimitiveType -> this.apply {
                         this.type = DataType.BOOLEAN
                     }
                     Float::class.javaObjectType,
                     Float::class.javaPrimitiveType,
                     Double::class.javaObjectType,
-                    Double::class.javaPrimitiveType -> descriptor.apply {
+                    Double::class.javaPrimitiveType -> this.apply {
                         this.type = DataType.NUMBER
                     }
                     Int::class.javaObjectType,
-                    Int::class.javaPrimitiveType -> descriptor.apply {
+                    Int::class.javaPrimitiveType -> this.apply {
                         this.type = DataType.INTEGER
                         attributes(Attributes.format(DataFormat.INT32))
                     }
                     Long::class.javaObjectType,
-                    Long::class.javaPrimitiveType -> descriptor.apply {
+                    Long::class.javaPrimitiveType -> this.apply {
                         this.type = DataType.INTEGER
                         attributes(Attributes.format(DataFormat.INT64))
                     }
-                    String::class.java -> descriptor.apply {
+                    String::class.java -> this.apply {
                         this.type = DataType.STRING
                     }
                 }
             }
 
             if (type?.isEnum == true) {
-                descriptor.attributes(
+                this.attributes(
                     Attributes.enum(type.enumConstants.map(Any::toString))
                 )
             }
         }
 
         @JvmStatic
-        fun actualPropName(name: String) = name.substringBefore("[]")
+        internal fun actualPropName(name: String) = name.substringBefore("[]")
 
         @JvmStatic
-        fun isArrayType(name: String) = name.lastIndexOf("[]") != -1
+        internal fun isArrayType(name: String) = name.lastIndexOf("[]") != -1
 
         @JvmStatic
-        fun fieldType(field: Field, name: String) =
+        internal fun fieldType(field: Field, name: String) =
             if (!isArrayType(name)) field.type
             else genericFirstItemType(field)
 
         @JvmStatic
-        fun genericFirstItemType(field: Field): Class<*>? {
+        internal fun genericFirstItemType(field: Field): Class<*>? {
             val type = field.genericType as? ParameterizedType
             return type?.actualTypeArguments?.first() as? Class<*>
         }
