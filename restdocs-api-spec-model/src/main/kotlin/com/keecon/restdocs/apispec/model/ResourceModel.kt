@@ -127,11 +127,18 @@ data class ParameterDescriptor(
     override val attributes: Attributes = Attributes()
 ) : AbstractParameterDescriptor
 
+data class TypeDescriptor(
+    override val type: String,
+    override val description: String = "",
+    override val optional: Boolean = false,
+    override val attributes: Attributes = Attributes()
+) : AbstractDescriptor
+
 data class Attributes(
     val validationConstraints: List<Constraint> = emptyList(),
     val enumValues: List<Any> = emptyList(),
     val format: String? = null,
-    val items: AbstractDescriptor? = null,
+    val items: TypeDescriptor? = null,
     val encoding: Encoding? = null,
 )
 

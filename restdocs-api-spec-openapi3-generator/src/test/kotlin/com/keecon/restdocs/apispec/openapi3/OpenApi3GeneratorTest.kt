@@ -4,7 +4,6 @@ import com.jayway.jsonpath.Configuration
 import com.jayway.jsonpath.DocumentContext
 import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.Option
-import com.keecon.restdocs.apispec.model.AbstractDescriptor
 import com.keecon.restdocs.apispec.model.Attributes
 import com.keecon.restdocs.apispec.model.Constraint
 import com.keecon.restdocs.apispec.model.Encoding
@@ -19,6 +18,7 @@ import com.keecon.restdocs.apispec.model.ResponseModel
 import com.keecon.restdocs.apispec.model.Schema
 import com.keecon.restdocs.apispec.model.SecurityRequirements
 import com.keecon.restdocs.apispec.model.SecurityType
+import com.keecon.restdocs.apispec.model.TypeDescriptor
 import io.swagger.v3.oas.models.servers.Server
 import io.swagger.v3.parser.OpenAPIV3Parser
 import io.swagger.v3.parser.core.models.ParseOptions
@@ -1828,11 +1828,4 @@ class OpenApi3GeneratorTest {
         val messages = OpenAPIV3Parser().readContents(openApiSpecJsonString, emptyList(), ParseOptions()).messages
         then(messages).describedAs("OpenAPI validation messages should be empty").isEmpty()
     }
-
-    data class TypeDescriptor(
-        override val type: String,
-        override val description: String = "",
-        override val optional: Boolean = false,
-        override val attributes: Attributes = Attributes()
-    ) : AbstractDescriptor
 }
