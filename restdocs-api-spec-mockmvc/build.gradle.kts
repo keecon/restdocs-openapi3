@@ -7,7 +7,7 @@ dependencies {
 
     implementation(project(":restdocs-api-spec"))
 
-    implementation("org.springframework.boot:spring-boot-starter-validation:$springRestDocsVersion")
+    implementation("org.springframework.boot:spring-boot-starter-validation:$springBootVersion")
     implementation("org.springframework.restdocs:spring-restdocs-mockmvc:$springRestDocsVersion")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")

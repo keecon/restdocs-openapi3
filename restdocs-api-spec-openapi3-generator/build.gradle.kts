@@ -1,4 +1,5 @@
 val jacksonVersion: String by extra
+val springBootVersion: String by extra
 val swaggerVersion: String by extra
 val swaggerParserVersion: String by extra
 val assertjVersion: String by extra
@@ -11,6 +12,7 @@ dependencies {
     implementation(project(":restdocs-api-spec-model"))
     implementation(project(":restdocs-api-spec-jsonschema"))
 
+    implementation("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("io.swagger.core.v3:swagger-core:$swaggerVersion")
