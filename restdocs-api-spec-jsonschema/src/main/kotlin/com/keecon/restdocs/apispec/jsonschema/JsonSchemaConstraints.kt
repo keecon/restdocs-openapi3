@@ -29,16 +29,16 @@ internal object JsonSchemaConstraints {
     internal fun StringSchema.Builder.applyFormat(descriptor: AbstractDescriptor) = apply {
         formatValidator(
             descriptor.attributes.format?.let {
-                when (it) {
+                when (val format = it.lowercase()) {
                     DataFormat.DATETIME.lowercase() -> FormatValidator.forFormat("date-time")
-                    else -> FormatValidator.forFormat(it.lowercase())
+                    else -> FormatValidator.forFormat(format)
                 }
             } ?: FormatValidator.NONE
         )
     }
 
     internal fun NumberSchema.Builder.applyFormat(descriptor: AbstractDescriptor) = apply {
-        when (descriptor.attributes.format) {
+        when (descriptor.attributes.format?.lowercase()) {
             DataFormat.INT32.lowercase(), DataFormat.INT64.lowercase() -> requiresInteger(true)
             else -> Unit
         }
