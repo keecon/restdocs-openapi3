@@ -28,7 +28,12 @@ internal object JsonSchemaConstraints {
 
     internal fun StringSchema.Builder.applyFormat(descriptor: AbstractDescriptor) = apply {
         formatValidator(
-            descriptor.attributes.format?.let { FormatValidator.forFormat(it) } ?: FormatValidator.NONE
+            descriptor.attributes.format?.let {
+                when (it) {
+                    DataFormat.DATETIME.lowercase() -> FormatValidator.forFormat("date-time")
+                    else -> FormatValidator.forFormat(it.lowercase())
+                }
+            } ?: FormatValidator.NONE
         )
     }
 
