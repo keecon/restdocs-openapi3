@@ -47,6 +47,7 @@ import io.swagger.v3.oas.models.responses.ApiResponse
 import io.swagger.v3.oas.models.responses.ApiResponses
 import io.swagger.v3.oas.models.servers.Server
 import io.swagger.v3.oas.models.tags.Tag
+import org.springframework.http.HttpStatus
 
 object OpenApi3Generator {
 
@@ -359,7 +360,7 @@ object OpenApi3Generator {
             .groupBy { it.response.contentType!! }
 
         val apiResponse = ApiResponse().apply {
-            description = responseModelsSameStatus.first().response.status.toString()
+            description = HttpStatus.valueOf(responseModelsSameStatus.first().response.status).toString()
             headers = responseModelsSameStatus
                 .flatMap { it.response.headers }
                 .associate {
