@@ -2,6 +2,8 @@ val jacksonVersion: String by extra
 val assertjVersion: String by extra
 val jsonpathVersion: String by extra
 val junitVersion: String by extra
+val hibernateValidatorVersion: String by extra
+val jsonSchemaValidatorVersion: String by extra
 
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
@@ -15,6 +17,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     testImplementation("com.jayway.jsonpath:json-path:$jsonpathVersion")
     testImplementation("org.assertj:assertj-core:$assertjVersion")
-    testImplementation("org.hibernate.validator:hibernate-validator:6.2.0.Final")
-    testImplementation("com.github.java-json-tools:json-schema-validator:2.2.14")
+    testImplementation("org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion")
+    testImplementation("com.github.java-json-tools:json-schema-validator:$jsonSchemaValidatorVersion")
 }

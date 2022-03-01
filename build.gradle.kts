@@ -55,13 +55,15 @@ allprojects {
 subprojects {
 
     val jacksonVersion by extra { "2.13.1" }
-    val springBootVersion by extra { "2.6.3" }
+    val springBootVersion by extra { "2.6.4" }
     val springRestDocsVersion by extra { "2.0.6.RELEASE" }
     val junitVersion by extra { "5.8.2" }
     val jsonpathVersion by extra { "2.6.0" }
     val swaggerVersion by extra { "2.1.13" }
     val swaggerParserVersion by extra { "2.0.30" }
     val assertjVersion by extra { "3.21.0" }
+    val hibernateValidatorVersion by extra { "6.2.2.Final" }
+    val jsonSchemaValidatorVersion by extra { "2.2.14" }
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
