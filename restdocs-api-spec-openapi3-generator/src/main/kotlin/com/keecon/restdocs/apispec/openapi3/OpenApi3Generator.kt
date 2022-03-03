@@ -360,7 +360,7 @@ object OpenApi3Generator {
             .groupBy { it.response.contentType!! }
 
         val apiResponse = ApiResponse().apply {
-            description = HttpStatus.valueOf(responseModelsSameStatus.first().response.status).toString()
+            description = HttpStatus.valueOf(responseModelsSameStatus.first().response.status).reasonPhrase
             headers = responseModelsSameStatus
                 .flatMap { it.response.headers }
                 .associate {
