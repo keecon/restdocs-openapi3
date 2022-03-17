@@ -194,6 +194,14 @@ internal class ConstraintsTest {
         then((descriptor.attributes[Attributes.ITEMS_KEY] as? Map<String, *>)).isEqualTo(
             mapOf(Attributes.TYPE_KEY to DataType.STRING)
         )
+
+        descriptor = model.withName("objectList[]").attributes(Attributes.items(DataType.OBJECT))
+        then(descriptor.type).isEqualTo(DataType.ARRAY)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotEmpty::class.java.name)
+        then((descriptor.attributes[Attributes.ITEMS_KEY] as? Map<String, *>)).isEqualTo(
+            mapOf(Attributes.TYPE_KEY to DataType.OBJECT)
+        )
     }
 
     @Test
@@ -328,6 +336,7 @@ internal class ConstraintsTest {
         @field:Valid @field:NotEmpty val floatList: List<Float>?,
         @field:Valid @field:NotEmpty val doubleList: List<Double>?,
         @field:Valid @field:NotEmpty val stringList: List<String>?,
+        @field:Valid @field:NotEmpty val objectList: List<NonEmptyConstraints>?,
     )
 
     private data class TypeConstraints(

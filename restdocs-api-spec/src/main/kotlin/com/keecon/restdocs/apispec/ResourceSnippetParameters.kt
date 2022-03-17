@@ -84,6 +84,7 @@ enum class DataType {
     NUMBER,
     BOOLEAN,
     ARRAY,
+    OBJECT,
 }
 
 enum class DataFormat {

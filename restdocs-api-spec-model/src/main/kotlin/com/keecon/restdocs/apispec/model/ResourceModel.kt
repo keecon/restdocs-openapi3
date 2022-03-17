@@ -58,6 +58,7 @@ enum class DataType {
     NUMBER,
     BOOLEAN,
     ARRAY,
+    OBJECT,
     ;
 
     fun lowercase(): String = name.lowercase()
