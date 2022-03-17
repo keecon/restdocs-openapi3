@@ -93,78 +93,83 @@ class Constraints private constructor(private val rootType: Class<*>) {
 
         @JvmStatic
         fun <T : AbstractDescriptor<T>> applyArrayAttributes(descriptor: T, type: Class<*>?) = descriptor.apply {
-            if (this is ParameterDescriptorWithType) {
-                this.type = DataType.ARRAY
+            when (this) {
+                is HeaderDescriptorWithType -> type(DataType.ARRAY)
+                is ParameterDescriptorWithType -> type(DataType.ARRAY)
+                is FieldDescriptor -> type(DataType.ARRAY)
             }
 
-            return when (type) {
+            when (type) {
                 Boolean::class.javaObjectType,
-                Boolean::class.javaPrimitiveType -> this.apply {
+                Boolean::class.javaPrimitiveType -> {
                     attributes(Attributes.items(DataType.BOOLEAN))
                 }
                 Float::class.javaObjectType,
                 Float::class.javaPrimitiveType,
                 Double::class.javaObjectType,
-                Double::class.javaPrimitiveType -> this.apply {
+                Double::class.javaPrimitiveType -> {
                     attributes(Attributes.items(DataType.NUMBER))
                 }
                 Int::class.javaObjectType,
-                Int::class.javaPrimitiveType -> this.apply {
-                    if (this is FieldDescriptor)
-                        attributes(Attributes.items(DataType.NUMBER, DataFormat.INT32))
-                    else attributes(Attributes.items(DataType.INTEGER, DataFormat.INT32))
+                Int::class.javaPrimitiveType -> {
+                    attributes(Attributes.items(DataType.INTEGER, DataFormat.INT32))
                 }
                 Long::class.javaObjectType,
-                Long::class.javaPrimitiveType -> this.apply {
-                    if (this is FieldDescriptor)
-                        attributes(Attributes.items(DataType.NUMBER, DataFormat.INT64))
-                    else attributes(Attributes.items(DataType.INTEGER, DataFormat.INT64))
+                Long::class.javaPrimitiveType -> {
+                    attributes(Attributes.items(DataType.INTEGER, DataFormat.INT64))
                 }
-                String::class.java -> this.apply {
+                String::class.java -> {
                     attributes(Attributes.items(DataType.STRING))
                 }
-                else -> this.apply {
-                    if (type?.isEnum == true) {
-                        attributes(Attributes.items(DataType.STRING, enums = type.enumConstants.map(Any::toString)))
-                    }
+                else -> if (type?.isEnum == true) {
+                    attributes(Attributes.items(DataType.STRING, enums = type.enumConstants.map(Any::toString)))
                 }
             }
         }
 
         @JvmStatic
         fun <T : AbstractDescriptor<T>> applyAttributes(descriptor: T, type: Class<*>?) = descriptor.apply {
-            if (this is ParameterDescriptorWithType) {
-                when (type) {
-                    Boolean::class.javaObjectType,
-                    Boolean::class.javaPrimitiveType -> this.apply {
-                        this.type = DataType.BOOLEAN
-                    }
-                    Float::class.javaObjectType,
-                    Float::class.javaPrimitiveType,
-                    Double::class.javaObjectType,
-                    Double::class.javaPrimitiveType -> this.apply {
-                        this.type = DataType.NUMBER
-                    }
-                    Int::class.javaObjectType,
-                    Int::class.javaPrimitiveType -> this.apply {
-                        this.type = DataType.INTEGER
-                        attributes(Attributes.format(DataFormat.INT32))
-                    }
-                    Long::class.javaObjectType,
-                    Long::class.javaPrimitiveType -> this.apply {
-                        this.type = DataType.INTEGER
-                        attributes(Attributes.format(DataFormat.INT64))
-                    }
-                    String::class.java -> this.apply {
-                        this.type = DataType.STRING
-                    }
+            when (type) {
+                Boolean::class.javaObjectType,
+                Boolean::class.javaPrimitiveType -> when (this) {
+                    is HeaderDescriptorWithType -> type(DataType.BOOLEAN)
+                    is ParameterDescriptorWithType -> type(DataType.BOOLEAN)
+                    is FieldDescriptor -> type(DataType.BOOLEAN)
                 }
-            }
-
-            if (type?.isEnum == true) {
-                this.attributes(
-                    Attributes.enum(type.enumConstants.map(Any::toString))
-                )
+                Float::class.javaObjectType,
+                Float::class.javaPrimitiveType,
+                Double::class.javaObjectType,
+                Double::class.javaPrimitiveType -> when (this) {
+                    is HeaderDescriptorWithType -> type(DataType.NUMBER)
+                    is ParameterDescriptorWithType -> type(DataType.NUMBER)
+                    is FieldDescriptor -> type(DataType.NUMBER)
+                }
+                Int::class.javaObjectType,
+                Int::class.javaPrimitiveType -> {
+                    when (this) {
+                        is HeaderDescriptorWithType -> type(DataType.INTEGER)
+                        is ParameterDescriptorWithType -> type(DataType.INTEGER)
+                        is FieldDescriptor -> type(DataType.INTEGER)
+                    }
+                    attributes(Attributes.format(DataFormat.INT32))
+                }
+                Long::class.javaObjectType,
+                Long::class.javaPrimitiveType -> {
+                    when (this) {
+                        is HeaderDescriptorWithType -> type(DataType.INTEGER)
+                        is ParameterDescriptorWithType -> type(DataType.INTEGER)
+                        is FieldDescriptor -> type(DataType.INTEGER)
+                    }
+                    attributes(Attributes.format(DataFormat.INT64))
+                }
+                String::class.java -> when (this) {
+                    is HeaderDescriptorWithType -> type(DataType.STRING)
+                    is ParameterDescriptorWithType -> type(DataType.STRING)
+                    is FieldDescriptor -> type(DataType.STRING)
+                }
+                else -> if (type?.isEnum == true) {
+                    this.attributes(Attributes.enum(type.enumConstants.map(Any::toString)))
+                }
             }
         }
 
