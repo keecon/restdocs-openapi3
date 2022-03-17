@@ -82,6 +82,11 @@ internal class FieldDescriptorWithSchema(
                         .applyConstraints(descriptor)
                         .applyFormat(descriptor)
                 )
+                "integer" -> descriptor.enumCombinedSchema(
+                    NumberSchema.builder()
+                        .requiresInteger(true)
+                        .applyConstraints(descriptor)
+                )
                 "string" -> descriptor.enumCombinedSchema(
                     StringSchema.builder()
                         .applyConstraints(descriptor)

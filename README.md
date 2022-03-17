@@ -10,4 +10,3 @@ This is an extension that bases the [restdocs-api-spec](https://github.com/ePage
 only OpenAPI 3 specs.
 
 - [OpenAPI 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md) in `json` and `yaml`
-
