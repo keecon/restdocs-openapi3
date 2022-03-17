@@ -168,7 +168,12 @@ class Constraints private constructor(private val rootType: Class<*>) {
                     is FieldDescriptor -> type(DataType.STRING)
                 }
                 else -> if (type?.isEnum == true) {
-                    this.attributes(Attributes.enum(type.enumConstants.map(Any::toString)))
+                    when (this) {
+                        is HeaderDescriptorWithType -> type(DataType.STRING)
+                        is ParameterDescriptorWithType -> type(DataType.STRING)
+                        is FieldDescriptor -> type(DataType.STRING)
+                    }
+                    attributes(Attributes.enum(type.enumConstants.map(Any::toString)))
                 }
             }
         }
