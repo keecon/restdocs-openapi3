@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.10" apply false
+    kotlin("jvm") version "1.6.20" apply false
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     id("pl.allegro.tech.build.axion-release") version "1.13.6"
     java
