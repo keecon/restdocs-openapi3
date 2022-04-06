@@ -242,7 +242,7 @@ object OpenApi3Generator {
             summary = modelsWithSamePathAndMethod.map { it.summary }.find { !it.isNullOrBlank() }
             description = modelsWithSamePathAndMethod.map { it.description }.find { !it.isNullOrBlank() }
             tags = modelsWithSamePathAndMethod.flatMap { it.tags }.distinct().ifEmpty { null }
-            deprecated = if (modelsWithSamePathAndMethod.all { it.deprecated }) true else null
+            if (modelsWithSamePathAndMethod.all { it.deprecated }) deprecated = true
             parameters =
                 extractPathParameters(
                     firstModelForPathAndMethod
