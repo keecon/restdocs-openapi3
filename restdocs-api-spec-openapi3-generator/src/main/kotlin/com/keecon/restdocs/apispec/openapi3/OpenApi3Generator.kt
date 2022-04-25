@@ -196,7 +196,7 @@ object OpenApi3Generator {
     }
 
     private fun groupByHttpMethod(resources: List<ResourceModel>): Map<HTTPMethod, List<ResourceModel>> {
-        return resources.groupBy { it.request.method }
+        return resources.sortedBy { it.operationId }.groupBy { it.request.method }
     }
 
     private fun resourceModels2PathItem(
