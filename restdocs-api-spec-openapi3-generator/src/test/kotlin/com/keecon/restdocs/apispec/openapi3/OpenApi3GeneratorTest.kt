@@ -1307,7 +1307,7 @@ class OpenApi3GeneratorTest {
             ),
             contentType = "application/json",
             example = """{
-                "description": "Good stuff!",
+                "description": "Good stuff!"
             }"""
         )
     }
@@ -1343,7 +1343,7 @@ class OpenApi3GeneratorTest {
                     {
                         "op": "add",
                         "path": "/description",
-                        "value": "updated
+                        "value": "updated"
                     }
                 ]
             """.trimIndent()

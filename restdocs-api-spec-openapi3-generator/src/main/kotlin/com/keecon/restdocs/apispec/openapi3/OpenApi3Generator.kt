@@ -1,5 +1,6 @@
 package com.keecon.restdocs.apispec.openapi3
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.keecon.restdocs.apispec.jsonschema.JsonSchemaGenerator
 import com.keecon.restdocs.apispec.model.AbstractDescriptor
@@ -316,7 +317,7 @@ object OpenApi3Generator {
                         }
                     },
                     examplesWithOperationId = requests.filter { it.request.example != null }
-                        .map { it.operationId to it.request.example!! }.toMap(),
+                        .associate { it.operationId to it.request.example!! },
                     contentType = contentType,
                     schemaName = requests.first().request.schema?.name
                 )
@@ -405,7 +406,19 @@ object OpenApi3Generator {
             .schema(schema)
             .examples(
                 examplesWithOperationId
-                    .map { it.key to Example().apply { value(it.value) } }
+                    .map {
+                        it.key to Example().apply {
+                            if (!contentType.contains("json")) {
+                                value(it.value)
+                            } else {
+                                if (it.value.startsWith("[")) {
+                                    value(ObjectMapper().readValue<List<Any>>(it.value))
+                                } else {
+                                    value(ObjectMapper().readValue<Map<Any, Any>>(it.value))
+                                }
+                            }
+                        }
+                    }
                     .toMap()
                     .ifEmpty { null }
             )
