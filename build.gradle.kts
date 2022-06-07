@@ -15,11 +15,9 @@ repositories {
 }
 
 scmVersion {
-    tag(
-        closureOf<pl.allegro.tech.build.axion.release.domain.TagNameSerializationConfig> {
-            prefix = ""
-        }
-    )
+    tag {
+        prefix = ""
+    }
 }
 
 val scmVer = scmVersion.version!!
