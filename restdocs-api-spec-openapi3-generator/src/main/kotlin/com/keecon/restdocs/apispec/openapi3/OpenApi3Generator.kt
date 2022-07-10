@@ -310,10 +310,16 @@ object OpenApi3Generator {
             .map { (contentType, requests) ->
                 toMediaType(
                     requestFields = requests.flatMap { it ->
-                        if (it.request.contentType == "application/x-www-form-urlencoded") {
-                            it.request.requestParameters.map { parameterDescriptor2FieldDescriptor(it) }
-                        } else {
-                            it.request.requestFields
+                        when (it.request.contentType) {
+                            "application/x-www-form-urlencoded" -> {
+                                it.request.requestParameters.map { parameterDescriptor2FieldDescriptor(it) }
+                            }
+                            "multipart/form-data" -> {
+                                it.request.requestParts.map { parameterDescriptor2FieldDescriptor(it) }
+                            }
+                            else -> {
+                                it.request.requestFields
+                            }
                         }
                     },
                     examplesWithOperationId = requests.filter { it.request.example != null }
