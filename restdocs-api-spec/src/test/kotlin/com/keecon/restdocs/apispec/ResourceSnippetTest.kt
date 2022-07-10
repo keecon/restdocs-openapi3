@@ -3,6 +3,7 @@ package com.keecon.restdocs.apispec
 import com.jayway.jsonpath.DocumentContext
 import com.jayway.jsonpath.JsonPath
 import com.keecon.restdocs.apispec.ResourceDocumentation.parameterWithName
+import com.keecon.restdocs.apispec.ResourceDocumentation.partWithName
 import com.keecon.restdocs.apispec.ResourceDocumentation.resource
 import org.assertj.core.api.BDDAssertions.then
 import org.assertj.core.api.BDDAssertions.thenThrownBy
@@ -15,6 +16,7 @@ import org.springframework.http.HttpHeaders.CONTENT_TYPE
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.OK
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
+import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.restdocs.generate.RestDocumentationGenerator.ATTRIBUTE_NAME_URL_TEMPLATE
 import org.springframework.restdocs.headers.HeaderDocumentation
 import org.springframework.restdocs.operation.Operation
@@ -62,7 +64,7 @@ class ResourceSnippetTest {
     }
 
     @Test
-    fun should_generate_resourcemodel_for_operation_with_request_and_response_body() {
+    fun should_generate_resource_model_for_operation_with_request_and_response_body() {
         givenOperationWithRequestAndResponseBody()
         givenRequestFieldDescriptors()
         givenRequestSchemaName()
@@ -106,6 +108,72 @@ class ResourceSnippetTest {
         then(resourceSnippetJson.read<String>("request.requestParameters[0].default")).isNotEmpty
         then(resourceSnippetJson.read<Boolean>("request.requestParameters[0].optional")).isFalse
         then(resourceSnippetJson.read<Boolean>("request.requestParameters[0].ignored")).isFalse
+
+        then(resourceSnippetJson.read<List<String>>("request.securityRequirements.requiredScopes"))
+            .containsExactly("scope1", "scope2")
+        then(resourceSnippetJson.read<String>("request.securityRequirements.type")).isEqualTo("OAUTH2")
+
+        then(resourceSnippetJson.read<String>("request.example")).isNotEmpty
+
+        then(resourceSnippetJson.read<Int>("response.status")).isEqualTo(HttpStatus.CREATED.value())
+        then(resourceSnippetJson.read<String>("response.example")).isNotEmpty
+
+        then(resourceSnippetJson.read<String>("response.schema.name")).isNotEmpty
+
+        then(resourceSnippetJson.read<List<*>>("response.headers")).hasSize(1)
+        then(resourceSnippetJson.read<String>("response.headers[0].name")).isNotEmpty
+        then(resourceSnippetJson.read<String>("response.headers[0].description")).isNotEmpty
+        then(resourceSnippetJson.read<String>("response.headers[0].type")).isNotEmpty
+        then(resourceSnippetJson.read<String>("response.headers[0].default")).isNull()
+        then(resourceSnippetJson.read<Boolean>("response.headers[0].optional")).isFalse
+        then(resourceSnippetJson.read<String>("response.headers[0].example")).isNotEmpty
+    }
+
+    @Test
+    fun should_generate_resource_model_for_operation_with_request_part_and_response_body() {
+        givenOperationWithRequestPartAndResponseBody()
+        givenRequestSchemaName()
+        givenResponseFieldDescriptors()
+        givenResponseSchemaName()
+        givenPathParameterDescriptors()
+        givenRequestPartDescriptors()
+        givenRequestAndResponseHeaderDescriptors()
+        givenTag()
+
+        whenResourceSnippetInvoked()
+
+        thenSnippetFileExists()
+        thenSnippetFileHasCommonRequestAttributes()
+
+        then(resourceSnippetJson.read<String>("request.contentType")).isEqualTo(MULTIPART_FORM_DATA_VALUE)
+        then(resourceSnippetJson.read<String>("request.example")).isEqualTo(operation.request.contentAsString)
+
+        then(resourceSnippetJson.read<List<*>>("tags")).hasSize(3)
+
+        then(resourceSnippetJson.read<String>("request.schema.name")).isNotEmpty
+
+        then(resourceSnippetJson.read<List<*>>("request.headers")).hasSize(1)
+        then(resourceSnippetJson.read<String>("request.headers[0].name")).isNotEmpty
+        then(resourceSnippetJson.read<String>("request.headers[0].description")).isNotEmpty
+        then(resourceSnippetJson.read<String>("request.headers[0].type")).isNotEmpty
+        then(resourceSnippetJson.read<String>("request.headers[0].default")).isNotEmpty
+        then(resourceSnippetJson.read<Boolean>("request.headers[0].optional")).isFalse
+        then(resourceSnippetJson.read<String>("request.headers[0].example")).isNotEmpty
+
+        then(resourceSnippetJson.read<List<*>>("request.pathParameters")).hasSize(1)
+        then(resourceSnippetJson.read<String>("request.pathParameters[0].name")).isNotEmpty
+        then(resourceSnippetJson.read<String>("request.pathParameters[0].description")).isNotEmpty
+        then(resourceSnippetJson.read<String>("request.pathParameters[0].type")).isNotEmpty
+        then(resourceSnippetJson.read<String>("request.pathParameters[0].default")).isNull()
+        then(resourceSnippetJson.read<Boolean>("request.pathParameters[0].optional")).isFalse
+        then(resourceSnippetJson.read<Boolean>("request.pathParameters[0].ignored")).isFalse
+
+        then(resourceSnippetJson.read<List<*>>("request.requestParts")).hasSize(1)
+        then(resourceSnippetJson.read<String>("request.requestParts[0].name")).isNotEmpty
+        then(resourceSnippetJson.read<String>("request.requestParts[0].description")).isNotEmpty
+        then(resourceSnippetJson.read<String>("request.requestParts[0].type")).isNotEmpty
+        then(resourceSnippetJson.read<Boolean>("request.requestParts[0].optional")).isFalse
+        then(resourceSnippetJson.read<Boolean>("request.requestParts[0].ignored")).isFalse
 
         then(resourceSnippetJson.read<List<String>>("request.securityRequirements.requiredScopes"))
             .containsExactly("scope1", "scope2")
@@ -272,6 +340,15 @@ class ResourceSnippetTest {
         parametersBuilder.requestParameters(
             parameterWithName("test-param").type(DataType.STRING).defaultValue("default-value")
                 .description("test param")
+        )
+    }
+
+    private fun givenRequestPartDescriptors() {
+        parametersBuilder.requestParts(
+            partWithName("file")
+                .type(DataType.STRING)
+                .attributes(com.keecon.restdocs.apispec.Attributes.format(DataFormat.BINARY))
+                .description("test multipart")
         )
     }
 
@@ -471,6 +548,37 @@ class ResourceSnippetTest {
             )
             .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .content(content)
+        operationBuilder
+            .response()
+            .status(201)
+            .header("X-SOME", "some")
+            .header(CONTENT_TYPE, responseContentType)
+            .content(content)
+        operation = operationBuilder.build()
+    }
+
+    private fun givenOperationWithRequestPartAndResponseBody(responseContentType: String = APPLICATION_JSON_VALUE) {
+        val operationBuilder = OperationBuilder("test", rootOutputDirectory)
+            .attribute(ATTRIBUTE_NAME_URL_TEMPLATE, "http://localhost:8080/some/{id}")
+        val content = "{\"comment\": \"some\"}"
+        operationBuilder
+            .request("http://localhost:8080/some/123")
+            .method("POST")
+            .header("X-SOME", "some")
+            .header(
+                AUTHORIZATION,
+                "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9" +
+                    ".eyJzY29wZSI6WyJzY29wZTEiLCJzY29wZTIiXSwiZXhwIjoxNTA3NzU4NDk4LCJpYXQiOjE1MDc3MT" +
+                    "UyOTgsImp0aSI6IjQyYTBhOTFhLWQ2ZWQtNDBjYy1iMTA2LWU5MGNkYWU0M2Q2ZCJ9" +
+                    ".eWGo7Y124_Hdrr-bKX08d_oCfdgtlGXo9csz-hvRhRORJi_ZK7PIwM0ChqoLa4AhR-dJ86npid75GB" +
+                    "9IxCW2f5E24FyZW2p5swpOpfkEAA4oFuj7jxHiaiqL_HFKKCRsVNAN3hGiSp9Hn3fde0-LlABqMaihd" +
+                    "zZzHL-xm8-CqbXT-qBfuscDImZrZQZqhizpSEV4idbEMzZykggLASGoOIL0t0ycfe3yeuQkMUhzZmXu" +
+                    "u08VM7zXwWnqfXCa-RmA6wC7ZnWqiJoi0vBr4BrlLR067YoUrT6pgRfiy2HZ0vEE_XY5SBtA-qI2Qnl" +
+                    "Jb7eTk7pgFtoGkYdeOZ86k6GDVw"
+            )
+            .header(CONTENT_TYPE, MULTIPART_FORM_DATA_VALUE)
+            .content(content)
+            .part("file", "test file body".toByteArray())
         operationBuilder
             .response()
             .status(201)

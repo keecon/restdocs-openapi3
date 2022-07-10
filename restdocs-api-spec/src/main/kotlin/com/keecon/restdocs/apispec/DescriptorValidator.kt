@@ -15,7 +15,10 @@ import org.springframework.restdocs.payload.ResponseFieldsSnippet
 import org.springframework.restdocs.request.ParameterDescriptor
 import org.springframework.restdocs.request.PathParametersSnippet
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
+import org.springframework.restdocs.request.RequestDocumentation.partWithName
 import org.springframework.restdocs.request.RequestParametersSnippet
+import org.springframework.restdocs.request.RequestPartDescriptor
+import org.springframework.restdocs.request.RequestPartsSnippet
 
 internal object DescriptorValidator {
 
@@ -77,6 +80,17 @@ internal object DescriptorValidator {
                     )
                 )
             }
+
+            validateIfDescriptorsPresent(
+                requestParts,
+                operation
+            ) {
+                RequestPartsSnippetWrapper(
+                    toRequestPartDescriptor(
+                        requestParts
+                    )
+                )
+            }
         }
     }
 
@@ -91,6 +105,13 @@ internal object DescriptorValidator {
         requestHeaders.map { h ->
             headerWithName(h.name).description(h.description)
                 .apply { if (h.optional) optional() }
+        }
+
+    private fun toRequestPartDescriptor(requestParts: List<RequestPartDescriptorWithType>) =
+        requestParts.map { p ->
+            partWithName(p.name).description(p.description)
+                .apply { if (p.optional) optional() }
+                .apply { if (p.isIgnored) ignored() }
         }
 
     private interface ValidateSnippet {
@@ -192,6 +213,14 @@ internal object DescriptorValidator {
         ValidateSnippet {
         override fun validate(operation: Operation) {
             this.createModel(operation)
+        }
+    }
+
+    private class RequestPartsSnippetWrapper(descriptors: List<RequestPartDescriptor>) :
+        RequestPartsSnippet(descriptors),
+        ValidateSnippet {
+        override fun validate(operation: Operation) {
+            super.createModel(operation)
         }
     }
 }

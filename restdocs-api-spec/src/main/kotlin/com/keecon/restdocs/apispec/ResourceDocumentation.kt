@@ -35,4 +35,9 @@ object ResourceDocumentation {
     fun headerWithName(name: String): HeaderDescriptorWithType {
         return HeaderDescriptorWithType(name)
     }
+
+    @JvmStatic
+    fun partWithName(name: String): RequestPartDescriptorWithType {
+        return RequestPartDescriptorWithType(name)
+    }
 }

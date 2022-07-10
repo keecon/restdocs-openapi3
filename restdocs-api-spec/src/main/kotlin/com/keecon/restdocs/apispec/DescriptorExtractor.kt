@@ -8,6 +8,8 @@ import org.springframework.restdocs.payload.AbstractFieldsSnippet
 import org.springframework.restdocs.payload.FieldDescriptor
 import org.springframework.restdocs.request.AbstractParametersSnippet
 import org.springframework.restdocs.request.ParameterDescriptor
+import org.springframework.restdocs.request.RequestPartDescriptor
+import org.springframework.restdocs.request.RequestPartsSnippet
 import org.springframework.restdocs.snippet.AbstractDescriptor
 import org.springframework.restdocs.snippet.Snippet
 import java.lang.reflect.InvocationTargetException
@@ -22,6 +24,7 @@ internal object DescriptorExtractor {
             is LinksSnippet -> extractLinks(snippet) as List<T>
             is AbstractHeadersSnippet -> extractHeaders(snippet) as List<T>
             is AbstractParametersSnippet -> extractParameters(snippet) as List<T>
+            is RequestPartsSnippet -> extractParts(snippet) as List<T>
             else -> emptyList()
         }
     }
@@ -80,6 +83,23 @@ internal object DescriptorExtractor {
                 AbstractParametersSnippet::class.java.getDeclaredMethod("getParameterDescriptors")
             getParameterDescriptors.isAccessible = true
             return ArrayList((getParameterDescriptors.invoke(snippet) as Map<String, ParameterDescriptor>).values)
+        } catch (e: NoSuchMethodException) {
+            e.printStackTrace()
+        } catch (e: InvocationTargetException) {
+            e.printStackTrace()
+        } catch (e: IllegalAccessException) {
+            e.printStackTrace()
+        }
+
+        return emptyList()
+    }
+
+    private fun extractParts(snippet: RequestPartsSnippet): List<RequestPartDescriptor> {
+        try {
+            val descriptorsByNameField =
+                AbstractParametersSnippet::class.java.getDeclaredField("descriptorsByName")
+            descriptorsByNameField.isAccessible = true
+            return ArrayList((descriptorsByNameField.get(snippet) as Map<String, RequestPartDescriptor>).values)
         } catch (e: NoSuchMethodException) {
             e.printStackTrace()
         } catch (e: InvocationTargetException) {

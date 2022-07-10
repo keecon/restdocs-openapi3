@@ -72,6 +72,7 @@ class ResourceSnippet(private val resourceSnippetParameters: ResourceSnippetPara
                 headers = resourceSnippetParameters.requestHeaders.withExampleValues(operation.request.headers),
                 pathParameters = resourceSnippetParameters.pathParameters.filter { !it.isIgnored },
                 requestParameters = resourceSnippetParameters.requestParameters.filter { !it.isIgnored },
+                requestParts = resourceSnippetParameters.requestParts.filter { !it.isIgnored },
                 schema = resourceSnippetParameters.requestSchema,
                 requestFields = if (hasRequestBody) {
                     resourceSnippetParameters.requestFields.filter { !it.isIgnored }
@@ -137,6 +138,7 @@ class ResourceSnippet(private val resourceSnippetParameters: ResourceSnippetPara
         val headers: List<HeaderDescriptorWithType>,
         val pathParameters: List<ParameterDescriptorWithType>,
         val requestParameters: List<ParameterDescriptorWithType>,
+        val requestParts: List<RequestPartDescriptorWithType>,
         val requestFields: List<FieldDescriptor>,
         val example: String?,
         val securityRequirements: SecurityRequirements?

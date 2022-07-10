@@ -37,6 +37,7 @@ data class RequestModel(
     val headers: List<HeaderDescriptor>,
     val pathParameters: List<ParameterDescriptor>,
     val requestParameters: List<ParameterDescriptor>,
+    val requestParts: List<PartDescriptor>,
     val requestFields: List<FieldDescriptor>,
     val example: String? = null,
     val schema: Schema? = null
@@ -119,6 +120,16 @@ open class FieldDescriptor(
 ) : AbstractDescriptor
 
 data class ParameterDescriptor(
+    override val name: String,
+    override val description: String,
+    override val type: String,
+    @JsonProperty("default") override val defaultValue: Any? = null,
+    override val optional: Boolean,
+    val ignored: Boolean,
+    override val attributes: Attributes = Attributes()
+) : AbstractParameterDescriptor
+
+data class PartDescriptor(
     override val name: String,
     override val description: String,
     override val type: String,

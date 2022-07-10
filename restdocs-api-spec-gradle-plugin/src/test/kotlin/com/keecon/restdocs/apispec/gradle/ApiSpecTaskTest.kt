@@ -104,6 +104,7 @@ abstract class ApiSpecTaskTest {
     "pathParameters" : [ ],
     "requestParameters" : [ ],
     "requestFields" : [ ],
+    "requestParts" : [ ],
     "example" : null,
     "securityRequirements" : {
       "type": "OAUTH2",
@@ -148,6 +149,7 @@ abstract class ApiSpecTaskTest {
     "pathParameters" : [ ],
     "requestParameters" : [ ],
     "requestFields" : [ ],
+    "requestParts" : [ ],
     "example" : null,
     "securityRequirements" : {
       "type": "OAUTH2",
@@ -184,6 +186,7 @@ abstract class ApiSpecTaskTest {
     "pathParameters" : [ ],
     "requestParameters" : [ ],
     "requestFields" : [ ],
+    "requestParts" : [ ],
     "example" : null,
     "securityRequirements" : null
   },

@@ -9,6 +9,7 @@ import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.ParameterDescriptor
+import org.springframework.restdocs.request.RequestPartDescriptor
 import org.springframework.restdocs.snippet.AbstractDescriptor
 import org.springframework.restdocs.snippet.Attributes
 import org.springframework.restdocs.snippet.IgnorableDescriptor
@@ -29,6 +30,7 @@ data class ResourceSnippetParameters @JvmOverloads constructor(
     val requestParameters: List<ParameterDescriptorWithType> = emptyList(),
     val requestHeaders: List<HeaderDescriptorWithType> = emptyList(),
     val responseHeaders: List<HeaderDescriptorWithType> = emptyList(),
+    val requestParts: List<RequestPartDescriptorWithType> = emptyList(),
     val tags: Set<String> = emptySet()
 ) {
     val responseFieldsWithLinks by lazy { responseFields + links.map(Companion::toFieldDescriptor) }
@@ -142,6 +144,38 @@ class HeaderDescriptorWithType(val name: String) : AbstractDescriptor<HeaderDesc
  * We are transitively extending AbstractDescriptor instead of ParameterDescriptor because otherwise methods like
  * description() and ignored() would return ParameterDescriptor instead of ParameterDescriptorWithType.
  */
+class RequestPartDescriptorWithType(val name: String) : IgnorableDescriptor<RequestPartDescriptorWithType>() {
+
+    var type: DataType = STRING
+        internal set
+
+    var optional: Boolean = false
+        internal set
+
+    @JsonProperty("default")
+    var defaultValue: Any? = null
+
+    fun type(type: DataType) = apply { this.type = type }
+
+    fun defaultValue(defaultValue: Any) = apply { this.defaultValue = defaultValue }
+
+    fun optional() = apply { optional = true }
+
+    companion object {
+        fun fromParameterDescriptor(requestPartDescriptor: RequestPartDescriptor) =
+            RequestPartDescriptorWithType(requestPartDescriptor.name).apply {
+                description(requestPartDescriptor.description)
+                attributes.putAll(requestPartDescriptor.attributes)
+                if (requestPartDescriptor.isOptional) optional()
+                if (requestPartDescriptor.isIgnored) ignored()
+            }
+    }
+}
+
+/**
+ * We are transitively extending AbstractDescriptor instead of ParameterDescriptor because otherwise methods like
+ * description() and ignored() would return ParameterDescriptor instead of ParameterDescriptorWithType.
+ */
 class ParameterDescriptorWithType(val name: String) : IgnorableDescriptor<ParameterDescriptorWithType>() {
 
     var type: DataType = STRING
@@ -222,6 +256,8 @@ class ResourceSnippetParametersBuilder : ResourceSnippetDetails() {
         private set
     var responseHeaders: List<HeaderDescriptorWithType> = emptyList()
         private set
+    var requestParts: List<RequestPartDescriptorWithType> = emptyList()
+        private set
 
     override fun summary(summary: String?) = apply { this.summary = summary }
     override fun description(description: String?) = apply { this.description = description }
@@ -264,6 +300,19 @@ class ResourceSnippetParametersBuilder : ResourceSnippetDetails() {
         }
     )
 
+    fun requestParts(vararg requestParts: RequestPartDescriptorWithType) =
+        this.requestParts(requestParts.toList())
+
+    fun requestParts(requestParts: List<RequestPartDescriptorWithType>) = apply {
+        this.requestParts = requestParts
+    }
+
+    fun requestParts(vararg requestParts: RequestPartDescriptor) = this.requestParts(
+        requestParts.map {
+            RequestPartDescriptorWithType.fromParameterDescriptor(it)
+        }
+    )
+
     fun requestHeaders(requestHeaders: List<HeaderDescriptorWithType>) = apply { this.requestHeaders = requestHeaders }
     fun requestHeaders(vararg requestHeaders: HeaderDescriptorWithType) = requestHeaders(requestHeaders.toList())
     fun requestHeaders(vararg requestHeaders: HeaderDescriptor) =
@@ -299,6 +348,7 @@ class ResourceSnippetParametersBuilder : ResourceSnippetDetails() {
         requestParameters,
         requestHeaders,
         responseHeaders,
+        requestParts,
         tags
     )
 }

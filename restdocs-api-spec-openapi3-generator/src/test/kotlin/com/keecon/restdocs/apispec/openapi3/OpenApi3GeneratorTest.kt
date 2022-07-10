@@ -1087,7 +1087,8 @@ class OpenApi3GeneratorTest {
                     pathParameters = listOf(),
                     requestParameters = listOf(),
                     securityRequirements = null,
-                    requestFields = listOf()
+                    requestFields = listOf(),
+                    requestParts = listOf(),
                 ),
                 response = ResponseModel(
                     status = 204,
@@ -1290,6 +1291,7 @@ class OpenApi3GeneratorTest {
             headers = listOf(),
             pathParameters = listOf(),
             requestParameters = listOf(),
+            requestParts = listOf(),
             schema = schema,
             securityRequirements = null,
             requestFields = listOf(
@@ -1319,6 +1321,7 @@ class OpenApi3GeneratorTest {
             headers = listOf(),
             pathParameters = listOf(),
             requestParameters = listOf(),
+            requestParts = listOf(),
             securityRequirements = null,
             requestFields = listOf(
                 FieldDescriptor(
@@ -1360,7 +1363,8 @@ class OpenApi3GeneratorTest {
             headers = emptyList(),
             pathParameters = emptyList(),
             requestParameters = emptyList(),
-            requestFields = listOf()
+            requestFields = listOf(),
+            requestParts = listOf(),
         )
     }
 
@@ -1376,6 +1380,7 @@ class OpenApi3GeneratorTest {
             securityRequirements = getSecurityRequirement(),
             headers = emptyList(),
             pathParameters = emptyList(),
+            requestParts = listOf(),
             requestParameters = listOf(
                 ParameterDescriptor(
                     name = "locale",
@@ -1427,7 +1432,8 @@ class OpenApi3GeneratorTest {
                     ignored = false
                 )
             ),
-            requestFields = listOf()
+            requestFields = listOf(),
+            requestParts = listOf(),
         )
     }
 
@@ -1787,7 +1793,8 @@ class OpenApi3GeneratorTest {
                 ),
             ),
             pathParameters = listOf(),
-            requestFields = listOf()
+            requestFields = listOf(),
+            requestParts = listOf(),
         )
     }
 
