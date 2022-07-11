@@ -30,12 +30,22 @@ internal object JsonSchemaConstraints {
         formatValidator(
             descriptor.attributes.format?.let {
                 when (val format = it.lowercase()) {
-                    DataFormat.DATETIME.lowercase() -> FormatValidator.forFormat("date-time")
+                    DataFormat.DATETIME.lowercase() -> {
+                        FormatValidator.forFormat("date-time")
+                    }
+
                     DataFormat.EMAIL.lowercase(),
                     DataFormat.URI.lowercase(),
                     DataFormat.HOSTNAME.lowercase(),
                     DataFormat.IPV4.lowercase(),
-                    DataFormat.IPV6.lowercase() -> FormatValidator.forFormat(format)
+                    DataFormat.IPV6.lowercase() -> {
+                        FormatValidator.forFormat(format)
+                    }
+
+                    DataFormat.BINARY.lowercase() -> {
+                        StringBinaryValidator()
+                    }
+
                     else -> FormatValidator.NONE
                 }
             } ?: FormatValidator.NONE
