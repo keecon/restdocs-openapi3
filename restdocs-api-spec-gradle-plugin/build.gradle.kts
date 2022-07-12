@@ -47,7 +47,7 @@ dependencies {
     implementation(project(":restdocs-api-spec-model"))
     implementation(project(":restdocs-api-spec-openapi3-generator"))
 
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10")
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("io.swagger.core.v3:swagger-core:$swaggerVersion")
