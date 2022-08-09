@@ -16,7 +16,7 @@ repositories {
 
 scmVersion {
     tag {
-        prefix = ""
+        prefix.set("")
     }
 }
 
