@@ -14,9 +14,9 @@ import org.springframework.restdocs.payload.RequestFieldsSnippet
 import org.springframework.restdocs.payload.ResponseFieldsSnippet
 import org.springframework.restdocs.request.ParameterDescriptor
 import org.springframework.restdocs.request.PathParametersSnippet
+import org.springframework.restdocs.request.QueryParametersSnippet
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 import org.springframework.restdocs.request.RequestDocumentation.partWithName
-import org.springframework.restdocs.request.RequestParametersSnippet
 import org.springframework.restdocs.request.RequestPartDescriptor
 import org.springframework.restdocs.request.RequestPartsSnippet
 
@@ -184,8 +184,9 @@ internal object DescriptorValidator {
         }
     }
 
+    // TODO(iwaltgen): RequestParameterSnippetWrapper rename QueryRequestParameterSnippetWrapper
     private class RequestParameterSnippetWrapper(descriptors: List<ParameterDescriptor>) :
-        RequestParametersSnippet(descriptors),
+        QueryParametersSnippet(descriptors),
         ValidateSnippet {
         override fun validate(operation: Operation) {
             super.createModel(operation)

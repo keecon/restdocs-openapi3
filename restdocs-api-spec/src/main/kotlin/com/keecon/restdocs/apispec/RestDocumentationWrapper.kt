@@ -8,7 +8,7 @@ import org.springframework.restdocs.payload.RequestFieldsSnippet
 import org.springframework.restdocs.payload.ResponseFieldsSnippet
 import org.springframework.restdocs.request.ParameterDescriptor
 import org.springframework.restdocs.request.PathParametersSnippet
-import org.springframework.restdocs.request.RequestParametersSnippet
+import org.springframework.restdocs.request.QueryParametersSnippet
 import org.springframework.restdocs.request.RequestPartsSnippet
 import org.springframework.restdocs.snippet.Snippet
 import java.util.function.Function
@@ -40,7 +40,7 @@ abstract class RestDocumentationWrapper {
                         }
                     )
                     .requestParameters(
-                        *snippets.filterIsInstance<RequestParametersSnippet>().flatMap {
+                        *snippets.filterIsInstance<QueryParametersSnippet>().flatMap {
                             DescriptorExtractor.extractDescriptorsFor<ParameterDescriptor>(it)
                         }
                             .toTypedArray()

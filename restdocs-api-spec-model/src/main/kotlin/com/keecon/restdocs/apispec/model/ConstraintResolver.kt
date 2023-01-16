@@ -4,24 +4,24 @@ import java.math.BigDecimal
 
 object ConstraintResolver {
 
-    private const val MIN_CONSTRAINT = "javax.validation.constraints.Min"
+    private const val MIN_CONSTRAINT = "jakarta.validation.constraints.Min"
 
-    private const val MAX_CONSTRAINT = "javax.validation.constraints.Max"
+    private const val MAX_CONSTRAINT = "jakarta.validation.constraints.Max"
 
-    private const val DECIMAL_MIN_CONSTRAINT = "javax.validation.constraints.DecimalMin"
+    private const val DECIMAL_MIN_CONSTRAINT = "jakarta.validation.constraints.DecimalMin"
 
-    private const val DECIMAL_MAX_CONSTRAINT = "javax.validation.constraints.DecimalMax"
+    private const val DECIMAL_MAX_CONSTRAINT = "jakarta.validation.constraints.DecimalMax"
 
-    private const val SIZE_CONSTRAINT = "javax.validation.constraints.Size"
+    private const val SIZE_CONSTRAINT = "jakarta.validation.constraints.Size"
 
-    private const val PATTERN_CONSTRAINT = "javax.validation.constraints.Pattern"
+    private const val PATTERN_CONSTRAINT = "jakarta.validation.constraints.Pattern"
 
-    private const val NOT_EMPTY_CONSTRAINT = "javax.validation.constraints.NotEmpty"
+    private const val NOT_EMPTY_CONSTRAINT = "jakarta.validation.constraints.NotEmpty"
 
-    private const val NOT_BLANK_CONSTRAINT = "javax.validation.constraints.NotBlank"
+    private const val NOT_BLANK_CONSTRAINT = "jakarta.validation.constraints.NotBlank"
 
     private val REQUIRED_CONSTRAINTS = setOf(
-        "javax.validation.constraints.NotNull",
+        "jakarta.validation.constraints.NotNull",
         NOT_EMPTY_CONSTRAINT,
         NOT_BLANK_CONSTRAINT,
     )

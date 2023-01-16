@@ -5,6 +5,7 @@ val swaggerParserVersion: String by extra
 val assertjVersion: String by extra
 val jsonpathVersion: String by extra
 val junitVersion: String by extra
+val hibernateValidatorVersion: String by extra
 
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
@@ -21,4 +22,5 @@ dependencies {
     testImplementation("org.assertj:assertj-core:$assertjVersion")
     testImplementation("com.jayway.jsonpath:json-path:$jsonpathVersion")
     testImplementation("io.swagger.parser.v3:swagger-parser:$swaggerParserVersion")
+    testImplementation("org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion")
 }

@@ -22,19 +22,19 @@ import com.keecon.restdocs.apispec.model.TypeDescriptor
 import io.swagger.v3.oas.models.servers.Server
 import io.swagger.v3.parser.OpenAPIV3Parser
 import io.swagger.v3.parser.core.models.ParseOptions
+import jakarta.validation.constraints.DecimalMax
+import jakarta.validation.constraints.DecimalMin
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.Collections
-import javax.validation.constraints.DecimalMax
-import javax.validation.constraints.DecimalMin
-import javax.validation.constraints.Max
-import javax.validation.constraints.Min
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.NotEmpty
-import javax.validation.constraints.NotNull
-import javax.validation.constraints.Pattern
-import javax.validation.constraints.Size
 
 class OpenApi3GeneratorTest {
 
@@ -89,11 +89,11 @@ class OpenApi3GeneratorTest {
 
         whenOpenApiObjectGenerated()
 
-        then(openApiJsonPathContext.read<Any>("paths./products/{id}.delete")).isNotNull
-        then(openApiJsonPathContext.read<Any>("paths./products/{id}.delete.requestBody")).isNull()
+        then(openApiJsonPathContext.read<Any>("paths./products/{id}.delete".toString())).isNotNull
+        then(openApiJsonPathContext.read<Any>("paths./products/{id}.delete.requestBody".toString())).isNull()
 
-        then(openApiJsonPathContext.read<Any>("paths./products/{id}.delete.responses.204")).isNotNull
-        then(openApiJsonPathContext.read<Any>("paths./products/{id}.delete.responses.204.content")).isNull()
+        then(openApiJsonPathContext.read<Any>("paths./products/{id}.delete.responses.204".toString())).isNotNull
+        then(openApiJsonPathContext.read<Any>("paths./products/{id}.delete.responses.204.content".toString())).isNull()
         thenOpenApiSpecIsValid()
     }
 
@@ -216,9 +216,9 @@ class OpenApi3GeneratorTest {
         whenOpenApiObjectGenerated()
 
         val patchResponseSchemaRef = openApiJsonPathContext
-            .read<String>("paths./products/{id}.patch.responses.200.content.application/json.schema.\$ref")
+            .read<String>("paths./products/{id}.patch.responses.200.content.application/json.schema.\$ref".toString())
         val getResponseSchemaRef = openApiJsonPathContext
-            .read<String>("paths./products/{id}.get.responses.200.content.application/json.schema.\$ref")
+            .read<String>("paths./products/{id}.get.responses.200.content.application/json.schema.\$ref".toString())
         then(patchResponseSchemaRef).isEqualTo(getResponseSchemaRef)
 
         val schemaId = getResponseSchemaRef.removePrefix("#/components/schemas/")
@@ -234,7 +234,7 @@ class OpenApi3GeneratorTest {
         whenOpenApiObjectGenerated()
 
         val params = openApiJsonPathContext
-            .read<List<Map<String, String>>>("paths./products/{id}.get.parameters.*")
+            .read<List<Map<String, String>>>("paths./products/{id}.get.parameters.*".toString())
 
         then(params).anyMatch { it["name"] == "id" }
         then(params).anyMatch { it["name"] == "locale" }
@@ -323,7 +323,7 @@ class OpenApi3GeneratorTest {
 
         whenOpenApiObjectGenerated()
 
-        then(openApiJsonPathContext.read<String>("paths./products/{id}.get.operationId")).isEqualTo("test")
+        then(openApiJsonPathContext.read<String>("paths./products/{id}.get.operationId".toString())).isEqualTo("test")
     }
 
     @Test
@@ -332,7 +332,9 @@ class OpenApi3GeneratorTest {
 
         whenOpenApiObjectGenerated()
 
-        then(openApiJsonPathContext.read<String>("paths./products/{id}.get.operationId")).isEqualTo("firstsecond")
+        then(
+            openApiJsonPathContext.read<String>("paths./products/{id}.get.operationId".toString())
+        ).isEqualTo("firstsecond")
     }
 
     @Test
@@ -355,7 +357,7 @@ class OpenApi3GeneratorTest {
 
         whenOpenApiObjectGenerated()
 
-        val params = openApiJsonPathContext.read<List<Map<*, *>>>("paths./products/{id}.get.parameters.*")
+        val params = openApiJsonPathContext.read<List<Map<*, *>>>("paths./products/{id}.get.parameters.*".toString())
 
         then(params).anyMatch { it["name"] == "id" }
         then(params).anyMatch {
@@ -433,7 +435,7 @@ class OpenApi3GeneratorTest {
 
         whenOpenApiObjectGenerated()
 
-        val params = openApiJsonPathContext.read<List<Map<*, *>>>("paths./metadata.get.parameters.*")
+        val params = openApiJsonPathContext.read<List<Map<*, *>>>("paths./metadata.get.parameters.*".toString())
 
         then(params).anyMatch {
             it["name"] == "X-SOME-BOOLEAN" &&

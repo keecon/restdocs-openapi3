@@ -2,6 +2,11 @@ package com.keecon.restdocs.apispec
 
 import com.keecon.restdocs.apispec.ResourceDocumentation.parameterWithName
 import com.keecon.restdocs.apispec.ResourceDocumentation.resource
+import jakarta.validation.Valid
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Size
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -27,11 +32,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
-import javax.validation.Valid
-import javax.validation.constraints.Min
-import javax.validation.constraints.NotEmpty
-import javax.validation.constraints.NotNull
-import javax.validation.constraints.Size
 
 @ExtendWith(SpringExtension::class)
 @WebMvcTest

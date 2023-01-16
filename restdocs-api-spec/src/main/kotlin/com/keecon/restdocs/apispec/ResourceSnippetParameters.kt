@@ -27,6 +27,7 @@ data class ResourceSnippetParameters @JvmOverloads constructor(
     val responseFields: List<FieldDescriptor> = emptyList(),
     val links: List<LinkDescriptor> = emptyList(),
     val pathParameters: List<ParameterDescriptorWithType> = emptyList(),
+    // TODO(iwaltgen): requestParameters rename queryParameters
     val requestParameters: List<ParameterDescriptorWithType> = emptyList(),
     val requestHeaders: List<HeaderDescriptorWithType> = emptyList(),
     val responseHeaders: List<HeaderDescriptorWithType> = emptyList(),

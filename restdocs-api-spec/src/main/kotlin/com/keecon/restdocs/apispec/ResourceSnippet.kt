@@ -67,7 +67,7 @@ class ResourceSnippet(private val resourceSnippetParameters: ResourceSnippetPara
             tags = tags,
             request = RequestModel(
                 path = getUriPath(operation)!!,
-                method = operation.request.method.name,
+                method = operation.request.method.name(),
                 contentType = if (hasRequestBody) getContentTypeOrDefault(operation.request.headers) else null,
                 headers = resourceSnippetParameters.requestHeaders.withExampleValues(operation.request.headers),
                 pathParameters = resourceSnippetParameters.pathParameters.filter { !it.isIgnored },
@@ -137,6 +137,7 @@ class ResourceSnippet(private val resourceSnippetParameters: ResourceSnippetPara
         val schema: Schema? = null,
         val headers: List<HeaderDescriptorWithType>,
         val pathParameters: List<ParameterDescriptorWithType>,
+        // TODO(iwaltgen): requestParameters rename queryParameters
         val requestParameters: List<ParameterDescriptorWithType>,
         val requestParts: List<RequestPartDescriptorWithType>,
         val requestFields: List<FieldDescriptor>,
