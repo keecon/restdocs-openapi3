@@ -4,7 +4,8 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 
 # dev
-.java-version
+.envrc
+.tool-versions
 gradle.properties
 
 ### IntelliJ IDEA ###
