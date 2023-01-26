@@ -10,13 +10,13 @@ val hibernateValidatorVersion: String by extra
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
 
-    implementation(project(":restdocs-api-spec-model"))
-    implementation(project(":restdocs-api-spec-jsonschema"))
+    api(project(":restdocs-api-spec-model"))
+    api(project(":restdocs-api-spec-jsonschema"))
 
+    api("io.swagger.core.v3:swagger-core:$swaggerVersion")
     implementation("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
-    implementation("io.swagger.core.v3:swagger-core:$swaggerVersion")
 
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     testImplementation("org.assertj:assertj-core:$assertjVersion")

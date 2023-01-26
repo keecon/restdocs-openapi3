@@ -5,7 +5,7 @@ val junitVersion: String by extra
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
 
-    implementation(project(":restdocs-api-spec"))
+    api(project(":restdocs-api-spec"))
 
     implementation("org.springframework.boot:spring-boot-starter-validation:$springBootVersion")
     implementation("org.springframework.restdocs:spring-restdocs-mockmvc:$springRestDocsVersion")
