@@ -1,9 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("jvm") version "1.8.0" apply false
-    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
-    id("pl.allegro.tech.build.axion-release") version "1.14.3"
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.axion.release)
     java
     jacoco
     `maven-publish`
@@ -51,17 +52,6 @@ allprojects {
 }
 
 subprojects {
-
-    val jacksonVersion by extra { "2.13.1" }
-    val springBootVersion by extra { "3.0.1" }
-    val springRestDocsVersion by extra { "3.0.0" }
-    val junitVersion by extra { "5.8.2" }
-    val jsonpathVersion by extra { "2.6.0" }
-    val swaggerVersion by extra { "2.1.13" }
-    val swaggerParserVersion by extra { "2.0.30" }
-    val assertjVersion by extra { "3.21.0" }
-    val hibernateValidatorVersion by extra { "7.0.5.Final" }
-    val jsonSchemaValidatorVersion by extra { "2.2.14" }
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {

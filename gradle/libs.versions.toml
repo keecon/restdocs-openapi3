@@ -1,0 +1,48 @@
+[versions]
+kotlin = "1.8.0"
+ktlint = "11.0.0"
+axion-release = "1.14.3"
+jackson = "2.13.1"
+spring-boot = "3.0.2"
+spring-restdocs = "3.0.0"
+junit = "5.8.2"
+junit-pioneer = "0.3.3"
+jsonpath = "2.6.0"
+swagger = "2.1.13"
+swagger-parser = "2.0.30"
+assertj = "3.21.0"
+hibernate-validator = "7.0.5.Final"
+json-schema-validator = "2.2.14"
+everit-json-schema = "1.11.0"
+plugin-publish = "0.21.0"
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+axion-release = { id = "pl.allegro.tech.build.axion-release", version.ref = "axion-release" }
+plugin-publish = { id = "com.gradle.plugin-publish", version.ref = "plugin-publish" }
+
+[libraries]
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "spring-boot" }
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation", version.ref = "spring-boot" }
+spring-boot-starter-hateoas = { module = "org.springframework.boot:spring-boot-starter-hateoas", version.ref = "spring-boot" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-boot" }
+spring-restdocs-core = { module = "org.springframework.restdocs:spring-restdocs-core", version.ref = "spring-restdocs" }
+spring-restdocs-mockmvc = { module = "org.springframework.restdocs:spring-restdocs-mockmvc", version.ref = "spring-restdocs" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson" }
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+swagger-core = { module = "io.swagger.core.v3:swagger-core", version.ref = "swagger" }
+swagger-parser = { module = "io.swagger.parser.v3:swagger-parser", version.ref = "swagger-parser" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+junit-pioneer = { module = "org.junit-pioneer:junit-pioneer", version.ref = "junit-pioneer" }
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+jsonpath = { module = "com.jayway.jsonpath:json-path", version.ref = "jsonpath" }
+hibernate-validator = { module = "org.hibernate.validator:hibernate-validator", version.ref = "hibernate-validator" }
+json-schema-validator = { module = "com.github.java-json-tools:json-schema-validator", version.ref = "json-schema-validator" }
+everit-json-schema = { module = "com.github.erosb:everit-json-schema", version.ref = "everit-json-schema" }
+
+[bundles]
+jackson = ["jackson-databind", "jackson-annotations", "jackson-module-kotlin"]
+junit = ["junit-jupiter-engine", "junit-pioneer"]
