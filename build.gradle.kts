@@ -136,10 +136,6 @@ subprojects {
     }
 }
 
-jacoco {
-    toolVersion = "0.8.7"
-}
-
 val jacocoMergeData = tasks.create<JacocoMerge>("jacocoMergeData") {
     dependsOn(subprojects.map { it.tasks.jacocoTestReport })
     destinationFile = file("$buildDir/jacoco/all-tests.exec")
