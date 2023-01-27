@@ -142,7 +142,7 @@ class ListSomethingIntegrationTest(
             ResourceSnippetParameters.builder()
                 .description("description")
                 .summary("summary")
-                .requestParameters(
+                .queryParameters(
                     model.withMappedName("code", "code[]").description("the code list")
                 )
                 .responseFields(

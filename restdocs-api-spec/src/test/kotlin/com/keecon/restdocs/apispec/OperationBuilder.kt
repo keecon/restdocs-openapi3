@@ -149,7 +149,10 @@ class OperationBuilder {
             for (builder in this.partBuilders) {
                 parts.add(builder.buildPart())
             }
-            return OperationRequestFactory().create(this.requestUri, this.method, this.content, this.headers, parts)
+            return OperationRequestFactory().create(
+                this.requestUri, this.method,
+                this.content, this.headers, parts
+            )
         }
 
         fun build(): Operation {
@@ -171,23 +174,26 @@ class OperationBuilder {
             return this
         }
 
-        fun param(name: String, vararg values: String): OperationRequestBuilder {
-            this.requestUri = UriComponentsBuilder.fromUri(this.requestUri)
-                .queryParam(name, values).build().toUri()
+        fun queryParam(name: String, vararg values: String): OperationRequestBuilder {
+            if (values.isNotEmpty()) {
+                this.requestUri = UriComponentsBuilder.fromUri(this.requestUri)
+                    .queryParam(name, values).build().toUri()
+            }
+            return this
+        }
+
+        fun part(name: String, content: ByteArray, contentType: String? = null): OperationRequestBuilder {
+            val partBuilder = OperationRequestPartBuilder(name, content)
+            if (contentType != null) {
+                partBuilder.header(HttpHeaders.CONTENT_TYPE, contentType)
+            }
+            this.partBuilders.add(partBuilder)
             return this
         }
 
         fun header(name: String, value: String): OperationRequestBuilder {
             this.headers.add(name, value)
             return this
-        }
-
-        fun part(name: String, content: ByteArray): OperationRequestPartBuilder {
-            val partBuilder = OperationRequestPartBuilder(
-                name, content
-            )
-            this.partBuilders.add(partBuilder)
-            return partBuilder
         }
 
         /**

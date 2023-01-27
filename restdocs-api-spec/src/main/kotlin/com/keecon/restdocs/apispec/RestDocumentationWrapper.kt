@@ -6,9 +6,11 @@ import org.springframework.restdocs.headers.ResponseHeadersSnippet
 import org.springframework.restdocs.hypermedia.LinksSnippet
 import org.springframework.restdocs.payload.RequestFieldsSnippet
 import org.springframework.restdocs.payload.ResponseFieldsSnippet
+import org.springframework.restdocs.request.FormParametersSnippet
 import org.springframework.restdocs.request.ParameterDescriptor
 import org.springframework.restdocs.request.PathParametersSnippet
 import org.springframework.restdocs.request.QueryParametersSnippet
+import org.springframework.restdocs.request.RequestPartDescriptor
 import org.springframework.restdocs.request.RequestPartsSnippet
 import org.springframework.restdocs.snippet.Snippet
 import java.util.function.Function
@@ -39,34 +41,35 @@ abstract class RestDocumentationWrapper {
                             DescriptorExtractor.extractDescriptorsFor(it)
                         }
                     )
-                    .requestParameters(
-                        *snippets.filterIsInstance<QueryParametersSnippet>().flatMap {
-                            DescriptorExtractor.extractDescriptorsFor<ParameterDescriptor>(it)
-                        }
-                            .toTypedArray()
-                    )
                     .pathParameters(
                         *snippets.filterIsInstance<PathParametersSnippet>().flatMap {
                             DescriptorExtractor.extractDescriptorsFor<ParameterDescriptor>(it)
-                        }
-                            .toTypedArray()
+                        }.toTypedArray()
+                    )
+                    .queryParameters(
+                        *snippets.filterIsInstance<QueryParametersSnippet>().flatMap {
+                            DescriptorExtractor.extractDescriptorsFor<ParameterDescriptor>(it)
+                        }.toTypedArray()
+                    )
+                    .formParameters(
+                        *snippets.filterIsInstance<FormParametersSnippet>().flatMap {
+                            DescriptorExtractor.extractDescriptorsFor<ParameterDescriptor>(it)
+                        }.toTypedArray()
+                    )
+                    .requestParts(
+                        *snippets.filterIsInstance<RequestPartsSnippet>().flatMap {
+                            DescriptorExtractor.extractDescriptorsFor<RequestPartDescriptor>(it)
+                        }.toTypedArray()
                     )
                     .requestHeaders(
                         *snippets.filterIsInstance<RequestHeadersSnippet>().flatMap {
                             DescriptorExtractor.extractDescriptorsFor<HeaderDescriptor>(it)
-                        }
-                            .toTypedArray()
+                        }.toTypedArray()
                     )
                     .responseHeaders(
                         *snippets.filterIsInstance<ResponseHeadersSnippet>().flatMap {
                             DescriptorExtractor.extractDescriptorsFor<HeaderDescriptor>(it)
-                        }
-                            .toTypedArray()
-                    )
-                    .requestParts(
-                        snippets.filterIsInstance<RequestPartsSnippet>().flatMap {
-                            DescriptorExtractor.extractDescriptorsFor(it)
-                        }
+                        }.toTypedArray()
                     )
                     .build()
                 snippets.toList() + ResourceDocumentation.resource(resourceParameters)

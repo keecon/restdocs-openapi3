@@ -170,7 +170,7 @@ open class ResourceSnippetIntegrationTest {
             .summary("summary")
             .deprecated(true)
             .privateResource(true)
-            .requestParameters(
+            .queryParameters(
                 model.withName("comment").description("the comment").optional(),
                 model.withName("flag").description("the flag").type(DataType.BOOLEAN),
                 model.withMappedName("count", "count").description("the count")

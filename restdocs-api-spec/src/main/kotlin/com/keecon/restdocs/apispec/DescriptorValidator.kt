@@ -12,6 +12,7 @@ import org.springframework.restdocs.payload.FieldDescriptor
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.RequestFieldsSnippet
 import org.springframework.restdocs.payload.ResponseFieldsSnippet
+import org.springframework.restdocs.request.FormParametersSnippet
 import org.springframework.restdocs.request.ParameterDescriptor
 import org.springframework.restdocs.request.PathParametersSnippet
 import org.springframework.restdocs.request.QueryParametersSnippet
@@ -51,15 +52,36 @@ internal object DescriptorValidator {
             }
 
             validateIfDescriptorsPresent(
-                requestParameters,
+                queryParameters,
                 operation
             ) {
-                RequestParameterSnippetWrapper(
+                QueryParameterSnippetWrapper(
                     toParameterDescriptors(
-                        requestParameters
+                        queryParameters
                     )
                 )
             }
+            validateIfDescriptorsPresent(
+                formParameters,
+                operation
+            ) {
+                FormParameterSnippetWrapper(
+                    toParameterDescriptors(
+                        formParameters
+                    )
+                )
+            }
+            validateIfDescriptorsPresent(
+                requestParts,
+                operation
+            ) {
+                RequestPartsSnippetWrapper(
+                    toRequestPartDescriptor(
+                        requestParts
+                    )
+                )
+            }
+
             validateIfDescriptorsPresent(
                 requestHeaders,
                 operation
@@ -77,17 +99,6 @@ internal object DescriptorValidator {
                 ResponseHeadersSnippetWrapper(
                     toHeaderDescriptors(
                         responseHeaders
-                    )
-                )
-            }
-
-            validateIfDescriptorsPresent(
-                requestParts,
-                operation
-            ) {
-                RequestPartsSnippetWrapper(
-                    toRequestPartDescriptor(
-                        requestParts
                     )
                 )
             }
@@ -184,9 +195,16 @@ internal object DescriptorValidator {
         }
     }
 
-    // TODO(iwaltgen): RequestParameterSnippetWrapper rename QueryRequestParameterSnippetWrapper
-    private class RequestParameterSnippetWrapper(descriptors: List<ParameterDescriptor>) :
+    private class QueryParameterSnippetWrapper(descriptors: List<ParameterDescriptor>) :
         QueryParametersSnippet(descriptors),
+        ValidateSnippet {
+        override fun validate(operation: Operation) {
+            super.createModel(operation)
+        }
+    }
+
+    private class FormParameterSnippetWrapper(descriptors: List<ParameterDescriptor>) :
+        FormParametersSnippet(descriptors),
         ValidateSnippet {
         override fun validate(operation: Operation) {
             super.createModel(operation)
