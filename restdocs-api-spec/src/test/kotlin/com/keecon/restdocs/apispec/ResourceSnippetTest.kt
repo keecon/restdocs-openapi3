@@ -18,7 +18,6 @@ import org.springframework.http.HttpStatus.OK
 import org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
-import org.springframework.http.MediaType.TEXT_PLAIN
 import org.springframework.http.MediaType.TEXT_PLAIN_VALUE
 import org.springframework.restdocs.generate.RestDocumentationGenerator.ATTRIBUTE_NAME_URL_TEMPLATE
 import org.springframework.restdocs.headers.HeaderDocumentation
