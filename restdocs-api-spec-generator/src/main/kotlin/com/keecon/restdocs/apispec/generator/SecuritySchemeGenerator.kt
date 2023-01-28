@@ -1,4 +1,4 @@
-package com.keecon.restdocs.apispec.openapi3
+package com.keecon.restdocs.apispec.generator
 
 import com.keecon.restdocs.apispec.model.Oauth2Configuration
 import com.keecon.restdocs.apispec.model.SecurityRequirements
@@ -38,21 +38,25 @@ internal object SecuritySchemeGenerator {
                             .tokenUrl(oauth2SecuritySchemeDefinition.tokenUrl)
                             .scopes(allScopes, scopeAndDescriptions)
                     )
+
                     "clientCredentials" -> flows.clientCredentials(
                         OAuthFlow()
                             .tokenUrl(oauth2SecuritySchemeDefinition.tokenUrl)
                             .scopes(allScopes, scopeAndDescriptions)
                     )
+
                     "password" -> flows.password(
                         OAuthFlow()
                             .tokenUrl(oauth2SecuritySchemeDefinition.tokenUrl)
                             .scopes(allScopes, scopeAndDescriptions)
                     )
+
                     "implicit" -> flows.implicit(
                         OAuthFlow()
                             .authorizationUrl(oauth2SecuritySchemeDefinition.authorizationUrl)
                             .scopes(allScopes, scopeAndDescriptions)
                     )
+
                     else -> throw IllegalArgumentException("Unknown flow '$flow' in oauth2SecuritySchemeDefinition")
                 }
             }
@@ -104,6 +108,7 @@ internal object SecuritySchemeGenerator {
                         )
                     )
                 }
+
                 SecurityType.BASIC -> addSecurityItem(SecurityRequirement().addList(BASIC_SECURITY_NAME))
                 SecurityType.API_KEY -> addSecurityItem(SecurityRequirement().addList(API_KEY_SECURITY_NAME))
                 SecurityType.JWT_BEARER -> addSecurityItem(SecurityRequirement().addList(JWT_BEARER_SECURITY_NAME))

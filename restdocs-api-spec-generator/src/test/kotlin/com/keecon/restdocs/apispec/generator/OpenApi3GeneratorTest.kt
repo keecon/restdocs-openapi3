@@ -1,4 +1,4 @@
-package com.keecon.restdocs.apispec.openapi3
+package com.keecon.restdocs.apispec.generator
 
 import com.jayway.jsonpath.Configuration
 import com.jayway.jsonpath.DocumentContext

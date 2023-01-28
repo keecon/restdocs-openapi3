@@ -40,7 +40,7 @@ dependencies {
     compileOnly(kotlin("gradle-plugin"))
 
     implementation(project(":restdocs-api-spec-model"))
-    implementation(project(":restdocs-api-spec-openapi3-generator"))
+    implementation(project(":restdocs-api-spec-generator"))
 
     implementation(libs.kotlin.gradle.plugin)
     implementation(libs.swagger.core)
