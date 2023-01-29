@@ -66,42 +66,13 @@ And only support [OpenAPI 3.0.1] specs.
 ```groovy
 when:
 def resultActions = mockMvc.perform(
-  get('/v1/system-uptime')
+  get('/v1/products/{productId}/result?code={code}', 1, 1)
     .accept(MediaType.APPLICATION_JSON)
 )
 
 then:
-def respModel = Constraints.model(SystemUptimeResponse.class)
-resultActions
-  .andExpect(status().isOk())
-  .andExpect(jsonPath('$.up', not(emptyOrNullString())))
-  .andExpect(jsonPath('$.datetime', not(emptyOrNullString())))
-  .andDo(document('system-uptime-get',
-    resource(ResourceSnippetParameters.builder()
-      .summary('Get a system uptime info')
-      .description('''
-        |Get a system uptime info
-        |- Each server node differs in uptime
-        |'''.stripMargin())
-      .responseSchema(schema('SystemUptimeResponse'))
-      .responseFields(
-        respModel.withPath('up').description('uptime (duration)'),
-        respModel.withPath('datetime').description('current time (date-time)')
-          .attributes(Attributes.format(DataFormat.DATETIME)),
-      )
-      .build()))
-  )
-```
+1 * mockProductService.getResult(1L, 1, _) >> result
 
-```groovy
-when:
-def resultActions = mockMvc.perform(
-  get('/v1/products/{productId}/result?code={code}', 2022, 2012)
-    .accept(MediaType.APPLICATION_JSON)
-    .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_VALUE)
-)
-
-then:
 def reqModel = Constraints.model(ProductResultRequest.class)
 def respModel = Constraints.model(ProductResultResponse.class)
 resultActions
@@ -128,7 +99,7 @@ resultActions
       .pathParameters(
         reqModel.withName('productId').description('product id'),
       )
-      .requestParameters(
+      .queryParameters(
         reqModel.withName('code').description('product result code'),
         reqModel.withName('seq').description('product result seq')
           .defaultValue(ProductResultRequest.DEFAULT_RESULT_SEQ)
@@ -143,8 +114,9 @@ resultActions
         respModel.withPath('result.assigns[]').description('result assign object list'),
         respModel.withPath('result.assigns[].code').description('result assign code'),
         respModel.withPath('result.assigns[].seq').description('result assign seq'),
-        respModel.withPath('result.assigns[].objectType').description('result assign object type'),
         respModel.withPath('result.assigns[].objectId').description('result assign object id'),
+        respModel.withPath('result.assigns[].fileType').description('result assign file type')
+          .optional(),
         respModel.withPath('result.assigns[].fileUrl').description('result assign file url')
           .optional(),
         respModel.withPath('result.assigns[].comments[]').description('result assign comment list')
@@ -154,6 +126,8 @@ resultActions
       )
       .build())))
 ```
+
+> https://github.com/keecon/restdocs-openapi3/blob/main/restdocs-api-spec-example/src/test/groovy/com/keecon/restdocs/apispec/example/ProductControllerSpec.groovy#L59-L119
 
 [jitpack-badge]: https://jitpack.io/v/keecon/restdocs-openapi3.svg
 
