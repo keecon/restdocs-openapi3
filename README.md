@@ -66,19 +66,80 @@ And only support [OpenAPI 3.0.1] specs.
 ```groovy
 when:
 def resultActions = mockMvc.perform(
+  post('/v1/products/{productId}/result', 1)
+    .contentType(MediaType.APPLICATION_JSON)
+    .content(objectMapper.writeValueAsBytes(new ProductResultCreateRequestBody(result)))
+    .accept(MediaType.APPLICATION_JSON)
+)
+
+then:
+def reqModel = Constraints.model(ProductResultCreateRequest.class)
+def reqBodyModel = Constraints.model(ProductResultCreateRequestBody.class)
+def respModel = Constraints.model(ProductResultCreateResponse.class)
+resultActions
+  .andExpect(status().isOk())
+  .andDo(document('products-id-result-post',
+    resource(ResourceSnippetParameters.builder()
+      .tag('product')
+      .summary('Create a product result')
+      .description('''
+        |Create a product result
+        |
+        |### Error details
+        |
+        |`400` BAD_REQUEST
+        |- bad request description
+        |
+        |`401` UNAUTHORIZED
+        |- unauthorized description
+        |
+        |'''.stripMargin())
+      .requestSchema(schema('ProductResultCreateRequest'))
+      .pathParameters(
+        reqModel.withName('productId').description('product id'),
+      )
+      .requestFields(
+        reqBodyModel.withPath('result').description('product result'),
+        reqBodyModel.withPath('result.code').description('product result code'),
+        reqBodyModel.withPath('result.seq').description('product result seq'),
+        reqBodyModel.withPath('result.score').description('product result score'),
+        reqBodyModel.withPath('result.assigns[]').description('result assign object list'),
+        reqBodyModel.withPath('result.assigns[].code').description('result assign code'),
+        reqBodyModel.withPath('result.assigns[].seq').description('result assign seq'),
+        reqBodyModel.withPath('result.assigns[].objectId').description('result assign object id'),
+        reqBodyModel.withPath('result.assigns[].fileType').description('result assign file type')
+          .optional(),
+        reqBodyModel.withPath('result.assigns[].fileUrl').description('result assign file url')
+          .optional(),
+        reqBodyModel.withPath('result.assigns[].comments[]').description('result assign comment list')
+          .type(DataType.ARRAY)
+          .attributes(Attributes.items(DataType.STRING, null, null))
+          .optional(),
+      )
+      .responseSchema(schema('ProductResultCreateResponse'))
+      .responseFields(
+        respModel.withPath('status').description('operation status'),
+        respModel.withPath('code').description('product result code')
+          .optional(),
+      )
+      .build())))
+```
+
+```groovy
+when:
+def resultActions = mockMvc.perform(
   get('/v1/products/{productId}/result?code={code}', 1, 1)
     .accept(MediaType.APPLICATION_JSON)
 )
 
 then:
-1 * mockProductService.getResult(1L, 1, _) >> result
-
 def reqModel = Constraints.model(ProductResultRequest.class)
 def respModel = Constraints.model(ProductResultResponse.class)
 resultActions
   .andExpect(status().isOk())
   .andDo(document('products-id-result-code-get',
     resource(ResourceSnippetParameters.builder()
+      .tag('product')
       .summary('Get a product result info')
       .description('''
         |Get a product result info
@@ -126,8 +187,6 @@ resultActions
       )
       .build())))
 ```
-
-> https://github.com/keecon/restdocs-openapi3/blob/main/restdocs-api-spec-example/src/test/groovy/com/keecon/restdocs/apispec/example/ProductControllerSpec.groovy#L59-L119
 
 [jitpack-badge]: https://jitpack.io/v/keecon/restdocs-openapi3.svg
 
