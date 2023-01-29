@@ -1,4 +1,4 @@
-package com.keecon.restdocs.apispec.example;
+package com.keecon.restdocs.apispec.example.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

@@ -14,6 +14,16 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class ProductService {
 
+	public Long createResult(Long productId, ProductResult result) {
+		// save result
+		return 1L;
+	}
+
+	public Long updateResult(Long productId, ProductResultAssignObject object) {
+		// append result assign object
+		return 1L;
+	}
+
 	public ProductResult getResult(Long productId, Long code, Integer seq) {
 		// example data set
 		return ProductResult.builder()
