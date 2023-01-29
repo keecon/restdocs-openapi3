@@ -5,6 +5,7 @@ axion-release = "1.14.3"
 jackson = "2.14.1"
 spring-boot = "3.0.2"
 spring-restdocs = "3.0.0"
+spring-dependency-management = "1.1.0"
 junit = "5.9.2"
 junit-pioneer = "0.3.3"
 jsonpath = "2.7.0"
@@ -21,6 +22,8 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 axion-release = { id = "pl.allegro.tech.build.axion-release", version.ref = "axion-release" }
 plugin-publish = { id = "com.gradle.plugin-publish", version.ref = "plugin-publish" }
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
 
 [libraries]
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "spring-boot" }

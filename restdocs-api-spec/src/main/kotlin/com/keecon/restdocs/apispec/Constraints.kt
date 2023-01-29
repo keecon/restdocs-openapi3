@@ -104,23 +104,28 @@ class Constraints private constructor(private val rootType: Class<*>) {
                 Boolean::class.javaPrimitiveType -> {
                     attributes(Attributes.items(DataType.BOOLEAN))
                 }
+
                 Float::class.javaObjectType,
                 Float::class.javaPrimitiveType,
                 Double::class.javaObjectType,
                 Double::class.javaPrimitiveType -> {
                     attributes(Attributes.items(DataType.NUMBER))
                 }
+
                 Int::class.javaObjectType,
                 Int::class.javaPrimitiveType -> {
                     attributes(Attributes.items(DataType.INTEGER, DataFormat.INT32))
                 }
+
                 Long::class.javaObjectType,
                 Long::class.javaPrimitiveType -> {
                     attributes(Attributes.items(DataType.INTEGER, DataFormat.INT64))
                 }
+
                 String::class.java -> {
                     attributes(Attributes.items(DataType.STRING))
                 }
+
                 else -> if (type?.isEnum == true) {
                     attributes(Attributes.items(DataType.STRING, enums = type.enumConstants.map(Any::toString)))
                 }
@@ -136,6 +141,7 @@ class Constraints private constructor(private val rootType: Class<*>) {
                     is ParameterDescriptorWithType -> type(DataType.BOOLEAN)
                     is FieldDescriptor -> type(DataType.BOOLEAN)
                 }
+
                 Float::class.javaObjectType,
                 Float::class.javaPrimitiveType,
                 Double::class.javaObjectType,
@@ -144,6 +150,7 @@ class Constraints private constructor(private val rootType: Class<*>) {
                     is ParameterDescriptorWithType -> type(DataType.NUMBER)
                     is FieldDescriptor -> type(DataType.NUMBER)
                 }
+
                 Int::class.javaObjectType,
                 Int::class.javaPrimitiveType -> {
                     when (this) {
@@ -153,6 +160,7 @@ class Constraints private constructor(private val rootType: Class<*>) {
                     }
                     attributes(Attributes.format(DataFormat.INT32))
                 }
+
                 Long::class.javaObjectType,
                 Long::class.javaPrimitiveType -> {
                     when (this) {
@@ -162,11 +170,13 @@ class Constraints private constructor(private val rootType: Class<*>) {
                     }
                     attributes(Attributes.format(DataFormat.INT64))
                 }
+
                 String::class.java -> when (this) {
                     is HeaderDescriptorWithType -> type(DataType.STRING)
                     is ParameterDescriptorWithType -> type(DataType.STRING)
                     is FieldDescriptor -> type(DataType.STRING)
                 }
+
                 else -> if (type?.isEnum == true) {
                     when (this) {
                         is HeaderDescriptorWithType -> type(DataType.STRING)

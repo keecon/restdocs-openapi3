@@ -1,0 +1,12 @@
+rootProject.name = 'restdocs-openapi3'
+
+include ':restdocs-api-spec'
+include ':restdocs-api-spec-generator'
+include ':restdocs-api-spec-jsonschema'
+include ':restdocs-api-spec-mockmvc'
+include ':restdocs-api-spec-model'
+
+include ':restdocs-api-spec-gradle-plugin'
+
+include ':restdocs-api-spec-example'
+

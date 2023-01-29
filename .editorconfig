@@ -10,6 +10,20 @@ max_line_length = 120
 insert_final_newline = true
 trim_trailing_whitespace = true
 
+[*.{java,gradle,groovy}]
+indent_style = tab
+tab_width = 4
+indent_size = 4
+
+ij_continuation_indent_size = 4
+ij_any_method_call_chain_wrap = normal
+ij_any_align_multiline_parameters = true
+ij_wrap_on_typing = true
+ij_any_wrap_long_lines = true
+ij_any_space_before_if_left_brace = true
+ij_any_space_before_if_parentheses = true
+ij_any_space_before_for_parentheses = true
+
 [*.{kt,kts}]
 tab_width = 4
 indent_size = 4

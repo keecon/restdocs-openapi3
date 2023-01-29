@@ -24,22 +24,26 @@ scmVersion {
 val scmVer = scmVersion.version!!
 
 fun Project.isPluginProject() = this.name.contains("plugin")
+fun Project.isExampleProject() = this.name.contains("example")
 
 allprojects {
 
     group = "com.keecon"
     version = scmVer
 
-    apply(plugin = "java")
-    apply(plugin = "kotlin")
-    apply(plugin = "jacoco")
-    apply(plugin = "maven-publish")
-    apply(plugin = "org.jlleitschuh.gradle.ktlint")
-
     repositories {
         google()
         mavenCentral()
     }
+
+    if (!isExampleProject()) {
+        apply(plugin = "kotlin")
+        apply(plugin = "maven-publish")
+        apply(plugin = "org.jlleitschuh.gradle.ktlint")
+    }
+
+    apply(plugin = "java")
+    apply(plugin = "jacoco")
 
     tasks.test {
         useJUnitPlatform()
@@ -60,7 +64,7 @@ subprojects {
         }
     }
 
-    if (!isPluginProject()) {
+    if (!isPluginProject() && !isExampleProject()) {
         java {
             withSourcesJar()
             withJavadocJar()
@@ -126,17 +130,19 @@ subprojects {
     }
 }
 
+val mergeTargets = subprojects.filterNot { it.isExampleProject() }
+
 val jacocoMergeData = tasks.create<JacocoMerge>("jacocoMergeData") {
-    dependsOn(subprojects.map { it.tasks.jacocoTestReport })
+    dependsOn(mergeTargets.map { it.tasks.jacocoTestReport })
     destinationFile = file("$buildDir/jacoco/all-tests.exec")
-    executionData(files(subprojects.map { it.tasks.jacocoTestReport.get().executionData }).filter { it.exists() })
+    executionData(files(mergeTargets.map { it.tasks.jacocoTestReport.get().executionData }).filter { it.exists() })
 }
 
 tasks.jacocoTestReport {
     dependsOn(tasks.test, jacocoMergeData)
     description = "Generates an aggregate report from all subprojects"
 
-    sourceSets(*subprojects.map { it.sourceSets.main.get() }.toTypedArray())
+    sourceSets(*mergeTargets.map { it.sourceSets.main.get() }.toTypedArray())
     executionData(jacocoMergeData.executionData)
 
     reports {

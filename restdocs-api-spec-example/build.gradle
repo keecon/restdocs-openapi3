@@ -1,0 +1,22 @@
+//buildscript() {
+//	repositories {
+//		gradlePluginPortal()
+//		maven { url 'https://jitpack.io' }
+//	}
+//	dependencies {
+//		classpath 'com.github.keecon:restdocs-openapi3:1.0.1'
+//	}
+//}
+
+plugins {
+	alias libs.plugins.spring.boot
+	alias libs.plugins.spring.dependency.management
+//	id 'com.keecon.restdocs-openapi3'
+}
+
+dependencies {
+	implementation(libs.spring.boot.starter.web)
+
+	testImplementation(libs.spring.boot.starter.test)
+	testImplementation(libs.spring.restdocs.mockmvc)
+}

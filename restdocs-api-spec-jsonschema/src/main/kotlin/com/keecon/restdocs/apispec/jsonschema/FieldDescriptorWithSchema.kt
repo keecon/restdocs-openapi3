@@ -74,24 +74,29 @@ internal class FieldDescriptorWithSchema(
                 "array" -> ArraySchema.builder()
                     .applyConstraints(descriptor)
                     .allItemSchema(arrayItemsSchema(descriptor))
+
                 "boolean" -> descriptor.enumCombinedSchema(
                     BooleanSchema.builder()
                 )
+
                 "number" -> descriptor.enumCombinedSchema(
                     NumberSchema.builder()
                         .applyConstraints(descriptor)
                         .applyFormat(descriptor)
                 )
+
                 "integer" -> descriptor.enumCombinedSchema(
                     NumberSchema.builder()
                         .requiresInteger(true)
                         .applyConstraints(descriptor)
                 )
+
                 "string" -> descriptor.enumCombinedSchema(
                     StringSchema.builder()
                         .applyConstraints(descriptor)
                         .applyFormat(descriptor)
                 )
+
                 else -> throw IllegalArgumentException("unknown field type $type")
             }
 
