@@ -1,22 +1,47 @@
-//buildscript() {
-//	repositories {
-//		gradlePluginPortal()
-//		maven { url 'https://jitpack.io' }
-//	}
-//	dependencies {
-//		classpath 'com.github.keecon:restdocs-openapi3:1.0.1'
-//	}
-//}
+buildscript() {
+	repositories {
+		maven { url 'https://jitpack.io' }
+	}
+	dependencies {
+		classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:1.0.1'
+	}
+}
 
 plugins {
+	id 'groovy'
 	alias libs.plugins.spring.boot
 	alias libs.plugins.spring.dependency.management
-//	id 'com.keecon.restdocs-openapi3'
+}
+
+apply plugin: 'com.keecon.restdocs-openapi3'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
 }
 
 dependencies {
 	implementation(libs.spring.boot.starter.web)
+	implementation(libs.spring.boot.starter.validation)
+
+	compileOnly libs.lombok
+	annotationProcessor libs.lombok
 
 	testImplementation(libs.spring.boot.starter.test)
 	testImplementation(libs.spring.restdocs.mockmvc)
+	testImplementation(libs.bundles.spock)
+	testImplementation(libs.bundles.junit)
+	testImplementation project(':restdocs-api-spec')
+	testImplementation project(':restdocs-api-spec-mockmvc')
 }
+
+openapi3 {
+	server = 'http://localhost:8080'
+	title = 'My API'
+	description = 'My API description'
+	version = project.version
+	tagDescriptionsPropertiesFile = 'src/test/resources/openapi-tags.yml'
+	format = 'yaml'
+}
+

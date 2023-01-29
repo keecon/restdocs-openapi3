@@ -16,6 +16,7 @@ hibernate-validator = "8.0.0.Final"
 json-schema-validator = "2.2.14"
 everit-json-schema = "1.11.0"
 plugin-publish = "0.21.0"
+spock = "2.4-M1-groovy-4.0"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -36,6 +37,7 @@ jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", ver
 jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson" }
 jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+lombok = { module = "org.projectlombok:lombok" }
 swagger-core = { module = "io.swagger.core.v3:swagger-core", version.ref = "swagger" }
 swagger-parser = { module = "io.swagger.parser.v3:swagger-parser", version.ref = "swagger-parser" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
@@ -45,7 +47,11 @@ jsonpath = { module = "com.jayway.jsonpath:json-path", version.ref = "jsonpath" 
 hibernate-validator = { module = "org.hibernate.validator:hibernate-validator", version.ref = "hibernate-validator" }
 json-schema-validator = { module = "com.github.java-json-tools:json-schema-validator", version.ref = "json-schema-validator" }
 everit-json-schema = { module = "com.github.erosb:everit-json-schema", version.ref = "everit-json-schema" }
+spock-core = { module = "org.spockframework:spock-core", version.ref = "spock" }
+spock-spring = { module = "org.spockframework:spock-spring", version.ref = "spock" }
 
 [bundles]
 jackson = ["jackson-databind", "jackson-annotations", "jackson-module-kotlin"]
 junit = ["junit-jupiter-engine", "junit-pioneer"]
+spock = ["spock-core", "spock-spring"]
+

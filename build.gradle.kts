@@ -37,12 +37,12 @@ allprojects {
     }
 
     if (!isExampleProject()) {
-        apply(plugin = "kotlin")
         apply(plugin = "maven-publish")
         apply(plugin = "org.jlleitschuh.gradle.ktlint")
     }
 
     apply(plugin = "java")
+    apply(plugin = "kotlin")
     apply(plugin = "jacoco")
 
     tasks.test {
