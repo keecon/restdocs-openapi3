@@ -1,6 +1,7 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     `java-gradle-plugin`
-    id("com.gradle.plugin-publish") version "0.21.0"
+    alias(libs.plugins.plugin.publish)
 }
 
 gradlePlugin {
@@ -31,12 +32,6 @@ pluginBundle {
     }
 }
 
-val jacksonVersion: String by extra
-val swaggerVersion: String by extra
-val assertjVersion: String by extra
-val jsonpathVersion: String by extra
-val junitVersion: String by extra
-
 val jacocoRuntime: Configuration by configurations.creating
 
 dependencies {
@@ -45,17 +40,15 @@ dependencies {
     compileOnly(kotlin("gradle-plugin"))
 
     implementation(project(":restdocs-api-spec-model"))
-    implementation(project(":restdocs-api-spec-openapi3-generator"))
+    implementation(project(":restdocs-api-spec-generator"))
 
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.0")
-    implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
-    implementation("io.swagger.core.v3:swagger-core:$swaggerVersion")
+    implementation(libs.kotlin.gradle.plugin)
+    implementation(libs.swagger.core)
+    implementation(libs.bundles.jackson)
 
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
-    testImplementation("org.junit-pioneer:junit-pioneer:0.3.3")
-    testImplementation("org.assertj:assertj-core:$assertjVersion")
-    testImplementation("com.jayway.jsonpath:json-path:$jsonpathVersion")
+    testImplementation(libs.assertj.core)
+    testImplementation(libs.jsonpath)
+    testImplementation(libs.bundles.junit)
 
     testCompileOnly(gradleTestKit())
 
@@ -88,9 +81,7 @@ val configureGradlePluginCredentials: Task by tasks.creating {
         val secret = System.getenv("GRADLE_PUBLISH_SECRET")
 
         if (key == null || secret == null) {
-            throw GradleException(
-                "GRADLE_PUBLISH_KEY and/or GRADLE_PUBLISH_SECRET are not defined environment variables"
-            )
+            throw GradleException("GRADLE_PUBLISH_KEY/GRADLE_PUBLISH_SECRET are not defined environment variables")
         }
 
         System.setProperty("gradle.publish.key", key)

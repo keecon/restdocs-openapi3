@@ -1,4 +1,4 @@
-package com.keecon.restdocs.apispec.openapi3
+package com.keecon.restdocs.apispec.generator
 
 import com.keecon.restdocs.apispec.model.AbstractDescriptor
 import com.keecon.restdocs.apispec.model.AbstractParameterDescriptor

@@ -13,7 +13,6 @@ import org.springframework.restdocs.operation.OperationRequestPart
 import org.springframework.restdocs.operation.OperationRequestPartFactory
 import org.springframework.restdocs.operation.OperationResponse
 import org.springframework.restdocs.operation.OperationResponseFactory
-import org.springframework.restdocs.operation.Parameters
 import org.springframework.restdocs.operation.StandardOperation
 import org.springframework.restdocs.snippet.RestDocumentationContextPlaceholderResolverFactory
 import org.springframework.restdocs.snippet.StandardWriterResolver
@@ -23,6 +22,7 @@ import org.springframework.restdocs.templates.TemplateEngine
 import org.springframework.restdocs.templates.TemplateFormats
 import org.springframework.restdocs.templates.mustache.AsciidoctorTableCellContentLambda
 import org.springframework.restdocs.templates.mustache.MustacheTemplateEngine
+import org.springframework.web.util.UriComponentsBuilder
 import java.io.File
 import java.net.URI
 
@@ -138,8 +138,6 @@ class OperationBuilder {
 
         private val headers = HttpHeaders()
 
-        private val parameters = Parameters()
-
         private val partBuilders = ArrayList<OperationRequestPartBuilder>()
 
         init {
@@ -153,7 +151,7 @@ class OperationBuilder {
             }
             return OperationRequestFactory().create(
                 this.requestUri, this.method,
-                this.content, this.headers, this.parameters, parts
+                this.content, this.headers, parts
             )
         }
 
@@ -176,28 +174,26 @@ class OperationBuilder {
             return this
         }
 
-        fun param(name: String, vararg values: String): OperationRequestBuilder {
+        fun queryParam(name: String, vararg values: String): OperationRequestBuilder {
             if (values.isNotEmpty()) {
-                for (value in values) {
-                    this.parameters.add(name, value)
-                }
-            } else {
-                this.parameters[name] = emptyList()
+                this.requestUri = UriComponentsBuilder.fromUri(this.requestUri)
+                    .queryParam(name, values).build().toUri()
             }
+            return this
+        }
+
+        fun part(name: String, content: ByteArray, contentType: String? = null): OperationRequestBuilder {
+            val partBuilder = OperationRequestPartBuilder(name, content)
+            if (contentType != null) {
+                partBuilder.header(HttpHeaders.CONTENT_TYPE, contentType)
+            }
+            this.partBuilders.add(partBuilder)
             return this
         }
 
         fun header(name: String, value: String): OperationRequestBuilder {
             this.headers.add(name, value)
             return this
-        }
-
-        fun part(name: String, content: ByteArray): OperationRequestPartBuilder {
-            val partBuilder = OperationRequestPartBuilder(
-                name, content
-            )
-            this.partBuilders.add(partBuilder)
-            return partBuilder
         }
 
         /**
@@ -254,7 +250,7 @@ class OperationBuilder {
 
         fun buildResponse(): OperationResponse {
             return OperationResponseFactory().create(
-                this.status.value(),
+                this.status,
                 this.headers,
                 this.content
             )

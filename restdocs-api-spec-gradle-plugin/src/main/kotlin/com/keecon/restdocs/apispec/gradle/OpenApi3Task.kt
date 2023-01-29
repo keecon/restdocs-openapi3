@@ -1,7 +1,7 @@
 package com.keecon.restdocs.apispec.gradle
 
+import com.keecon.restdocs.apispec.generator.OpenApi3Generator
 import com.keecon.restdocs.apispec.model.ResourceModel
-import com.keecon.restdocs.apispec.openapi3.OpenApi3Generator
 import io.swagger.v3.oas.models.servers.Server
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional

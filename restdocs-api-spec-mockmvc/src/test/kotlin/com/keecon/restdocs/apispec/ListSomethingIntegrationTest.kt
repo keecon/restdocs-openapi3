@@ -17,7 +17,7 @@ import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
 import org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 import org.springframework.restdocs.request.RequestDocumentation.pathParameters
-import org.springframework.restdocs.request.RequestDocumentation.requestParameters
+import org.springframework.restdocs.request.RequestDocumentation.queryParameters
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
@@ -106,7 +106,7 @@ class ListSomethingIntegrationTest(
                         requestHeaders(
                             headerWithName("X-Custom-Header").description("some custom header")
                         ),
-                        requestParameters(
+                        queryParameters(
                             parameterWithName("comment").description("the comment").optional(),
                             parameterWithName("flag").description("the flag"),
                             parameterWithName("count").description("the count")
@@ -142,7 +142,7 @@ class ListSomethingIntegrationTest(
             ResourceSnippetParameters.builder()
                 .description("description")
                 .summary("summary")
-                .requestParameters(
+                .queryParameters(
                     model.withMappedName("code", "code[]").description("the code list")
                 )
                 .responseFields(

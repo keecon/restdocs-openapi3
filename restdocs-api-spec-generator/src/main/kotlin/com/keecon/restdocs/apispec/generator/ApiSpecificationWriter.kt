@@ -1,4 +1,4 @@
-package com.keecon.restdocs.apispec.openapi3
+package com.keecon.restdocs.apispec.generator
 
 import io.swagger.v3.core.util.Json
 import io.swagger.v3.core.util.Yaml

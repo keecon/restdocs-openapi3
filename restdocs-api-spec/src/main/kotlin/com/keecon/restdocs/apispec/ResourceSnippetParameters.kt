@@ -27,10 +27,11 @@ data class ResourceSnippetParameters @JvmOverloads constructor(
     val responseFields: List<FieldDescriptor> = emptyList(),
     val links: List<LinkDescriptor> = emptyList(),
     val pathParameters: List<ParameterDescriptorWithType> = emptyList(),
-    val requestParameters: List<ParameterDescriptorWithType> = emptyList(),
+    val queryParameters: List<ParameterDescriptorWithType> = emptyList(),
+    val formParameters: List<ParameterDescriptorWithType> = emptyList(),
+    val requestParts: List<RequestPartDescriptorWithType> = emptyList(),
     val requestHeaders: List<HeaderDescriptorWithType> = emptyList(),
     val responseHeaders: List<HeaderDescriptorWithType> = emptyList(),
-    val requestParts: List<RequestPartDescriptorWithType> = emptyList(),
     val tags: Set<String> = emptySet()
 ) {
     val responseFieldsWithLinks by lazy { responseFields + links.map(Companion::toFieldDescriptor) }
@@ -250,7 +251,9 @@ class ResourceSnippetParametersBuilder : ResourceSnippetDetails() {
         private set
     var pathParameters: List<ParameterDescriptorWithType> = emptyList()
         private set
-    var requestParameters: List<ParameterDescriptorWithType> = emptyList()
+    var queryParameters: List<ParameterDescriptorWithType> = emptyList()
+        private set
+    var formParameters: List<ParameterDescriptorWithType> = emptyList()
         private set
     var requestHeaders: List<HeaderDescriptorWithType> = emptyList()
         private set
@@ -277,56 +280,68 @@ class ResourceSnippetParametersBuilder : ResourceSnippetDetails() {
     fun links(vararg links: LinkDescriptor) = apply { links(links.toList()) }
     fun links(links: List<LinkDescriptor>) = apply { this.links = links }
 
-    fun pathParameters(vararg pathParameters: ParameterDescriptorWithType) = pathParameters(pathParameters.toList())
-    fun pathParameters(pathParameters: List<ParameterDescriptorWithType>) =
-        apply { this.pathParameters = pathParameters }
+    fun pathParameters(vararg pathParameters: ParameterDescriptorWithType) =
+        pathParameters(pathParameters.toList())
 
-    fun pathParameters(vararg pathParameters: ParameterDescriptor) = pathParameters(
-        pathParameters.map {
-            ParameterDescriptorWithType.fromParameterDescriptor(it)
-        }
-    )
-
-    fun requestParameters(vararg requestParameters: ParameterDescriptorWithType) =
-        requestParameters(requestParameters.toList())
-
-    fun requestParameters(requestParameters: List<ParameterDescriptorWithType>) = apply {
-        this.requestParameters = requestParameters
+    fun pathParameters(pathParameters: List<ParameterDescriptorWithType>) = apply {
+        this.pathParameters = pathParameters
     }
 
-    fun requestParameters(vararg requestParameters: ParameterDescriptor) = requestParameters(
-        requestParameters.map {
-            ParameterDescriptorWithType.fromParameterDescriptor(it)
-        }
+    fun pathParameters(vararg pathParameters: ParameterDescriptor) = pathParameters(
+        pathParameters.map { ParameterDescriptorWithType.fromParameterDescriptor(it) }
+    )
+
+    fun queryParameters(vararg queryParameters: ParameterDescriptorWithType) =
+        queryParameters(queryParameters.toList())
+
+    fun queryParameters(queryParameters: List<ParameterDescriptorWithType>) = apply {
+        this.queryParameters = queryParameters
+    }
+
+    fun queryParameters(vararg queryParameters: ParameterDescriptor) = queryParameters(
+        queryParameters.map { ParameterDescriptorWithType.fromParameterDescriptor(it) }
+    )
+
+    fun formParameters(vararg formParameters: ParameterDescriptorWithType) =
+        formParameters(formParameters.toList())
+
+    fun formParameters(formParameters: List<ParameterDescriptorWithType>) = apply {
+        this.formParameters = formParameters
+    }
+
+    fun formParameters(vararg formParameters: ParameterDescriptor) = formParameters(
+        formParameters.map { ParameterDescriptorWithType.fromParameterDescriptor(it) }
     )
 
     fun requestParts(vararg requestParts: RequestPartDescriptorWithType) =
-        this.requestParts(requestParts.toList())
+        requestParts(requestParts.toList())
 
     fun requestParts(requestParts: List<RequestPartDescriptorWithType>) = apply {
         this.requestParts = requestParts
     }
 
-    fun requestParts(vararg requestParts: RequestPartDescriptor) = this.requestParts(
-        requestParts.map {
-            RequestPartDescriptorWithType.fromParameterDescriptor(it)
-        }
+    fun requestParts(vararg requestParts: RequestPartDescriptor) = requestParts(
+        requestParts.map { RequestPartDescriptorWithType.fromParameterDescriptor(it) }
     )
 
-    fun requestHeaders(requestHeaders: List<HeaderDescriptorWithType>) = apply { this.requestHeaders = requestHeaders }
-    fun requestHeaders(vararg requestHeaders: HeaderDescriptorWithType) = requestHeaders(requestHeaders.toList())
-    fun requestHeaders(vararg requestHeaders: HeaderDescriptor) =
-        requestHeaders(
-            requestHeaders.map {
-                HeaderDescriptorWithType.fromHeaderDescriptor(it)
-            }
-        )
+    fun requestHeaders(vararg requestHeaders: HeaderDescriptorWithType) =
+        requestHeaders(requestHeaders.toList())
+
+    fun requestHeaders(requestHeaders: List<HeaderDescriptorWithType>) = apply {
+        this.requestHeaders = requestHeaders
+    }
+
+    fun requestHeaders(vararg requestHeaders: HeaderDescriptor) = requestHeaders(
+        requestHeaders.map { HeaderDescriptorWithType.fromHeaderDescriptor(it) }
+    )
+
+    fun responseHeaders(vararg responseHeaders: HeaderDescriptorWithType) =
+        responseHeaders(responseHeaders.toList())
 
     fun responseHeaders(responseHeaders: List<HeaderDescriptorWithType>) = apply {
         this.responseHeaders = responseHeaders
     }
 
-    fun responseHeaders(vararg responseHeaders: HeaderDescriptorWithType) = responseHeaders(responseHeaders.toList())
     fun responseHeaders(vararg responseHeaders: HeaderDescriptor) = responseHeaders(
         responseHeaders.map { HeaderDescriptorWithType.fromHeaderDescriptor(it) }
     )
@@ -345,10 +360,11 @@ class ResourceSnippetParametersBuilder : ResourceSnippetDetails() {
         responseFields,
         links,
         pathParameters,
-        requestParameters,
+        queryParameters,
+        formParameters,
+        requestParts,
         requestHeaders,
         responseHeaders,
-        requestParts,
         tags
     )
 }

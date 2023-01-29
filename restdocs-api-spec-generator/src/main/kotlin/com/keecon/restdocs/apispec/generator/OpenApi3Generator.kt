@@ -1,7 +1,15 @@
-package com.keecon.restdocs.apispec.openapi3
+package com.keecon.restdocs.apispec.generator
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.keecon.restdocs.apispec.generator.ParameterExtensions.applyProperties
+import com.keecon.restdocs.apispec.generator.SchemaConstraints.applyConstraints
+import com.keecon.restdocs.apispec.generator.SchemaExtensions.applyDefaultValue
+import com.keecon.restdocs.apispec.generator.SchemaExtensions.applyEnumValues
+import com.keecon.restdocs.apispec.generator.SchemaExtensions.applyItems
+import com.keecon.restdocs.apispec.generator.SchemaExtensions.applyProperties
+import com.keecon.restdocs.apispec.generator.SecuritySchemeGenerator.addSecurityDefinitions
+import com.keecon.restdocs.apispec.generator.SecuritySchemeGenerator.addSecurityItemFromSecurityRequirements
 import com.keecon.restdocs.apispec.jsonschema.JsonSchemaGenerator
 import com.keecon.restdocs.apispec.model.AbstractDescriptor
 import com.keecon.restdocs.apispec.model.AbstractParameterDescriptor
@@ -15,14 +23,6 @@ import com.keecon.restdocs.apispec.model.RequestModel
 import com.keecon.restdocs.apispec.model.ResourceModel
 import com.keecon.restdocs.apispec.model.ResponseModel
 import com.keecon.restdocs.apispec.model.groupByPath
-import com.keecon.restdocs.apispec.openapi3.ParameterExtensions.applyProperties
-import com.keecon.restdocs.apispec.openapi3.SchemaConstraints.applyConstraints
-import com.keecon.restdocs.apispec.openapi3.SchemaExtensions.applyDefaultValue
-import com.keecon.restdocs.apispec.openapi3.SchemaExtensions.applyEnumValues
-import com.keecon.restdocs.apispec.openapi3.SchemaExtensions.applyItems
-import com.keecon.restdocs.apispec.openapi3.SchemaExtensions.applyProperties
-import com.keecon.restdocs.apispec.openapi3.SecuritySchemeGenerator.addSecurityDefinitions
-import com.keecon.restdocs.apispec.openapi3.SecuritySchemeGenerator.addSecurityItemFromSecurityRequirements
 import io.swagger.v3.core.util.Json
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
@@ -314,9 +314,11 @@ object OpenApi3Generator {
                             "application/x-www-form-urlencoded" -> {
                                 it.request.requestParameters.map { parameterDescriptor2FieldDescriptor(it) }
                             }
+
                             "multipart/form-data" -> {
                                 it.request.requestParts.map { parameterDescriptor2FieldDescriptor(it) }
                             }
+
                             else -> {
                                 it.request.requestFields
                             }
@@ -501,29 +503,34 @@ object OpenApi3Generator {
                 applyDefaultValue(descriptor as? AbstractParameterDescriptor)
                 applyEnumValues(descriptor)
             }
+
             DataType.STRING.lowercase() -> StringSchema().apply {
                 applyProperties(descriptor)
                 applyDefaultValue(descriptor as? AbstractParameterDescriptor)
                 applyEnumValues(descriptor)
                 applyConstraints(descriptor)
             }
+
             DataType.NUMBER.lowercase() -> NumberSchema().apply {
                 applyProperties(descriptor)
                 applyDefaultValue(descriptor as? AbstractParameterDescriptor)
                 applyEnumValues(descriptor)
                 applyConstraints(descriptor)
             }
+
             DataType.INTEGER.lowercase() -> IntegerSchema().apply {
                 applyProperties(descriptor)
                 applyDefaultValue(descriptor as? AbstractParameterDescriptor)
                 applyEnumValues(descriptor)
                 applyConstraints(descriptor)
             }
+
             DataType.ARRAY.lowercase() -> ArraySchema().apply {
                 applyProperties(descriptor)
                 applyItems(descriptor)
                 applyConstraints(descriptor)
             }
+
             else -> throw IllegalArgumentException("Unknown type '${descriptor.type}'")
         }
     }
