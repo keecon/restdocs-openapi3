@@ -64,9 +64,9 @@ class ListSomethingIntegrationTest(
                 .contentType(APPLICATION_JSON)
                 .accept(HAL_JSON)
                 .header("X-Custom-Header", "test")
-                .param("comment", "some")
-                .param("flag", flagValue?.toString())
-                .param("count", "1")
+                .queryParam("comment", "some")
+                .queryParam("flag", flagValue?.toString())
+                .queryParam("count", "1")
         ).andExpect(status().isOk)
     }
 
@@ -76,7 +76,7 @@ class ListSomethingIntegrationTest(
             get("/some/select")
                 .contentType(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
-                .param("code", *params.map(Int::toString).toTypedArray())
+                .queryParam("code", *params.map(Int::toString).toTypedArray())
         resultActions = mockMvc.perform(builder).andExpect(status().isOk)
     }
 

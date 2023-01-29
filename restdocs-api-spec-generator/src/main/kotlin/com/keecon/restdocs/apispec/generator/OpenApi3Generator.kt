@@ -49,6 +49,8 @@ import io.swagger.v3.oas.models.responses.ApiResponses
 import io.swagger.v3.oas.models.servers.Server
 import io.swagger.v3.oas.models.tags.Tag
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE
+import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 
 object OpenApi3Generator {
 
@@ -249,10 +251,9 @@ object OpenApi3Generator {
                     firstModelForPathAndMethod
                 ).plus(
                     modelsWithSamePathAndMethod
-                        .filter { it.request.contentType != "application/x-www-form-urlencoded" }
-                        .flatMap { it.request.requestParameters }
+                        .flatMap { it.request.queryParameters }
                         .distinctBy { it.name }
-                        .map { requestParameterDescriptor2Parameter(it) }
+                        .map { queryParameterDescriptor2Parameter(it) }
                 ).plus(
                     modelsWithSamePathAndMethod
                         .flatMap { it.request.headers }
@@ -311,11 +312,11 @@ object OpenApi3Generator {
                 toMediaType(
                     requestFields = requests.flatMap { it ->
                         when (it.request.contentType) {
-                            "application/x-www-form-urlencoded" -> {
-                                it.request.requestParameters.map { parameterDescriptor2FieldDescriptor(it) }
+                            APPLICATION_FORM_URLENCODED_VALUE -> {
+                                it.request.formParameters.map { parameterDescriptor2FieldDescriptor(it) }
                             }
 
-                            "multipart/form-data" -> {
+                            MULTIPART_FORM_DATA_VALUE -> {
                                 it.request.requestParts.map { parameterDescriptor2FieldDescriptor(it) }
                             }
 
@@ -475,7 +476,7 @@ object OpenApi3Generator {
         }
     }
 
-    private fun requestParameterDescriptor2Parameter(parameterDescriptor: ParameterDescriptor): QueryParameter {
+    private fun queryParameterDescriptor2Parameter(parameterDescriptor: ParameterDescriptor): QueryParameter {
         return QueryParameter().apply {
             name = parameterDescriptor.name
             description = parameterDescriptor.description

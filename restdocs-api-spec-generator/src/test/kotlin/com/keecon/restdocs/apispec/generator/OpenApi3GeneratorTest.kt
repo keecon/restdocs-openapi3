@@ -314,7 +314,7 @@ class OpenApi3GeneratorTest {
 
         whenOpenApiObjectGenerated()
 
-        thenResourceHasValidSchemaGeneratedFromRequestParameters(method.toString().lowercase())
+        thenResourceHasValidSchemaGeneratedFromFormParameters(method.toString().lowercase())
     }
 
     @Test
@@ -516,7 +516,7 @@ class OpenApi3GeneratorTest {
         thenOpenApiSpecIsValid()
     }
 
-    fun thenResourceHasValidSchemaGeneratedFromRequestParameters(method: String) {
+    fun thenResourceHasValidSchemaGeneratedFromFormParameters(method: String) {
         val productGetById = "paths./products/{id}.$method"
         val getResponseSchemaRef = openApiJsonPathContext
             .read<String>("$productGetById.requestBody.content.application/x-www-form-urlencoded.schema.\$ref")
@@ -1087,7 +1087,8 @@ class OpenApi3GeneratorTest {
                     method = HTTPMethod.DELETE,
                     headers = listOf(),
                     pathParameters = listOf(),
-                    requestParameters = listOf(),
+                    queryParameters = listOf(),
+                    formParameters = listOf(),
                     securityRequirements = null,
                     requestFields = listOf(),
                     requestParts = listOf(),
@@ -1292,7 +1293,8 @@ class OpenApi3GeneratorTest {
             method = HTTPMethod.PATCH,
             headers = listOf(),
             pathParameters = listOf(),
-            requestParameters = listOf(),
+            queryParameters = listOf(),
+            formParameters = listOf(),
             requestParts = listOf(),
             schema = schema,
             securityRequirements = null,
@@ -1322,7 +1324,8 @@ class OpenApi3GeneratorTest {
             method = HTTPMethod.PATCH,
             headers = listOf(),
             pathParameters = listOf(),
-            requestParameters = listOf(),
+            queryParameters = listOf(),
+            formParameters = listOf(),
             requestParts = listOf(),
             securityRequirements = null,
             requestFields = listOf(
@@ -1364,7 +1367,8 @@ class OpenApi3GeneratorTest {
             securityRequirements = getSecurityRequirement(),
             headers = emptyList(),
             pathParameters = emptyList(),
-            requestParameters = emptyList(),
+            queryParameters = listOf(),
+            formParameters = listOf(),
             requestFields = listOf(),
             requestParts = listOf(),
         )
@@ -1383,7 +1387,8 @@ class OpenApi3GeneratorTest {
             headers = emptyList(),
             pathParameters = emptyList(),
             requestParts = listOf(),
-            requestParameters = listOf(
+            queryParameters = listOf(),
+            formParameters = listOf(
                 ParameterDescriptor(
                     name = "locale",
                     description = "Localizes the product fields to the given locale code",
@@ -1425,7 +1430,7 @@ class OpenApi3GeneratorTest {
                     ignored = false
                 )
             ),
-            requestParameters = listOf(
+            queryParameters = listOf(
                 ParameterDescriptor(
                     name = "locale",
                     description = "Localizes the product fields to the given locale code",
@@ -1434,6 +1439,7 @@ class OpenApi3GeneratorTest {
                     ignored = false
                 )
             ),
+            formParameters = listOf(),
             requestFields = listOf(),
             requestParts = listOf(),
         )
@@ -1458,7 +1464,7 @@ class OpenApi3GeneratorTest {
 
     private fun getProductRequestWithDifferentParameter(name: String, description: String): RequestModel {
         return getProductRequest().copy(
-            requestParameters = listOf(
+            queryParameters = listOf(
                 ParameterDescriptor(
                     name = name,
                     description = description,
@@ -1502,7 +1508,7 @@ class OpenApi3GeneratorTest {
                     defaultValue = 2
                 )
             ),
-            requestParameters = listOf(
+            queryParameters = listOf(
                 ParameterDescriptor(
                     name = "booleanParameter",
                     description = "a boolean parameter",
@@ -1541,7 +1547,7 @@ class OpenApi3GeneratorTest {
 
     private fun getProductRequestWithRequestParameterWithWrongDefaultValue(): RequestModel {
         return getProductRequest().copy(
-            requestParameters = listOf(
+            queryParameters = listOf(
                 ParameterDescriptor(
                     name = "booleanParameter",
                     description = "a boolean parameter",
@@ -1679,7 +1685,7 @@ class OpenApi3GeneratorTest {
                     )
                 ),
             ),
-            requestParameters = listOf(
+            queryParameters = listOf(
                 ParameterDescriptor(
                     name = "booleanParameter",
                     description = "a boolean parameter",
@@ -1794,6 +1800,7 @@ class OpenApi3GeneratorTest {
                     )
                 ),
             ),
+            formParameters = listOf(),
             pathParameters = listOf(),
             requestFields = listOf(),
             requestParts = listOf(),
@@ -1802,7 +1809,7 @@ class OpenApi3GeneratorTest {
 
     private fun getProductRequestWithRequestParameterWithWrongEnumValues(): RequestModel {
         return getProductRequest().copy(
-            requestParameters = listOf(
+            queryParameters = listOf(
                 ParameterDescriptor(
                     name = "integerParameter",
                     description = "a integer parameter",
