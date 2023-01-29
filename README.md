@@ -6,14 +6,17 @@
 [![sonarcloud-badge]](https://sonarcloud.io/summary/new_code?id=keecon_restdocs-openapi3)
 [![license-badge]](https://github.com/keecon/restdocs-openapi3/blob/main/LICENSE)
 
-A modified version of the [restdocs-api-spec] with class field type and constraint inference.
+A modified version of the [ePages-de/restdocs-api-spec] with class field type and constraint inference.
 And only support [OpenAPI 3.0.1] specs.
 
-## Getting started
+## Build configuration
 
-### Build configuration
+### Versions
 
-#### Gradle
+- The 1.x version is compatible with Spring boot 3.0.x and Spring REST Docs 3.0.x.
+- The 0.x version is compatible with Spring boot 2.7.x and Spring REST Docs 2.0.x.
+
+### Gradle
 
 1. Add the plugin
 
@@ -58,7 +61,7 @@ And only support [OpenAPI 3.0.1] specs.
     }
     ```
 
-### Usage with Spring REST Docs
+## Usage with Spring REST Docs
 
 ```groovy
 when:
@@ -162,6 +165,6 @@ resultActions
 
 [license-badge]: https://img.shields.io/github/license/keecon/restdocs-openapi3.svg
 
-[restdocs-api-spec]: https://github.com/ePages-de/restdocs-api-spec
+[ePages-de/restdocs-api-spec]: https://github.com/ePages-de/restdocs-api-spec
 
 [OpenAPI 3.0.1]: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md
