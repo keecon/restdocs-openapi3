@@ -13,8 +13,8 @@ And only support [OpenAPI 3.0.1] specs.
 
 ### Versions
 
-- The 1.x version is compatible with Spring boot 3.0.x and Spring REST Docs 3.0.x.
-- The 0.x version is compatible with Spring boot 2.7.x and Spring REST Docs 2.0.x.
+- The *1.x.x* version is compatible with Spring Boot *3.0.x* and Spring REST Docs *3.0.x*.
+- The *0.x.x* version is compatible with Spring Boot *2.7.x* and Spring REST Docs *2.0.x*.
 
 ### Gradle
 
