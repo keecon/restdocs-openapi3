@@ -12,7 +12,6 @@ import org.junitpioneer.jupiter.TempDirectory
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
-import kotlin.streams.toList
 
 abstract class ApiSpecTaskTest {
 
@@ -90,35 +89,35 @@ abstract class ApiSpecTaskTest {
         val operationDir = File(snippetsFolder, "some-operation").apply { mkdir() }
         File(operationDir, "resource.json").writeText(
             """
-                {
-  "operationId" : "product-get",
-  "summary" : null,
-  "description" : null,
-  "privateResource" : false,
-  "deprecated" : false,
-  "request" : {
-    "path" : "/products/{id}",
-    "method" : "GET",
-    "contentType" : null,
-    "headers" : [ ],
-    "pathParameters" : [ ],
-    "requestParameters" : [ ],
-    "requestFields" : [ ],
-    "requestParts" : [ ],
-    "example" : null,
-    "securityRequirements" : {
-      "type": "OAUTH2",
-      "requiredScopes": ["prod:r"]
-    }
-  },
-  "response" : {
-    "status" : 200,
-    "contentType" : "application/hal+json",
-    "headers" : [ ],
-    "responseFields" : [ ],
-    "example" : "{\n  \"name\" : \"Fancy pants\",\n  \"price\" : 49.99,\n  \"_links\" : {\n    \"self\" : {\n      \"href\" : \"http://localhost:8080/products/7\"\n    },\n    \"product\" : {\n      \"href\" : \"http://localhost:8080/products/7\"\n    }\n  }\n}"
-  }
-}
+            {
+              "operationId" : "product-get",
+              "summary" : null,
+              "description" : null,
+              "privateResource" : false,
+              "deprecated" : false,
+              "request" : {
+                "path" : "/products/{id}",
+                "method" : "GET",
+                "contentType" : null,
+                "headers" : [ ],
+                "pathParameters" : [ ],
+                "requestParameters" : [ ],
+                "requestFields" : [ ],
+                "requestParts" : [ ],
+                "example" : null,
+                "securityRequirements" : {
+                  "type": "OAUTH2",
+                  "requiredScopes": ["prod:r"]
+                }
+              },
+              "response" : {
+                "status" : 200,
+                "contentType" : "application/hal+json",
+                "headers" : [ ],
+                "responseFields" : [ ],
+                "example" : "{\n  \"name\" : \"Fancy pants\",\n  \"price\" : 49.99,\n  \"_links\" : {\n    \"self\" : {\n      \"href\" : \"http://localhost:8080/products/7\"\n    },\n    \"product\" : {\n      \"href\" : \"http://localhost:8080/products/7\"\n    }\n  }\n}"
+              }
+            }
             """.trimIndent()
         )
     }
@@ -127,43 +126,43 @@ abstract class ApiSpecTaskTest {
         val operationDir = File(snippetsFolder, "some-operation").apply { mkdir() }
         File(operationDir, "resource.json").writeText(
             """
-                {
-  "operationId" : "product-get",
-  "summary" : null,
-  "description" : null,
-  "privateResource" : false,
-  "deprecated" : false,
-  "request" : {
-    "path" : "/products/{id}",
-    "method" : "GET",
-    "contentType" : null,
-    "headers" : [ {
-      "name" : "one",
-      "attributes" : { },
-      "description" : "Override request header param",
-      "type" : "STRING",
-      "optional" : true,
-      "example" : "one",
-      "default" : "a default value"
-    } ],
-    "pathParameters" : [ ],
-    "requestParameters" : [ ],
-    "requestFields" : [ ],
-    "requestParts" : [ ],
-    "example" : null,
-    "securityRequirements" : {
-      "type": "OAUTH2",
-      "requiredScopes": ["prod:r"]
-    }
-  },
-  "response" : {
-    "status" : 200,
-    "contentType" : "application/hal+json",
-    "headers" : [ ],
-    "responseFields" : [ ],
-    "example" : "{\n  \"name\" : \"Fancy pants\",\n  \"price\" : 49.99,\n  \"_links\" : {\n    \"self\" : {\n      \"href\" : \"http://localhost:8080/products/7\"\n    },\n    \"product\" : {\n      \"href\" : \"http://localhost:8080/products/7\"\n    }\n  }\n}"
-  }
-}
+            {
+              "operationId" : "product-get",
+              "summary" : null,
+              "description" : null,
+              "privateResource" : false,
+              "deprecated" : false,
+              "request" : {
+                "path" : "/products/{id}",
+                "method" : "GET",
+                "contentType" : null,
+                "headers" : [ {
+                  "name" : "one",
+                  "attributes" : { },
+                  "description" : "Override request header param",
+                  "type" : "STRING",
+                  "optional" : true,
+                  "example" : "one",
+                  "default" : "a default value"
+                } ],
+                "pathParameters" : [ ],
+                "requestParameters" : [ ],
+                "requestFields" : [ ],
+                "requestParts" : [ ],
+                "example" : null,
+                "securityRequirements" : {
+                  "type": "OAUTH2",
+                  "requiredScopes": ["prod:r"]
+                }
+              },
+              "response" : {
+                "status" : 200,
+                "contentType" : "application/hal+json",
+                "headers" : [ ],
+                "responseFields" : [ ],
+                "example" : "{\n  \"name\" : \"Fancy pants\",\n  \"price\" : 49.99,\n  \"_links\" : {\n    \"self\" : {\n      \"href\" : \"http://localhost:8080/products/7\"\n    },\n    \"product\" : {\n      \"href\" : \"http://localhost:8080/products/7\"\n    }\n  }\n}"
+              }
+            }
             """.trimIndent()
         )
     }
@@ -172,32 +171,32 @@ abstract class ApiSpecTaskTest {
         val operationDir = File(snippetsFolder, "some-private-operation").apply { mkdir() }
         File(operationDir, "resource.json").writeText(
             """
-                {
-  "operationId" : "product-get-some",
-  "summary" : null,
-  "description" : null,
-  "privateResource" : true,
-  "deprecated" : false,
-  "request" : {
-    "path" : "/products/some/{id}",
-    "method" : "GET",
-    "contentType" : null,
-    "headers" : [ ],
-    "pathParameters" : [ ],
-    "requestParameters" : [ ],
-    "requestFields" : [ ],
-    "requestParts" : [ ],
-    "example" : null,
-    "securityRequirements" : null
-  },
-  "response" : {
-    "status" : 200,
-    "contentType" : "application/hal+json",
-    "headers" : [ ],
-    "responseFields" : [ ],
-    "example" : "{\n  \"name\" : \"Fancy pants\",\n  \"price\" : 49.99,\n  \"_links\" : {\n    \"self\" : {\n      \"href\" : \"http://localhost:8080/products/7\"\n    },\n    \"product\" : {\n      \"href\" : \"http://localhost:8080/products/7\"\n    }\n  }\n}"
-  }
-}
+            {
+              "operationId" : "product-get-some",
+              "summary" : null,
+              "description" : null,
+              "privateResource" : true,
+              "deprecated" : false,
+              "request" : {
+                "path" : "/products/some/{id}",
+                "method" : "GET",
+                "contentType" : null,
+                "headers" : [ ],
+                "pathParameters" : [ ],
+                "requestParameters" : [ ],
+                "requestFields" : [ ],
+                "requestParts" : [ ],
+                "example" : null,
+                "securityRequirements" : null
+              },
+              "response" : {
+                "status" : 200,
+                "contentType" : "application/hal+json",
+                "headers" : [ ],
+                "responseFields" : [ ],
+                "example" : "{\n  \"name\" : \"Fancy pants\",\n  \"price\" : 49.99,\n  \"_links\" : {\n    \"self\" : {\n      \"href\" : \"http://localhost:8080/products/7\"\n    },\n    \"product\" : {\n      \"href\" : \"http://localhost:8080/products/7\"\n    }\n  }\n}"
+              }
+            }
             """.trimIndent()
         )
     }
