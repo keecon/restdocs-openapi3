@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/restdocs-api-spec-example/com.keecon.restdocs-openapi3.restdocs-api-spec-example.main.iml" filepath="$PROJECT_DIR$/.idea/modules/restdocs-api-spec-example/com.keecon.restdocs-openapi3.restdocs-api-spec-example.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/restdocs-api-spec-example/restdocs-openapi3.restdocs-api-spec-example.main.iml" filepath="$PROJECT_DIR$/.idea/modules/restdocs-api-spec-example/restdocs-openapi3.restdocs-api-spec-example.main.iml" />
     </modules>
   </component>
