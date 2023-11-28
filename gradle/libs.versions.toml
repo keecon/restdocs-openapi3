@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.9.20"
+kotlin = "1.9.21"
 ktlint = "11.0.0"
 axion-release = "1.15.5"
 jackson = "2.16.0"
