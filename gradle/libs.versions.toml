@@ -1,7 +1,7 @@
 [versions]
 kotlin = "1.9.21"
 ktlint = "11.0.0"
-axion-release = "1.15.5"
+axion-release = "1.16.1"
 jackson = "2.16.0"
 spring-boot = "3.2.0"
 spring-restdocs = "3.0.1"
