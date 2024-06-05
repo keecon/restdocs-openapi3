@@ -101,6 +101,7 @@ enum class DataFormat {
     DATE,
     DATETIME,
     DURATION,
+    JWT,
     EMAIL,
     UUID,
     UUID_ENCODED,
