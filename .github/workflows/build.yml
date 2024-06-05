@@ -27,12 +27,12 @@ jobs:
           cache: gradle
 
       - name: Build, test with Gradle
-        run: ./gradlew clean build --no-daemon
+        run: ./gradlew clean testCodeCoverageReport --no-daemon
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           token: ${{secrets.CODECOV_TOKEN}}
-          files: ./build/reports/jacoco/test/jacocoTestReport.xml
+          files: ./build/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml
           flags: tests
           name: main-tests

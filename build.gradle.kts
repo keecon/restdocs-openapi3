@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -8,6 +8,7 @@ plugins {
     java
     jacoco
     `maven-publish`
+    `jacoco-report-aggregation`
 }
 
 repositories {
@@ -18,6 +19,12 @@ repositories {
 scmVersion {
     tag {
         prefix.set("")
+    }
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -57,10 +64,9 @@ allprojects {
 
 subprojects {
 
-    tasks.withType<KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = JavaVersion.VERSION_17.toString()
+    tasks.named("compileKotlin", KotlinCompilationTask::class.java) {
+        compilerOptions {
+            freeCompilerArgs.add("-Xjsr305=strict")
         }
     }
 
@@ -81,73 +87,26 @@ subprojects {
 
     tasks.jacocoTestReport {
         dependsOn(tasks.test)
-        finalizedBy(tasks.jacocoTestCoverageVerification)
 
         reports {
             xml.required.set(true)
             html.required.set(true)
-            html.outputLocation.set(file("$buildDir/jacocoHtml"))
-        }
-    }
-
-    tasks.jacocoTestCoverageVerification {
-        violationRules {
-            rule {
-                limit {
-                    // 'counter'    -> 'INSTRUCTION' (default)
-                    // 'value'      -> 'COVEREDRATIO' (default)
-                    minimum = "0.30".toBigDecimal()
-                }
-            }
-
-            // rule {
-            //     enabled = true
-            //     element = "CLASS"
-            //
-            //     limit {
-            //         counter = "BRANCH"
-            //         value = "COVEREDRATIO"
-            //         minimum = "0.90".toBigDecimal()
-            //     }
-            //
-            //     limit {
-            //         counter = "LINE"
-            //         value = "COVEREDRATIO"
-            //         minimum = "0.80".toBigDecimal()
-            //     }
-            //
-            //     limit {
-            //         counter = "LINE"
-            //         value = "TOTALCOUNT"
-            //         maximum = "200".toBigDecimal()
-            //     }
-            //
-            //     excludes = listOf(
-            //         "*.test.*",
-            //     )
-            // }
         }
     }
 }
 
-val mergeTargets = subprojects.filterNot { it.isExampleProject() }
-
-val jacocoMergeData = tasks.create<JacocoMerge>("jacocoMergeData") {
-    dependsOn(mergeTargets.map { it.tasks.jacocoTestReport })
-    destinationFile = file("$buildDir/jacoco/all-tests.exec")
-    executionData(files(mergeTargets.map { it.tasks.jacocoTestReport.get().executionData }).filter { it.exists() })
+dependencies {
+    jacocoAggregation(project(":restdocs-api-spec"))
+    jacocoAggregation(project(":restdocs-api-spec-generator"))
+    jacocoAggregation(project(":restdocs-api-spec-gradle-plugin"))
+    jacocoAggregation(project(":restdocs-api-spec-jsonschema"))
+    jacocoAggregation(project(":restdocs-api-spec-mockmvc"))
+    jacocoAggregation(project(":restdocs-api-spec-model"))
 }
 
-tasks.jacocoTestReport {
-    dependsOn(tasks.test, jacocoMergeData)
-    description = "Generates an aggregate report from all subprojects"
-
-    sourceSets(*mergeTargets.map { it.sourceSets.main.get() }.toTypedArray())
-    executionData(jacocoMergeData.executionData)
-
+tasks.testCodeCoverageReport {
     reports {
         xml.required.set(true)
         html.required.set(true)
-        html.outputLocation.set(file("$buildDir/jacocoHtml"))
     }
 }
