@@ -8,6 +8,7 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.restdocs.RestDocumentationContext
 import org.springframework.restdocs.generate.RestDocumentationGenerator.ATTRIBUTE_NAME_URL_TEMPLATE
 import org.springframework.restdocs.operation.Operation
+import org.springframework.restdocs.operation.OperationRequestPart
 import org.springframework.restdocs.payload.FieldDescriptor
 import org.springframework.restdocs.snippet.PlaceholderResolverFactory
 import org.springframework.restdocs.snippet.RestDocumentationContextPlaceholderResolverFactory
@@ -46,7 +47,10 @@ class ResourceSnippet(private val resourceSnippetParameters: ResourceSnippetPara
         val operationId =
             propertyPlaceholderHelper.replacePlaceholders(operation.name, placeholderResolverFactory.create(context))
 
-        val hasRequestBody = operation.request.contentAsString.isNotEmpty()
+        val hasRequestBody = operation.request.contentAsString.isNotEmpty() ||
+            operation.request.parts?.stream()
+                ?.map(OperationRequestPart::getContentAsString)
+                ?.anyMatch { it.isNotEmpty() } ?: false
         val hasResponseBody = operation.response.contentAsString.isNotEmpty()
 
         val securityRequirements = SecurityRequirementsHandler().extractSecurityRequirements(operation)
