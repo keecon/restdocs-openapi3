@@ -316,7 +316,7 @@ object OpenApi3Generator {
                                 it.request.formParameters.map { parameterDescriptor2FieldDescriptor(it) }
                             }
 
-                            MULTIPART_FORM_DATA_VALUE -> {
+                            MULTIPART_FORM_DATA_VALUE, "$MULTIPART_FORM_DATA_VALUE;charset=UTF-8" -> {
                                 it.request.requestParts.map { parameterDescriptor2FieldDescriptor(it) }
                             }
 
