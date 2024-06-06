@@ -18,6 +18,7 @@ import org.springframework.restdocs.templates.TemplateFormat
 import org.springframework.util.PropertyPlaceholderHelper
 import org.springframework.web.util.UriComponentsBuilder
 import java.util.Optional
+import java.util.stream.Collectors
 
 class ResourceSnippet(private val resourceSnippetParameters: ResourceSnippetParameters) : Snippet {
 
@@ -82,7 +83,13 @@ class ResourceSnippet(private val resourceSnippetParameters: ResourceSnippetPara
                 requestFields = if (hasRequestBody) {
                     resourceSnippetParameters.requestFields.filter { !it.isIgnored }
                 } else emptyList(),
-                example = if (hasRequestBody) operation.request.contentAsString else null,
+                example = if (hasRequestBody) {
+                    operation.request.contentAsString.ifEmpty {
+                        operation.request.parts?.stream()
+                            ?.map(OperationRequestPart::getContentAsString)
+                            ?.collect(Collectors.joining("\n"))
+                    }
+                } else null,
                 securityRequirements = securityRequirements
             ),
             response = ResponseModel(
