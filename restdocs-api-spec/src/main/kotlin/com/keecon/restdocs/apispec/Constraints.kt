@@ -1,10 +1,12 @@
 package com.keecon.restdocs.apispec
 
 import com.keecon.restdocs.apispec.ResourceDocumentation.parameterWithName
+import com.keecon.restdocs.apispec.ResourceDocumentation.partWithName
 import org.springframework.restdocs.constraints.ValidatorConstraintResolver
 import org.springframework.restdocs.payload.FieldDescriptor
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.snippet.AbstractDescriptor
+import org.springframework.web.multipart.MultipartFile
 import java.lang.reflect.Field
 import java.lang.reflect.ParameterizedType
 
@@ -42,6 +44,20 @@ class Constraints private constructor(private val rootType: Class<*>) {
      */
     fun withMappedName(name: String, propsPath: String): ParameterDescriptorWithType =
         addConstraints(parameterWithName(name), propsPath)
+
+    /**
+     * Create a part description with constraints for bean property with the same name
+     * @param name name of the part
+     */
+    fun withPart(name: String) = withMappedPart(name, name)
+
+    /**
+     * Create a part description with constraints for bean property with a name differing from the name
+     * @param name name of the part
+     * @param propsPath name of the property of the bean that is used to get the part constraints
+     */
+    fun withMappedPart(name: String, propsPath: String): RequestPartDescriptorWithType =
+        addConstraints(partWithName(name), propsPath)
 
     private fun <T : AbstractDescriptor<T>> addConstraints(descriptor: T, propsPath: String): T {
         val (propName, objectType) = propertyWithObjectType(propsPath)
@@ -96,6 +112,7 @@ class Constraints private constructor(private val rootType: Class<*>) {
             when (this) {
                 is HeaderDescriptorWithType -> type(DataType.ARRAY)
                 is ParameterDescriptorWithType -> type(DataType.ARRAY)
+                is RequestPartDescriptorWithType -> type(DataType.ARRAY)
                 is FieldDescriptor -> type(DataType.ARRAY)
             }
 
@@ -126,6 +143,10 @@ class Constraints private constructor(private val rootType: Class<*>) {
                     attributes(Attributes.items(DataType.STRING))
                 }
 
+                MultipartFile::class.java -> {
+                    attributes(Attributes.items(DataType.STRING, DataFormat.BINARY))
+                }
+
                 else -> if (type?.isEnum == true) {
                     attributes(Attributes.items(DataType.STRING, enums = type.enumConstants.map(Any::toString)))
                 }
@@ -139,6 +160,7 @@ class Constraints private constructor(private val rootType: Class<*>) {
                 Boolean::class.javaPrimitiveType -> when (this) {
                     is HeaderDescriptorWithType -> type(DataType.BOOLEAN)
                     is ParameterDescriptorWithType -> type(DataType.BOOLEAN)
+                    is RequestPartDescriptorWithType -> type(DataType.BOOLEAN)
                     is FieldDescriptor -> type(DataType.BOOLEAN)
                 }
 
@@ -148,6 +170,7 @@ class Constraints private constructor(private val rootType: Class<*>) {
                 Double::class.javaPrimitiveType -> when (this) {
                     is HeaderDescriptorWithType -> type(DataType.NUMBER)
                     is ParameterDescriptorWithType -> type(DataType.NUMBER)
+                    is RequestPartDescriptorWithType -> type(DataType.NUMBER)
                     is FieldDescriptor -> type(DataType.NUMBER)
                 }
 
@@ -156,6 +179,7 @@ class Constraints private constructor(private val rootType: Class<*>) {
                     when (this) {
                         is HeaderDescriptorWithType -> type(DataType.INTEGER)
                         is ParameterDescriptorWithType -> type(DataType.INTEGER)
+                        is RequestPartDescriptorWithType -> type(DataType.INTEGER)
                         is FieldDescriptor -> type(DataType.INTEGER)
                     }
                     attributes(Attributes.format(DataFormat.INT32))
@@ -166,6 +190,7 @@ class Constraints private constructor(private val rootType: Class<*>) {
                     when (this) {
                         is HeaderDescriptorWithType -> type(DataType.INTEGER)
                         is ParameterDescriptorWithType -> type(DataType.INTEGER)
+                        is RequestPartDescriptorWithType -> type(DataType.INTEGER)
                         is FieldDescriptor -> type(DataType.INTEGER)
                     }
                     attributes(Attributes.format(DataFormat.INT64))
@@ -174,13 +199,25 @@ class Constraints private constructor(private val rootType: Class<*>) {
                 String::class.java -> when (this) {
                     is HeaderDescriptorWithType -> type(DataType.STRING)
                     is ParameterDescriptorWithType -> type(DataType.STRING)
+                    is RequestPartDescriptorWithType -> type(DataType.STRING)
                     is FieldDescriptor -> type(DataType.STRING)
+                }
+
+                MultipartFile::class.java -> {
+                    when (this) {
+                        is HeaderDescriptorWithType -> type(DataType.STRING)
+                        is ParameterDescriptorWithType -> type(DataType.STRING)
+                        is RequestPartDescriptorWithType -> type(DataType.STRING)
+                        is FieldDescriptor -> type(DataType.STRING)
+                    }
+                    attributes(Attributes.format(DataFormat.BINARY))
                 }
 
                 else -> if (type?.isEnum == true) {
                     when (this) {
                         is HeaderDescriptorWithType -> type(DataType.STRING)
                         is ParameterDescriptorWithType -> type(DataType.STRING)
+                        is RequestPartDescriptorWithType -> type(DataType.STRING)
                         is FieldDescriptor -> type(DataType.STRING)
                     }
                     attributes(Attributes.enum(type.enumConstants.map(Any::toString)))

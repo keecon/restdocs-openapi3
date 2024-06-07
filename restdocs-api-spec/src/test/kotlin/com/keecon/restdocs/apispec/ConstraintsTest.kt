@@ -80,6 +80,39 @@ internal class ConstraintsTest {
 
     @Test
     @Suppress("UNCHECKED_CAST")
+    fun `should resolve part constraints`() {
+        val model = Constraints.model(NonEmptyConstraints::class.java)
+        val descriptor = model.withPart("nonEmpty")
+
+        then(descriptor.attributes).containsKey(Attributes.CONSTRAINTS_KEY)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotEmpty::class.java.name)
+    }
+
+    @Test
+    @Suppress("UNCHECKED_CAST")
+    fun `should resolve one level nested part constraints`() {
+        val model = Constraints.model(NonEmptyConstraints::class.java)
+        val descriptor = model.withPart("nested.nonEmpty")
+
+        then(descriptor.attributes).containsKey(Attributes.CONSTRAINTS_KEY)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotEmpty::class.java.name)
+    }
+
+    @Test
+    @Suppress("UNCHECKED_CAST")
+    fun `should resolve two level nested part constraints`() {
+        val model = Constraints.model(NonEmptyConstraints::class.java)
+        val descriptor = model.withPart("nested.nested.nonEmpty")
+
+        then(descriptor.attributes).containsKey(Attributes.CONSTRAINTS_KEY)
+        then((descriptor.attributes[Attributes.CONSTRAINTS_KEY] as List<Constraint>).map { it.name })
+            .containsExactly(NotEmpty::class.java.name)
+    }
+
+    @Test
+    @Suppress("UNCHECKED_CAST")
     fun `should resolve composite field constraints`() {
         val model = Constraints.model(CompositeConstraints::class.java)
 
