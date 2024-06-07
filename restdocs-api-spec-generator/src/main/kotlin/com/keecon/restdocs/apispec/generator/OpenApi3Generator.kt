@@ -312,7 +312,7 @@ object OpenApi3Generator {
                 toMediaType(
                     requestFields = requests.flatMap { it ->
                         when (it.request.contentType) {
-                            APPLICATION_FORM_URLENCODED_VALUE -> {
+                            APPLICATION_FORM_URLENCODED_VALUE, "$APPLICATION_FORM_URLENCODED_VALUE;charset=UTF-8" -> {
                                 it.request.formParameters.map { parameterDescriptor2FieldDescriptor(it) }
                             }
 
