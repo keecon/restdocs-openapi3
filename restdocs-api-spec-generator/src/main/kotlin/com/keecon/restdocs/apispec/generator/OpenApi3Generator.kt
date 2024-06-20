@@ -38,6 +38,7 @@ import io.swagger.v3.oas.models.media.Content
 import io.swagger.v3.oas.models.media.IntegerSchema
 import io.swagger.v3.oas.models.media.MediaType
 import io.swagger.v3.oas.models.media.NumberSchema
+import io.swagger.v3.oas.models.media.ObjectSchema
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.media.StringSchema
 import io.swagger.v3.oas.models.parameters.HeaderParameter
@@ -530,6 +531,10 @@ object OpenApi3Generator {
                 applyProperties(descriptor)
                 applyItems(descriptor)
                 applyConstraints(descriptor)
+            }
+
+            DataType.OBJECT.lowercase() -> ObjectSchema().apply {
+                applyProperties(descriptor)
             }
 
             else -> throw IllegalArgumentException("Unknown type '${descriptor.type}'")
