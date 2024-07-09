@@ -17,6 +17,7 @@ repositories {
 }
 
 scmVersion {
+    versionCreator("simple")
     tag {
         prefix.set("")
     }
