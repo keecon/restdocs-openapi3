@@ -3,7 +3,7 @@ buildscript() {
 		maven { url 'https://jitpack.io' }
 	}
 	dependencies {
-		classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:1.0.2'
+		classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:1.0.9'
 	}
 }
 
