@@ -1,5 +1,6 @@
 package com.keecon.restdocs.apispec
 
+import com.google.common.base.CaseFormat
 import com.keecon.restdocs.apispec.ResourceDocumentation.parameterWithName
 import com.keecon.restdocs.apispec.ResourceDocumentation.partWithName
 import org.springframework.restdocs.constraints.ValidatorConstraintResolver
@@ -24,6 +25,13 @@ class Constraints private constructor(private val rootType: Class<*>) {
     fun withPath(path: String) = withMappedPath(path, path)
 
     /**
+     * Create a field description with constraints for bean property with the underscore name
+     * @param path json path of the field
+     */
+    fun withUnderscorePath(path: String) =
+        withMappedPath(path, CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, path))
+
+    /**
      * Create a field description with constraints for bean property with a name differing from the path
      * @param path json path of the field
      * @param propsPath name of the property of the bean that is used to get the field constraints
@@ -38,6 +46,13 @@ class Constraints private constructor(private val rootType: Class<*>) {
     fun withName(name: String) = withMappedName(name, name)
 
     /**
+     * Create a parameter description with constraints for bean property with the underscore name
+     * @param name name of the parameter
+     */
+    fun withUnderscoreName(name: String) =
+        withMappedName(name, CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name))
+
+    /**
      * Create a parameter description with constraints for bean property with a name differing from the name
      * @param name name of the parameter
      * @param propsPath name of the property of the bean that is used to get the parameter constraints
@@ -50,6 +65,13 @@ class Constraints private constructor(private val rootType: Class<*>) {
      * @param name name of the part
      */
     fun withPart(name: String) = withMappedPart(name, name)
+
+    /**
+     * Create a part description with constraints for bean property with the underscore name
+     * @param name name of the part
+     */
+    fun withUnderscorePart(name: String) =
+        withMappedPart(name, CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name))
 
     /**
      * Create a part description with constraints for bean property with a name differing from the name
