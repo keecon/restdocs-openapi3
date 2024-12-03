@@ -2,7 +2,7 @@
 kotlin = "2.0.21"
 ktlint = "11.0.0"
 axion-release = "1.18.16"
-jackson = "2.18.1"
+jackson = "2.18.2"
 guava = "33.3.1-jre"
 spring-boot = "3.3.6"
 spring-restdocs = "3.0.3"
