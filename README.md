@@ -13,29 +13,32 @@ And only support [OpenAPI 3.0.1] specs.
 
 ### Versions
 
-- The *1.x.x* version is compatible with Spring Boot *3.0.x* and Spring REST Docs *3.0.x*.
-- The *0.x.x* version is compatible with Spring Boot *2.7.x* and Spring REST Docs *2.0.x*.
+| Artifact line | Spring Boot | Spring REST Docs | Java bytecode | Tested JDKs | Status |
+|---|---|---|---|---|---|
+| 1.x | 3.5.x | 3.0.x | 17 | 17, 21, 25 | Maintained |
+| 2.x | 4.1.x | 4.0.x | 17 | — (target: 17, 21, 25) | Planned, not released |
+| 0.x | 2.7.x | 2.0.x | — | — | Frozen, unsupported |
+
+The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin ID remains
+`com.keecon.restdocs-openapi3` across release lines.
 
 ### Gradle
 
 1. Add the plugin
 
     ```groovy
-    buildscript() {
+    buildscript {
       repositories {
         // ...
-        maven { url "https://jitpack.io" }
+        maven { url = uri('https://jitpack.io') }
       }
       dependencies {
         // ...
-        classpath 'com.github.keecon:restdocs-openapi3:x.x.x'
+        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:1.1.0'
       }
     }
 
-    plugins {
-      // ...
-      id 'com.github.keecon:restdocs-openapi3'
-    }
+    apply plugin: 'com.keecon.restdocs-openapi3'
     ```
 
 2. Add required dependencies to your tests
@@ -48,7 +51,8 @@ And only support [OpenAPI 3.0.1] specs.
 
     dependencies {
       //..
-      testImplementation 'com.github.keecon:restdocs-openapi3:x.x.x'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:1.1.0'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:1.1.0'
     }
 
     openapi3 {
