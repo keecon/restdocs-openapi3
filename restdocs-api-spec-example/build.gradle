@@ -1,6 +1,6 @@
-buildscript() {
+buildscript {
 	repositories {
-		maven { url 'https://jitpack.io' }
+		maven { url = uri('https://jitpack.io') }
 	}
 	dependencies {
 		classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:1.0.2'
@@ -19,6 +19,10 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+}
+
+tasks.named('test') {
+	outputs.dir file('build/generated-snippets')
 }
 
 dependencies {
