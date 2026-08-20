@@ -2,7 +2,7 @@ dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
     compileOnly(kotlin("reflect"))
 
-    implementation(libs.spring.boot.starter.web)
+    implementation(libs.spring.web)
     implementation(libs.spring.restdocs.core)
     implementation(libs.bundles.jackson)
     implementation(libs.guava)

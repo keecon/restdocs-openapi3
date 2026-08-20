@@ -7,8 +7,10 @@ import com.keecon.restdocs.apispec.model.ResourceModel
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 
+@DisableCachingByDefault(because = "Task inputs and outputs are not yet modeled for build caching")
 abstract class ApiSpecTask : DefaultTask() {
 
     @Input

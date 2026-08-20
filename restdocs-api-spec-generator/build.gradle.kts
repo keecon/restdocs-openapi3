@@ -5,7 +5,7 @@ dependencies {
     api(project(":restdocs-api-spec-jsonschema"))
 
     api(libs.swagger.core)
-    implementation(libs.spring.boot.starter.web)
+    implementation(libs.spring.web)
     implementation(libs.bundles.jackson)
 
     testImplementation(libs.assertj.core)

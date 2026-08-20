@@ -1,7 +1,6 @@
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     `java-gradle-plugin`
-    alias(libs.plugins.plugin.publish)
 }
 
 gradlePlugin {
@@ -10,25 +9,6 @@ gradlePlugin {
             id = "com.keecon.restdocs-openapi3"
             implementationClass = "com.keecon.restdocs.apispec.gradle.RestdocsOpenApi3Plugin"
         }
-    }
-}
-
-pluginBundle {
-    website = "https://github.com/keecon/restdocs-openapi3"
-    vcsUrl = "https://github.com/keecon/restdocs-openapi3"
-    tags = listOf("spring", "restdocs", "openapi3", "api", "specification")
-    description =
-        "Extends Spring REST Docs with API specifications in OpenAPI 3 formats"
-
-    (plugins) {
-        "com.keecon.restdocs-openapi3" {
-            displayName = "restdocs-openapi3 gradle plugin"
-        }
-    }
-
-    mavenCoordinates {
-        groupId = "com.keecon"
-        artifactId = "restdocs-api-spec-gradle-plugin"
     }
 }
 
@@ -52,7 +32,11 @@ dependencies {
 
     testCompileOnly(gradleTestKit())
 
-    jacocoRuntime("org.jacoco:org.jacoco.agent:0.8.2:runtime")
+    jacocoRuntime(libs.jacoco.agent) {
+        artifact {
+            classifier = "runtime"
+        }
+    }
 }
 
 // generate gradle properties file with jacoco agent configured
@@ -72,22 +56,3 @@ val createTestKitFiles: Task by tasks.creating {
 }
 
 tasks["test"].dependsOn(createTestKitFiles)
-
-// Set Gradle plugin publishing credentials from environment
-// see https://github.com/gradle/gradle/issues/1246
-//     https://github.com/cortinico/kotlin-gradle-plugin-template/blob/1194fbbb2bc61857a76da5b5b2df919a558653de/plugin-build/plugin/build.gradle.kts#L43-L55
-val configureGradlePluginCredentials: Task by tasks.creating {
-    doLast {
-        val key = System.getenv("GRADLE_PUBLISH_KEY")
-        val secret = System.getenv("GRADLE_PUBLISH_SECRET")
-
-        if (key == null || secret == null) {
-            throw GradleException("GRADLE_PUBLISH_KEY/GRADLE_PUBLISH_SECRET are not defined environment variables")
-        }
-
-        System.setProperty("gradle.publish.key", key)
-        System.setProperty("gradle.publish.secret", secret)
-    }
-}
-
-tasks["publishPlugins"].dependsOn(configureGradlePluginCredentials)

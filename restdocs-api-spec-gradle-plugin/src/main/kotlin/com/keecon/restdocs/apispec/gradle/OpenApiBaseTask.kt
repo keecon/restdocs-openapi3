@@ -2,7 +2,9 @@ package com.keecon.restdocs.apispec.gradle
 
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
+import org.gradle.work.DisableCachingByDefault
 
+@DisableCachingByDefault(because = "Task inputs and outputs are not yet modeled for build caching")
 abstract class OpenApiBaseTask : ApiSpecTask() {
     @Input
     @Optional
