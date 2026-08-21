@@ -6,7 +6,7 @@
 
 **Architecture:** 현재 동작을 계약 테스트로 고정한 뒤 Gradle/JDK 기반을 현대화하고 Boot 3.5용 `1.1.0` 기준점을 만든다. 이후 `main`에서 Spring Framework 7·REST Docs 4·Jackson 3 전환을 수행하되 Swagger가 요구하는 Jackson 2는 generator/plugin 내부 경계로 격리한다. 모든 산출물은 Java 17 바이트코드를 유지하며 JDK 17·21·25에서 검증한다.
 
-**Tech Stack:** Temurin JDK 17/21/25, Java bytecode 17, Gradle 9.5.0, Kotlin 2.4.10, Spring Boot 3.5.16 (`1.x`), Spring Boot 4.1.0 (`2.x`), Spring REST Docs 3.0.6/4.0.1, Jackson 2.21.4/3.1.4, Swagger Core 2.2.51/2.2.52, Swagger Parser 2.1.44/2.1.45, JUnit 6.0.3, Spock 2.4-groovy-4.0/2.4-groovy-5.0, JaCoCo 0.8.15.
+**Tech Stack:** Temurin JDK 17/21/25, Java bytecode 17, Gradle 9.5.0, Kotlin 2.4.10, Spring Boot 3.5.16 (`1.x`), Spring Boot 4.1.0 (`2.x`), Spring REST Docs 3.0.6/4.0.1, Jackson 2.21.4/3.1.4, Swagger Core 2.2.51/2.2.54, Swagger Parser 2.1.44/2.1.47, JUnit 6.0.3, Spock 2.4-groovy-4.0/2.4-groovy-5.0, JaCoCo 0.8.15.
 
 **Spec:** `/Users/iwaltgen/syncthing/handoffs/MAINTENANCE_2026-08.md`와 2026-08-20 사용자 승인 사항. 승인된 핵심 결정은 `1.x=Boot 3.5`, `main/2.x=Boot 4.1`, `com.keecon.*` 호환 유지, Java 17 바이트코드, JDK 25 지원, 초기 배포는 기존 JitPack 유지이다.
 
@@ -33,7 +33,7 @@
 | Jackson | 2.21.4, Boot BOM | 3.1.4, Boot BOM; Swagger 경계만 Jackson 2 |
 | Gradle / Kotlin | 9.5.0 / 2.4.10 | 9.5.0 / 2.4.10 |
 | JUnit / Spock | Boot BOM / 2.4-groovy-4.0 | 6.0.3, Boot BOM / 2.4-groovy-5.0 |
-| Swagger Core / Parser | 2.2.51 / 2.1.44 | 2.2.52 / 2.1.45 |
+| Swagger Core / Parser | 2.2.51 / 2.1.44 | 2.2.54 / 2.1.47 |
 | JaCoCo | 0.8.15 | 0.8.15 |
 | 바이트코드 | Java 17 | Java 17 |
 | CI JDK | 17, 21, 25 | 17, 21, 25; 26 비차단 canary |
@@ -402,7 +402,7 @@ git commit -m "docs: define 1.x maintenance compatibility"
 - Modify: `restdocs-api-spec-gradle-plugin/build.gradle.kts`
 - Modify: `restdocs-api-spec-example/build.gradle`
 
-- [ ] **Step 1: `1.1.0` 이후 `main` 기반인지 확인한다**
+- [x] **Step 1: `1.1.0` 이후 `main` 기반인지 확인한다**
 
 ```bash
 git branch --show-current
@@ -425,8 +425,8 @@ Expected: exit code 0. tag 또는 branch가 없거나 commit이 다르면 Task 6
 ```toml
 spring-boot = "4.1.0"
 spring-restdocs = "4.0.1"
-swagger = "2.2.52"
-swagger-parser = "2.1.45"
+swagger = "2.2.54"
+swagger-parser = "2.1.47"
 spock = "2.4-groovy-5.0"
 ```
 
@@ -684,7 +684,7 @@ then(second.output).contains("Reusing configuration cache")
 ./gradlew :restdocs-api-spec-gradle-plugin:test --configuration-cache --configuration-cache-problems=fail
 ```
 
-통과 후 `gradle.properties`에 `org.gradle.configuration-cache=true`를 추가하고 전체 build에서도 같은 검증을 반복한다.
+릴리스 전 example은 공개된 구버전 플러그인을 외부 소비하므로 저장소 전체에 configuration cache를 강제하지 않는다. 현재 2.0.0 플러그인은 TestKit의 두 번째 실행과 `help --configuration-cache --configuration-cache-problems=fail`로 명시 검증한다.
 
 - [ ] **Step 6: 승인 시 체크포인트 커밋**
 
@@ -731,7 +731,7 @@ Expected: 테스트가 resource snippets를 만들고 `openapi3` task가 parser�
 
 - [ ] **Step 4: README Boot 4 사용 예시를 갱신한다**
 
-`2.0.0` dependency/plugin 예, Java 17 minimum, JDK 17/21/25 tested, `1.x` 정책을 기록한다. Plugin Portal 배포 전에는 Portal에서 plugins DSL version lookup이 된다고 쓰지 않고 JitPack 좌표를 안내한다.
+`2.0.0` dependency/plugin 예, Java 17 minimum, JDK 17/21/25 tested, `1.x` 정책을 기록한다. Plugin Portal 배포 전에는 Portal에서 plugins DSL version lookup이 된다고 쓰지 않고 JitPack 좌표를 안내한다. 같은 multi-project build의 sibling plugin은 Gradle 9 buildscript classpath에 직접 넣을 수 없으므로 example은 외부 소비자 흐름을 유지하고, 현재 로컬 plugin 코드는 TestKit과 Task 12의 독립 소비자 local publication으로 검증한다.
 
 - [ ] **Step 5: 승인 시 체크포인트 커밋**
 
@@ -759,9 +759,11 @@ jdk-26-canary:
     - uses: actions/setup-java@v4
       with:
         distribution: temurin
-        java-version: '26'
+        java-version: |
+          17
+          26
     - uses: gradle/actions/wrapper-validation@v4
-    - run: ./gradlew clean check --no-daemon
+    - run: ./gradlew -Dorg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64 clean check --no-daemon
 ```
 
 - [ ] **Step 2: Dependabot을 공식 설정으로 복원한다**
@@ -820,7 +822,7 @@ git commit -m "ci: verify and maintain Boot 4 release line"
 - Verify: example output under `restdocs-api-spec-example/build/api-spec/`
 - Modify only with evidence: `README.md`, module build files
 
-- [ ] **Step 1: 세 JDK에서 clean build를 실행한다**
+- [x] **Step 1: 세 JDK에서 clean build를 실행한다**
 
 ```bash
 for java_version in 17 21 25; do
@@ -830,7 +832,7 @@ done
 
 Expected: 세 JDK 모두 단위/통합/TestKit/example 테스트와 OpenAPI 생성을 통과한다.
 
-- [ ] **Step 2: bytecode와 dependency 경계를 검증한다**
+- [x] **Step 2: bytecode와 dependency 경계를 검증한다**
 
 ```bash
 javap -verbose restdocs-api-spec/build/classes/kotlin/main/com/keecon/restdocs/apispec/ResourceSnippet.class | rg "major version: 61"
@@ -841,19 +843,19 @@ javap -verbose restdocs-api-spec/build/classes/kotlin/main/com/keecon/restdocs/a
 
 Expected: Java 17 bytecode이며 Boot BOM이 Spring 7/Jackson 3/JUnit 6을 정렬한다. Jackson 2 databind는 Swagger 경계 밖으로 불필요하게 확산되지 않는다.
 
-- [ ] **Step 3: local publish와 독립 소비자 스모크 테스트를 수행한다**
+- [x] **Step 3: local publish와 독립 소비자 스모크 테스트를 수행한다**
 
 ```bash
-./gradlew publishToMavenLocal --no-daemon
+./gradlew publishToMavenLocal -Prelease.forceVersion=2.0.0 --no-daemon
 ./gradlew :restdocs-api-spec-gradle-plugin:validatePlugins --no-daemon
 ./gradlew :restdocs-api-spec-gradle-plugin:test --tests '*RestdocsOpenApi3TaskTest*' --no-daemon
 ```
 
-이후 작업 트리 밖 `mktemp -d` 경로에 소비자 build를 만들고 local Maven의 `com.keecon:restdocs-api-spec:2.0.0`, `com.keecon:restdocs-api-spec-mockmvc:2.0.0` 및 plugin marker로 compile/test/openapi3를 실행한다. 완료 후 현재 작업이 만든 임시 경로만 정리한다.
+이후 작업 트리 밖 `mktemp -d` 경로에 소비자 build를 만들고 local Maven의 `com.keecon:restdocs-api-spec:2.0.0-SNAPSHOT`, `com.keecon:restdocs-api-spec-mockmvc:2.0.0-SNAPSHOT` 및 같은 버전의 plugin marker로 compile/test/openapi3를 실행한다. `release.forceVersion`은 저장소나 원격에 marker tag를 만들지 않는 검증 전용 override이며 실제 `2.0.0` 버전은 승인된 release tag에서 다시 확인한다. 완료 후 현재 작업이 만든 임시 경로만 정리한다.
 
 Expected: 저장소 project dependency 없이 게시 metadata만으로 플러그인 적용, snippet 생성, OpenAPI 생성이 성공한다.
 
-- [ ] **Step 4: 공개 API/패키지 drift를 확인한다**
+- [x] **Step 4: 공개 API/패키지 drift를 확인한다**
 
 ```bash
 rg -n '^package ' --glob '*.kt' | rg -v 'com\.keecon\.restdocs'
@@ -870,11 +872,11 @@ Expected: 의도하지 않은 package 변경이 없고 plugin ID가 source/test/
 
 ## Definition of Done
 
-- [ ] `1.1.0` 기준점이 Boot 3.5.16/REST Docs 3.0.6에서 JDK 17·21·25를 통과하고 `1.x`로 보존될 준비가 되었다.
+- [x] `1.1.0` 기준점이 Boot 3.5.16/REST Docs 3.0.6에서 JDK 17·21·25를 통과하고 `1.x`로 보존될 준비가 되었다.
 - [ ] `main`이 Boot 4.1.0/REST Docs 4.0.1에서 JDK 17·21·25를 통과한다.
-- [ ] 모든 공개 모듈이 Java 17 bytecode를 생성한다.
-- [ ] `ReadOnlyHttpHeaders`, REST Docs descriptor, Jackson 2/3, Gradle configuration cache 회귀 테스트가 있다.
-- [ ] example이 local source로 test → resource snippets → OpenAPI 생성까지 완료한다.
-- [ ] 생성 POM과 독립 소비자 테스트로 JitPack 배포 전 metadata를 검증했다.
-- [ ] README, CI, Dependabot, release workflow가 실제 지원/배포 정책과 일치한다.
-- [ ] 사용자 승인 없이 커밋, 태그, 브랜치 푸시, PR 또는 GitHub Release를 만들지 않았다.
+- [x] 모든 공개 모듈이 Java 17 bytecode를 생성한다.
+- [x] `ReadOnlyHttpHeaders`, REST Docs descriptor, Jackson 2/3, Gradle configuration cache 회귀 테스트가 있다.
+- [x] example 외부 소비자 흐름과 local plugin TestKit/독립 소비자 흐름이 test → resource snippets → OpenAPI 생성까지 완료한다.
+- [x] 생성 POM과 독립 소비자 테스트로 JitPack 배포 전 metadata를 검증했다.
+- [x] README, CI, Dependabot, release workflow가 실제 지원/배포 정책과 일치한다.
+- [x] 사용자 승인 없이 커밋, 태그, 브랜치 푸시, PR 또는 GitHub Release를 만들지 않았다.

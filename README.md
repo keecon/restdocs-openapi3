@@ -16,11 +16,15 @@ And only support [OpenAPI 3.0.1] specs.
 | Artifact line | Spring Boot | Spring REST Docs | Java bytecode | Tested JDKs | Status |
 |---|---|---|---|---|---|
 | 1.x | 3.5.x | 3.0.x | 17 | 17, 21, 25 | Maintained |
-| 2.x | 4.1.x | 4.0.x | 17 | — (target: 17, 21, 25) | Planned, not released |
+| 2.x | 4.1.x | 4.0.x | 17 | 17, 21, 25 | In development, not released |
 | 0.x | 2.7.x | 2.0.x | — | — | Frozen, unsupported |
 
 The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin ID remains
 `com.keecon.restdocs-openapi3` across release lines.
+
+The 2.x line requires Java 17 or newer. CI verifies JDK 17, 21, and 25; JDK 26 is a non-blocking
+canary. Use 1.1.0 for Spring Boot 3.5 applications. The 2.0.0 coordinates below become available
+from JitPack after the `2.0.0` tag is published; no Plugin Portal publication is assumed.
 
 ### Gradle
 
@@ -34,7 +38,7 @@ The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin 
       }
       dependencies {
         // ...
-        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:1.1.0'
+        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.0.0'
       }
     }
 
@@ -51,8 +55,8 @@ The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin 
 
     dependencies {
       //..
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:1.1.0'
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:1.1.0'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:2.0.0'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:2.0.0'
     }
 
     openapi3 {
