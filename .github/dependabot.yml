@@ -1,17 +1,5 @@
 version: 2
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "tuesday"
-      time: "10:00"
-      timezone: "Asia/Seoul"
-    open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "actions"
-
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
@@ -19,7 +7,19 @@ updates:
       day: "tuesday"
       time: "10:00"
       timezone: "Asia/Seoul"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     labels:
       - "dependencies"
       - "gradle"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "10:00"
+      timezone: "Asia/Seoul"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "actions"
