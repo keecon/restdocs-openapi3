@@ -866,14 +866,14 @@ git status --short
 
 Expected: 의도하지 않은 package 변경이 없고 plugin ID가 source/test/docs에서 일치한다.
 
-- [ ] **Step 5: 최종 보고와 릴리스 승인 요청**
+- [x] **Step 5: 최종 보고와 릴리스 승인 요청**
 
 보고 항목은 JDK 17/21/25 결과, JDK 26 canary, resolved dependency 버전, class major 61, POM, 독립 소비자 결과, 공개 API/Groovy DSL 호환성, 알려진 제한이다. 검증 보고 후 명시 승인된 경우에만 최종 커밋, `2.0.0` 태그, 푸시와 GitHub Release를 실행한다.
 
 ## Definition of Done
 
 - [x] `1.1.0` 기준점이 Boot 3.5.16/REST Docs 3.0.6에서 JDK 17·21·25를 통과하고 `1.x`로 보존될 준비가 되었다.
-- [ ] `main`이 Boot 4.1.0/REST Docs 4.0.1에서 JDK 17·21·25를 통과한다.
+- [x] `main`이 Boot 4.1.0/REST Docs 4.0.1에서 JDK 17·21·25를 통과한다.
 - [x] 모든 공개 모듈이 Java 17 bytecode를 생성한다.
 - [x] `ReadOnlyHttpHeaders`, REST Docs descriptor, Jackson 2/3, Gradle configuration cache 회귀 테스트가 있다.
 - [x] example 외부 소비자 흐름과 local plugin TestKit/독립 소비자 흐름이 test → resource snippets → OpenAPI 생성까지 완료한다.
