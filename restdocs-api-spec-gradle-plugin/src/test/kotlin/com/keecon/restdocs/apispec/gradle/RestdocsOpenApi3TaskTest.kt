@@ -62,6 +62,18 @@ class RestdocsOpenApi3TaskTest : RestdocsOpenApiTaskTestBase() {
         thenHeaderWithDefaultValuesContainedInOutput()
     }
 
+    @Test
+    fun `should reuse configuration cache`() {
+        givenBuildFileWithOpenApiClosureWithSingleServerString()
+        givenResourceSnippet()
+
+        whenPluginExecuted()
+        thenApiSpecTaskSuccessful()
+        whenPluginExecuted()
+
+        then(result.output).contains("Reusing configuration cache")
+    }
+
     private fun thenSingleServerContainedInOutput() {
         with(outputFileContext()) {
             then(read<List<String>>("servers[*].url")).containsOnly("http://some.api")

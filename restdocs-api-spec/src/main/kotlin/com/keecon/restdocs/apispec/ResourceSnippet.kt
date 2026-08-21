@@ -1,7 +1,5 @@
 package com.keecon.restdocs.apispec
 
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -17,12 +15,18 @@ import org.springframework.restdocs.snippet.StandardWriterResolver
 import org.springframework.restdocs.templates.TemplateFormat
 import org.springframework.util.PropertyPlaceholderHelper
 import org.springframework.web.util.UriComponentsBuilder
+import tools.jackson.databind.SerializationFeature
+import tools.jackson.databind.cfg.EnumFeature
+import tools.jackson.module.kotlin.jacksonMapperBuilder
 import java.util.Optional
 import java.util.stream.Collectors
 
 class ResourceSnippet(private val resourceSnippetParameters: ResourceSnippetParameters) : Snippet {
 
-    private val objectMapper = jacksonObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
+    private val objectMapper = jacksonMapperBuilder()
+        .enable(SerializationFeature.INDENT_OUTPUT)
+        .disable(EnumFeature.WRITE_ENUMS_USING_TO_STRING)
+        .build()
     private val propertyPlaceholderHelper = PropertyPlaceholderHelper("{", "}")
 
     override fun document(operation: Operation) {
@@ -49,9 +53,9 @@ class ResourceSnippet(private val resourceSnippetParameters: ResourceSnippetPara
             propertyPlaceholderHelper.replacePlaceholders(operation.name, placeholderResolverFactory.create(context))
 
         val hasRequestBody = operation.request.contentAsString.isNotEmpty() ||
-            operation.request.parts?.stream()
-                ?.map(OperationRequestPart::getContentAsString)
-                ?.anyMatch { it.isNotEmpty() } ?: false
+            operation.request.parts.stream()
+                .map(OperationRequestPart::getContentAsString)
+                .anyMatch { it.isNotEmpty() }
         val hasResponseBody = operation.response.contentAsString.isNotEmpty()
 
         val securityRequirements = SecurityRequirementsHandler().extractSecurityRequirements(operation)
@@ -85,9 +89,9 @@ class ResourceSnippet(private val resourceSnippetParameters: ResourceSnippetPara
                 } else emptyList(),
                 example = if (hasRequestBody) {
                     operation.request.contentAsString.ifEmpty {
-                        operation.request.parts?.stream()
-                            ?.map(OperationRequestPart::getContentAsString)
-                            ?.collect(Collectors.joining("\n"))
+                        operation.request.parts.stream()
+                            .map(OperationRequestPart::getContentAsString)
+                            .collect(Collectors.joining("\n"))
                     }
                 } else null,
                 securityRequirements = securityRequirements
@@ -121,10 +125,10 @@ class ResourceSnippet(private val resourceSnippetParameters: ResourceSnippetPara
     private fun getUriPath(operation: Operation) = getUriComponents(operation).path
 
     private fun getContentTypeOrDefault(headers: HttpHeaders) =
-        Optional.ofNullable(headers.contentType)
-            .map { MediaType(it.type, it.subtype, it.parameters) }
-            .orElse(APPLICATION_JSON)
-            .toString()
+        headers.getFirst(HttpHeaders.CONTENT_TYPE)
+            ?.let(MediaType::parseMediaType)
+            ?.toString()
+            ?: APPLICATION_JSON.toString()
 
     internal object JsonTemplateFormat : TemplateFormat {
         override fun getId(): String = "json"

@@ -1,7 +1,5 @@
 package com.keecon.restdocs.apispec.generator
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.keecon.restdocs.apispec.generator.ParameterExtensions.applyProperties
 import com.keecon.restdocs.apispec.generator.SchemaConstraints.applyConstraints
 import com.keecon.restdocs.apispec.generator.SchemaExtensions.applyDefaultValue
@@ -23,7 +21,6 @@ import com.keecon.restdocs.apispec.model.RequestModel
 import com.keecon.restdocs.apispec.model.ResourceModel
 import com.keecon.restdocs.apispec.model.ResponseModel
 import com.keecon.restdocs.apispec.model.groupByPath
-import io.swagger.v3.core.util.Json
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
@@ -52,10 +49,13 @@ import io.swagger.v3.oas.models.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
+import tools.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.module.kotlin.readValue
 
 object OpenApi3Generator {
 
     private val PATH_PARAMETER_PATTERN = """\{([^/}]+)}""".toRegex()
+    private val objectMapper = jacksonObjectMapper()
     private fun generate(
         resources: List<ResourceModel>,
         servers: List<Server>,
@@ -408,7 +408,7 @@ object OpenApi3Generator {
         schemaName: String? = null
     ): Pair<String, MediaType> {
         val schema = JsonSchemaGenerator().generateSchema(requestFields, schemaName)
-            .let { Json.mapper().readValue<Schema<Any>>(it) }
+            .let(ApiSpecificationWriter::parseSchema)
 
         if (schemaName != null) schema.name = schemaName
 
@@ -422,9 +422,9 @@ object OpenApi3Generator {
                                 value(it.value)
                             } else {
                                 if (it.value.startsWith("[")) {
-                                    value(ObjectMapper().readValue<List<Any>>(it.value))
+                                    value(objectMapper.readValue<List<Any>>(it.value))
                                 } else {
-                                    value(ObjectMapper().readValue<Map<Any, Any>>(it.value))
+                                    value(objectMapper.readValue<Map<Any, Any>>(it.value))
                                 }
                             }
                         }

@@ -4,7 +4,8 @@ dependencies {
 
     implementation(libs.spring.web)
     implementation(libs.spring.restdocs.core)
-    implementation(libs.bundles.jackson)
+    implementation(libs.bundles.jackson3)
+    implementation(libs.jackson2.annotations)
     implementation(libs.guava)
 
     testImplementation(libs.spring.boot.starter.test)

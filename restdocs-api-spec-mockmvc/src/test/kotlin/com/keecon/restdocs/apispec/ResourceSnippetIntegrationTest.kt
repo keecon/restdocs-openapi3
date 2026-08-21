@@ -10,8 +10,8 @@ import jakarta.validation.constraints.Size
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.restdocs.test.autoconfigure.AutoConfigureRestDocs
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.hateoas.EntityModel
 import org.springframework.hateoas.Link

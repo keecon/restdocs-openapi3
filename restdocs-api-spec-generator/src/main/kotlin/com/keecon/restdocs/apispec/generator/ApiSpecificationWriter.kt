@@ -3,6 +3,7 @@ package com.keecon.restdocs.apispec.generator
 import io.swagger.v3.core.util.Json
 import io.swagger.v3.core.util.Yaml
 import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.media.Schema
 
 internal object ApiSpecificationWriter {
 
@@ -16,6 +17,11 @@ internal object ApiSpecificationWriter {
         } else {
             Json.pretty().writeValueAsString(openApi)
         }
+    }
+
+    fun parseSchema(json: String): Schema<Any> {
+        @Suppress("UNCHECKED_CAST")
+        return Json.mapper().readValue(json, Schema::class.java) as Schema<Any>
     }
 
     private fun supportedFormats() = yamlFormats + jsonFormats

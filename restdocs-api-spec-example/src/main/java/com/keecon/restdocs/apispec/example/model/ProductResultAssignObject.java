@@ -6,11 +6,14 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Singular;
 import lombok.Value;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonPOJOBuilder;
 
 import java.util.List;
 
 @Value
 @Builder
+@JsonDeserialize(builder = ProductResultAssignObject.ProductResultAssignObjectBuilder.class)
 public class ProductResultAssignObject {
 
 	@NotNull
@@ -31,5 +34,9 @@ public class ProductResultAssignObject {
 
 	@Singular
 	List<@NotEmpty String> comments;
+
+	@JsonPOJOBuilder(withPrefix = "")
+	public static class ProductResultAssignObjectBuilder {
+	}
 
 }

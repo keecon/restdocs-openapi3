@@ -5,7 +5,6 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.RestDocumentationContext
-import org.springframework.restdocs.mustache.Mustache
 import org.springframework.restdocs.operation.Operation
 import org.springframework.restdocs.operation.OperationRequest
 import org.springframework.restdocs.operation.OperationRequestFactory
@@ -20,7 +19,6 @@ import org.springframework.restdocs.snippet.WriterResolver
 import org.springframework.restdocs.templates.StandardTemplateResourceResolver
 import org.springframework.restdocs.templates.TemplateEngine
 import org.springframework.restdocs.templates.TemplateFormats
-import org.springframework.restdocs.templates.mustache.AsciidoctorTableCellContentLambda
 import org.springframework.restdocs.templates.mustache.MustacheTemplateEngine
 import org.springframework.web.util.UriComponentsBuilder
 import java.io.File
@@ -90,11 +88,8 @@ class OperationBuilder {
 
     fun build(): Operation {
         if (this.attributes[TemplateEngine::class.java.name] == null) {
-            val templateContext = HashMap<String, Any>()
-            templateContext["tableCellContent"] = AsciidoctorTableCellContentLambda()
             this.attributes[TemplateEngine::class.java.name] = MustacheTemplateEngine(
-                StandardTemplateResourceResolver(this.templateFormat),
-                Mustache.compiler().escapeHTML(false), templateContext
+                StandardTemplateResourceResolver(this.templateFormat)
             )
         }
         val context = createContext()
@@ -121,7 +116,10 @@ class OperationBuilder {
         val manualRestDocumentation = ManualRestDocumentation(
             this.outputDirectory.absolutePath
         )
-        manualRestDocumentation.beforeTest(this.testClass, this.testMethodName)
+        manualRestDocumentation.beforeTest(
+            this.testClass ?: OperationBuilder::class.java,
+            this.testMethodName ?: "test"
+        )
         return manualRestDocumentation.beforeOperation()
     }
 

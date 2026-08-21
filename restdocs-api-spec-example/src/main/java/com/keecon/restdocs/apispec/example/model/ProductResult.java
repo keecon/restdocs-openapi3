@@ -4,12 +4,15 @@ import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Singular;
 import lombok.Value;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonPOJOBuilder;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Value
 @Builder
+@JsonDeserialize(builder = ProductResult.ProductResultBuilder.class)
 public class ProductResult {
 
 	@NotNull
@@ -29,4 +32,8 @@ public class ProductResult {
 	@NotEmpty
 	@Singular
 	List<@NotNull ProductResultAssignObject> assigns;
+
+	@JsonPOJOBuilder(withPrefix = "")
+	public static class ProductResultBuilder {
+	}
 }

@@ -6,7 +6,7 @@ import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.hateoas.MediaTypes.HAL_JSON
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.restdocs.headers.HeaderDocumentation.headerWithName
@@ -30,7 +30,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.io.File
 
 @ExtendWith(SpringExtension::class)
-@WebMvcTest
+@WebMvcTest(properties = ["spring.jackson.deserialization.fail-on-null-for-primitives=false"])
 class DoSomethingIntegrationTest(
     @Autowired private val mockMvc: MockMvc
 ) : ResourceSnippetIntegrationTest() {

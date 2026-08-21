@@ -4,7 +4,7 @@ import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.hateoas.MediaTypes.HAL_JSON
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.restdocs.headers.HeaderDocumentation.headerWithName
@@ -59,15 +59,14 @@ class ListSomethingIntegrationTest(
 
     private fun givenEndpointInvoked(flagValue: Boolean? = true) {
         operationName = "list-something-${System.currentTimeMillis()}"
-        resultActions = mockMvc.perform(
-            get("/some/{someId}/other/{otherId}", "id", 1)
+        val request = get("/some/{someId}/other/{otherId}", "id", 1)
                 .contentType(APPLICATION_JSON)
                 .accept(HAL_JSON)
                 .header("X-Custom-Header", "test")
                 .queryParam("comment", "some")
-                .queryParam("flag", flagValue?.toString())
                 .queryParam("count", "1")
-        ).andExpect(status().isOk)
+        flagValue?.let { request.queryParam("flag", it.toString()) }
+        resultActions = mockMvc.perform(request).andExpect(status().isOk)
     }
 
     private fun givenEndpointListSelectInvoked(params: List<Int>) {

@@ -1,6 +1,5 @@
 package com.keecon.restdocs.apispec.example
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.keecon.restdocs.apispec.Attributes
 import com.keecon.restdocs.apispec.Constraints
 import com.keecon.restdocs.apispec.DataType
@@ -11,11 +10,12 @@ import com.keecon.restdocs.apispec.example.model.ProductResult
 import com.keecon.restdocs.apispec.example.model.ProductResultAssignObject
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.restdocs.test.autoconfigure.AutoConfigureRestDocs
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
+import tools.jackson.databind.ObjectMapper
 
 import static com.keecon.restdocs.apispec.MockMvcRestDocumentationWrapper.document
 import static com.keecon.restdocs.apispec.ResourceDocumentation.resource

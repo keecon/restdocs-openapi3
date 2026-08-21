@@ -2,33 +2,37 @@ package com.keecon.restdocs.apispec.gradle
 
 import com.keecon.restdocs.apispec.generator.OpenApi3Generator
 import com.keecon.restdocs.apispec.model.ResourceModel
-import io.swagger.v3.oas.models.servers.Server
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
-import org.gradle.work.DisableCachingByDefault
+import tools.jackson.dataformat.yaml.YAMLMapper
+import tools.jackson.module.kotlin.kotlinModule
+import tools.jackson.module.kotlin.readValue
 
-@DisableCachingByDefault(because = "Task inputs and outputs are not yet modeled for build caching")
-open class OpenApi3Task : OpenApiBaseTask() {
+@CacheableTask
+abstract class OpenApi3Task : OpenApiBaseTask() {
 
-    @Input
-    @Optional
-    var servers: List<Server> = listOf()
+    @get:Input
+    abstract val serializedServers: Property<String>
 
     fun applyExtension(extension: OpenApi3Extension) {
         super.applyExtension(extension)
-        servers = extension.servers
+        serializedServers.set(extension.serializedServersProperty)
     }
 
     override fun generateSpecification(resourceModels: List<ResourceModel>): String {
         return OpenApi3Generator.generateAndSerialize(
             resources = resourceModels,
-            servers = servers,
-            title = title,
-            description = apiDescription,
-            tagDescriptions = tagDescriptions,
-            version = apiVersion,
-            oauth2SecuritySchemeDefinition = oauth2SecuritySchemeDefinition,
-            format = format
+            servers = YAMLMapper.builder()
+                .addModule(kotlinModule())
+                .build()
+                .readValue(serializedServers.get()),
+            title = title.get(),
+            description = apiDescription.orNull,
+            tagDescriptions = tagDescriptions(),
+            version = apiVersion.get(),
+            oauth2SecuritySchemeDefinition = oauth2SecuritySchemeDefinition(),
+            format = format.get()
         )
     }
 }

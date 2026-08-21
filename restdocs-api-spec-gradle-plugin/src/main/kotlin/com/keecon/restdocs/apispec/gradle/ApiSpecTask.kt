@@ -1,63 +1,71 @@
 package com.keecon.restdocs.apispec.gradle
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.keecon.restdocs.apispec.model.ResourceModel
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
-import org.gradle.work.DisableCachingByDefault
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.module.kotlin.jacksonMapperBuilder
+import tools.jackson.module.kotlin.readValue
 import java.io.File
 
-@DisableCachingByDefault(because = "Task inputs and outputs are not yet modeled for build caching")
+@CacheableTask
 abstract class ApiSpecTask : DefaultTask() {
 
-    @Input
-    var separatePublicApi: Boolean = false
+    @get:Input
+    abstract val separatePublicApi: Property<Boolean>
 
-    @Input
-    lateinit var outputDirectory: String
+    @get:OutputDirectory
+    abstract val outputDirectory: DirectoryProperty
 
-    @Input
-    lateinit var snippetsDirectory: String
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val snippetsDirectory: DirectoryProperty
 
-    @Input
-    lateinit var outputFileNamePrefix: String
+    @get:Input
+    abstract val outputFileNamePrefix: Property<String>
 
     private val outputDirectoryFile
-        get() = project.file(outputDirectory)
+        get() = outputDirectory.get().asFile
 
     private val snippetsDirectoryFile
-        get() = project.file(snippetsDirectory)
-
-    private val objectMapper = jacksonObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        get() = snippetsDirectory.get().asFile
 
     open fun applyExtension(extension: ApiSpecExtension) {
-        outputDirectory = extension.outputDirectory
-        snippetsDirectory = extension.snippetsDirectory
-        outputFileNamePrefix = extension.outputFileNamePrefix
-        separatePublicApi = extension.separatePublicApi
+        outputDirectory.set(extension.outputDirectoryProperty)
+        snippetsDirectory.set(extension.snippetsDirectoryProperty)
+        outputFileNamePrefix.set(extension.outputFileNamePrefixProperty)
+        separatePublicApi.set(extension.separatePublicApiProperty)
     }
 
     @TaskAction
     fun aggregateResourceModels() {
+        val objectMapper = jacksonMapperBuilder()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .build()
 
         val resourceModels = snippetsDirectoryFile.walkTopDown()
             .filter { it.name == "resource.json" }
             .map { objectMapper.readValue<ResourceModel>(it.readText()) }
             .toList()
 
-        writeSpecificationFile(outputFileNamePrefix, generateSpecification(resourceModels))
+        writeSpecificationFile(outputFileNamePrefix.get(), generateSpecification(resourceModels))
 
-        if (separatePublicApi) {
+        if (separatePublicApi.get()) {
             val content = generateSpecification(resourceModels.filterNot { it.privateResource })
-            writeSpecificationFile("$outputFileNamePrefix-public", content)
+            writeSpecificationFile("${outputFileNamePrefix.get()}-public", content)
         }
     }
 
     private fun writeSpecificationFile(outputFilenamePrefix: String, content: String) {
-        outputDirectoryFile.mkdir()
+        outputDirectoryFile.mkdirs()
         File(outputDirectoryFile, "$outputFilenamePrefix.${outputFileExtension()}").writeText(content)
     }
 

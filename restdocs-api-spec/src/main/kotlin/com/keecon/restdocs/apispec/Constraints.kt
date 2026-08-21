@@ -94,7 +94,14 @@ class Constraints private constructor(private val rootType: Class<*>) {
             applyAttributes(descriptor, propType)
         }
 
-        val constraints = this.validatorConstraintResolver.resolveForProperty(actualPropName(propName), objectType)
+        val constraints = this.validatorConstraintResolver
+            .resolveForProperty(actualPropName(propName), objectType)
+            .sortedWith(
+                compareBy(
+                    { if (it.name in REQUIRED_CONSTRAINT_NAMES) 0 else 1 },
+                    { it.name }
+                )
+            )
         return descriptor.attributes(Attributes.constraints(constraints))
     }
 
@@ -110,6 +117,12 @@ class Constraints private constructor(private val rootType: Class<*>) {
     }
 
     companion object {
+
+        private val REQUIRED_CONSTRAINT_NAMES = setOf(
+            "jakarta.validation.constraints.NotBlank",
+            "jakarta.validation.constraints.NotEmpty",
+            "jakarta.validation.constraints.NotNull"
+        )
 
         @JvmStatic
         fun model(rootType: Class<*>) = Constraints(rootType)

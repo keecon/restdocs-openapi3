@@ -1,9 +1,9 @@
 package com.keecon.restdocs.apispec
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import org.springframework.http.HttpHeaders
 import org.springframework.restdocs.operation.Operation
+import tools.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.module.kotlin.readValue
 import java.io.IOException
 import java.util.Base64
 import java.util.Collections.emptyList
@@ -12,6 +12,8 @@ import java.util.Collections.emptyList
  * Extract a list of scopes from a JWT token
  */
 internal class JwtSecurityHandler : SecurityRequirementsExtractor {
+
+    private val objectMapper = jacksonObjectMapper()
 
     override fun extractSecurityRequirements(operation: Operation): SecurityRequirements? {
         if (!hasJWTBearer(operation)) return null
@@ -25,8 +27,7 @@ internal class JwtSecurityHandler : SecurityRequirementsExtractor {
     }
 
     private fun getJWT(operation: Operation) = operation.request.headers
-        .filterKeys { it == HttpHeaders.AUTHORIZATION }
-        .flatMap { it.value }
+        .getOrEmpty(HttpHeaders.AUTHORIZATION)
         .filter { it.startsWith("Bearer ") }
         .map { it.replace("Bearer ", "") }
 
@@ -36,7 +37,7 @@ internal class JwtSecurityHandler : SecurityRequirementsExtractor {
             val jwtHeader = jwtParts[0]
             val decodedJwtHeader = String(Base64.getDecoder().decode(jwtHeader))
             try {
-                return ObjectMapper().readValue<Map<String, Any>>(decodedJwtHeader).containsKey("alg")
+                return objectMapper.readValue<Map<String, Any>>(decodedJwtHeader).containsKey("alg")
             } catch (e: IOException) {
                 // probably not JWT
             }
@@ -55,7 +56,7 @@ internal class JwtSecurityHandler : SecurityRequirementsExtractor {
             val jwtPayload = jwtParts[1]
             val decodedPayload = String(Base64.getDecoder().decode(jwtPayload))
             try {
-                val jwtMap = ObjectMapper().readValue<Map<String, Any>>(decodedPayload)
+                val jwtMap = objectMapper.readValue<Map<String, Any>>(decodedPayload)
                 val scope = jwtMap["scope"]
                 if (scope is List<*>)
                     return scope as List<String>

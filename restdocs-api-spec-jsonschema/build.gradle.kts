@@ -4,7 +4,7 @@ dependencies {
     implementation(project(":restdocs-api-spec-model"))
 
     implementation(libs.everit.json.schema)
-    implementation(libs.bundles.jackson)
+    implementation(libs.bundles.jackson3)
 
     testImplementation(libs.jsonpath)
     testImplementation(libs.assertj.core)

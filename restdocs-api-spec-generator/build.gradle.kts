@@ -6,7 +6,7 @@ dependencies {
 
     api(libs.swagger.core)
     implementation(libs.spring.web)
-    implementation(libs.bundles.jackson)
+    implementation(libs.bundles.jackson3)
 
     testImplementation(libs.assertj.core)
     testImplementation(libs.jsonpath)

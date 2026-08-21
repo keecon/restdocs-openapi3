@@ -25,8 +25,7 @@ internal class BasicSecurityHandler : SecurityRequirementsExtractor {
         else null
 
     private fun isBasicSecurity(operation: Operation) = operation.request.headers
-        .filterKeys { it == HttpHeaders.AUTHORIZATION }
-        .flatMap { it.value }
+        .getOrEmpty(HttpHeaders.AUTHORIZATION)
         .any { it.startsWith("Basic ") }
 }
 

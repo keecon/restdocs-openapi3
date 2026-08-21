@@ -12,7 +12,6 @@ import org.springframework.restdocs.request.RequestPartDescriptor
 import org.springframework.restdocs.request.RequestPartsSnippet
 import org.springframework.restdocs.snippet.AbstractDescriptor
 import org.springframework.restdocs.snippet.Snippet
-import java.lang.reflect.InvocationTargetException
 import java.util.Collections.emptyList
 
 @Suppress("UNCHECKED_CAST")
@@ -29,85 +28,54 @@ internal object DescriptorExtractor {
         }
     }
 
-    private fun extractFields(snippet: AbstractFieldsSnippet): List<FieldDescriptor> {
-        try {
-            val getFieldDescriptors = AbstractFieldsSnippet::class.java.getDeclaredMethod("getFieldDescriptors")
-            getFieldDescriptors.isAccessible = true
-            return getFieldDescriptors.invoke(snippet) as List<FieldDescriptor>
-        } catch (e: NoSuchMethodException) {
-            e.printStackTrace()
-        } catch (e: InvocationTargetException) {
-            e.printStackTrace()
-        } catch (e: IllegalAccessException) {
-            e.printStackTrace()
-        }
+    private fun extractFields(snippet: AbstractFieldsSnippet): List<FieldDescriptor> =
+        invokeDescriptorAccessor(snippet, AbstractFieldsSnippet::class.java, "getFieldDescriptors")
 
-        return emptyList()
+    private fun extractLinks(snippet: LinksSnippet): List<LinkDescriptor> =
+        invokeDescriptorAccessor<Map<String, LinkDescriptor>>(
+            snippet,
+            LinksSnippet::class.java,
+            "getDescriptorsByRel"
+        ).values.toList()
+
+    private fun extractHeaders(snippet: AbstractHeadersSnippet): List<HeaderDescriptor> =
+        invokeDescriptorAccessor(snippet, AbstractHeadersSnippet::class.java, "getHeaderDescriptors")
+
+    private fun extractParameters(snippet: AbstractParametersSnippet): List<ParameterDescriptor> =
+        invokeDescriptorAccessor<Map<String, ParameterDescriptor>>(
+            snippet,
+            AbstractParametersSnippet::class.java,
+            "getParameterDescriptors"
+        ).values.toList()
+
+    private fun extractParts(snippet: RequestPartsSnippet): List<RequestPartDescriptor> =
+        readDescriptorField<Map<String, RequestPartDescriptor>>(
+            snippet,
+            RequestPartsSnippet::class.java,
+            "descriptorsByName"
+        ).values.toList()
+
+    private fun <T> invokeDescriptorAccessor(target: Any, owner: Class<*>, name: String): T {
+        try {
+            val method = owner.getDeclaredMethod(name).apply { trySetAccessible() }
+            return method.invoke(target) as T
+        } catch (exception: ReflectiveOperationException) {
+            throw IllegalStateException(
+                "Spring REST Docs descriptor API changed: ${owner.name}#$name",
+                exception
+            )
+        }
     }
 
-    private fun extractLinks(snippet: LinksSnippet): List<LinkDescriptor> {
+    private fun <T> readDescriptorField(target: Any, owner: Class<*>, name: String): T {
         try {
-            val getDescriptorsByRel = LinksSnippet::class.java.getDeclaredMethod("getDescriptorsByRel")
-            getDescriptorsByRel.isAccessible = true
-            return (getDescriptorsByRel.invoke(snippet) as Map<String, LinkDescriptor>).values.toList()
-        } catch (e: NoSuchMethodException) {
-            e.printStackTrace()
-        } catch (e: InvocationTargetException) {
-            e.printStackTrace()
-        } catch (e: IllegalAccessException) {
-            e.printStackTrace()
+            val field = owner.getDeclaredField(name).apply { trySetAccessible() }
+            return field.get(target) as T
+        } catch (exception: ReflectiveOperationException) {
+            throw IllegalStateException(
+                "Spring REST Docs descriptor API changed: ${owner.name}#$name",
+                exception
+            )
         }
-
-        return emptyList()
-    }
-
-    private fun extractHeaders(snippet: AbstractHeadersSnippet): List<HeaderDescriptor> {
-        try {
-            val getHeaderDescriptors = AbstractHeadersSnippet::class.java.getDeclaredMethod("getHeaderDescriptors")
-            getHeaderDescriptors.isAccessible = true
-            return getHeaderDescriptors.invoke(snippet) as List<HeaderDescriptor>
-        } catch (e: NoSuchMethodException) {
-            e.printStackTrace()
-        } catch (e: InvocationTargetException) {
-            e.printStackTrace()
-        } catch (e: IllegalAccessException) {
-            e.printStackTrace()
-        }
-
-        return emptyList()
-    }
-
-    private fun extractParameters(snippet: AbstractParametersSnippet): List<ParameterDescriptor> {
-        try {
-            val getParameterDescriptors =
-                AbstractParametersSnippet::class.java.getDeclaredMethod("getParameterDescriptors")
-            getParameterDescriptors.isAccessible = true
-            return ArrayList((getParameterDescriptors.invoke(snippet) as Map<String, ParameterDescriptor>).values)
-        } catch (e: NoSuchMethodException) {
-            e.printStackTrace()
-        } catch (e: InvocationTargetException) {
-            e.printStackTrace()
-        } catch (e: IllegalAccessException) {
-            e.printStackTrace()
-        }
-
-        return emptyList()
-    }
-
-    private fun extractParts(snippet: RequestPartsSnippet): List<RequestPartDescriptor> {
-        try {
-            val descriptorsByNameField =
-                AbstractParametersSnippet::class.java.getDeclaredField("descriptorsByName")
-            descriptorsByNameField.isAccessible = true
-            return ArrayList((descriptorsByNameField.get(snippet) as Map<String, RequestPartDescriptor>).values)
-        } catch (e: NoSuchMethodException) {
-            e.printStackTrace()
-        } catch (e: InvocationTargetException) {
-            e.printStackTrace()
-        } catch (e: IllegalAccessException) {
-            e.printStackTrace()
-        }
-
-        return emptyList()
     }
 }

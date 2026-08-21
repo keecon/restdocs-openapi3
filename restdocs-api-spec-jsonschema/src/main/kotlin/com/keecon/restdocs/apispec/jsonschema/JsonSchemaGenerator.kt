@@ -1,7 +1,5 @@
 package com.keecon.restdocs.apispec.jsonschema
 
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.keecon.restdocs.apispec.jsonschema.JsonSchemaConstraints.applyConstraints
 import com.keecon.restdocs.apispec.model.ConstraintResolver.isRequired
 import com.keecon.restdocs.apispec.model.FieldDescriptor
@@ -12,6 +10,8 @@ import org.everit.json.schema.internal.JSONPrinter
 import java.io.StringWriter
 import java.util.Collections.emptyList
 import java.util.function.Predicate
+import tools.jackson.databind.SerializationFeature
+import tools.jackson.module.kotlin.jacksonMapperBuilder
 
 class JsonSchemaGenerator {
 
@@ -61,7 +61,7 @@ class JsonSchemaGenerator {
     }
 
     private fun toFormattedString(schema: Schema): String {
-        val objectMapper = jacksonObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
+        val objectMapper = jacksonMapperBuilder().enable(SerializationFeature.INDENT_OUTPUT).build()
         return StringWriter().use {
             schema.describeTo(JSONPrinter(it))
             objectMapper.writeValueAsString(objectMapper.readTree(it.toString()))

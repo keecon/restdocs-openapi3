@@ -42,8 +42,6 @@ abstract class ApiSpecTaskTest {
             buildFile = resolve("build.gradle").toFile()
             snippetsFolder = resolve("build/generated-snippets").toFile().apply { mkdirs() }
             outputFolder = resolve("build/api-spec").toFile()
-
-            initializeGradleProperties()
         }
     }
 
@@ -59,18 +57,17 @@ abstract class ApiSpecTaskTest {
         thenOutputFileForPublicResourceSpecificationNotFound()
     }
 
-    private fun Path.initializeGradleProperties() {
-        // jacoco agent configuration
-        resolve("gradle.properties").toFile()
-            .writeText(File("build/testkit/testkit-gradle.properties").readText())
-    }
-
     protected fun whenPluginExecuted() {
         result = GradleRunner.create()
             .withProjectDir(testProjectDir.toFile())
-            .withArguments("--info", "--stacktrace", taskName)
+            .withArguments(
+                "--configuration-cache",
+                "--configuration-cache-problems=fail",
+                "--info",
+                "--stacktrace",
+                taskName
+            )
             .withPluginClasspath()
-            .withDebug(true)
             .build()
     }
 
