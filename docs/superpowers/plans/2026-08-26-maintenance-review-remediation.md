@@ -595,7 +595,7 @@ Expected: `v1.x` fast-forwards; `v0.x` remains at `b067247`.
 
 ```bash
 git fetch origin --prune
-test "$(git rev-parse origin/v0.x)" = "$(git rev-parse 0.19.3)"
+test "$(git rev-parse origin/v0.x)" = "$(git rev-parse '0.19.3^{commit}')"
 git merge-base --is-ancestor 1.1.0 origin/v1.x
 git merge-base --is-ancestor 2.1.0 origin/main
 git show origin/main:MAINTENANCE.md | rg 'v0.x|v1.x|main'
