@@ -3,7 +3,8 @@ buildscript {
 		maven { url = uri('https://jitpack.io') }
 	}
 	dependencies {
-		classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.0.0'
+		// The example consumes the latest released plugin; the current source plugin is verified by TestKit.
+		classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.1.0'
 	}
 }
 

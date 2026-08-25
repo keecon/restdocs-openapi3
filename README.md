@@ -15,9 +15,9 @@ And only support [OpenAPI 3.0.1] specs.
 
 | Artifact line | Spring Boot | Spring REST Docs | Java bytecode | Tested JDKs | Status |
 |---|---|---|---|---|---|
-| 1.x | 3.5.x | 3.0.x | 17 | 17, 21, 25 | Maintained |
-| 2.x | 4.1.x | 4.0.x | 17 | 17, 21, 25 | Released (2.1.0) |
-| 0.x | 2.7.x | 2.0.x | — | — | Frozen, unsupported |
+| [1.x (`v1.x`)](https://github.com/keecon/restdocs-openapi3/tree/v1.x) | 3.5.x | 3.0.x | 17 | 17, 21, 25 | Maintained |
+| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | Active (2.1.0) |
+| [0.x (`v0.x`)](https://github.com/keecon/restdocs-openapi3/tree/v0.x) | 2.7.x | 2.0.x | — | — | Frozen, unsupported |
 
 The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin ID remains
 `com.keecon.restdocs-openapi3` across release lines.
@@ -25,6 +25,8 @@ The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin 
 The 2.x line requires Java 17 or newer. CI verifies the LTS JDK releases 17, 21, and 25.
 Use 1.1.0 for Spring Boot 3.5 applications. Version 2.1.0 is available from JitPack; no Plugin
 Portal publication is assumed.
+
+See [MAINTENANCE.md](MAINTENANCE.md) for the branch lifecycle, backport, and release policy.
 
 ### Gradle
 
@@ -68,6 +70,41 @@ Portal publication is assumed.
       format = 'yaml'
     }
     ```
+
+The existing assignment syntax remains supported. Groovy builds can also use method syntax:
+
+```groovy
+openapi3 {
+  server 'https://api.example.com'
+  contact {
+    name = 'API Support'
+    email = 'support@example.com'
+  }
+}
+```
+
+After adding the same JitPack buildscript classpath and applying the plugin, Kotlin builds can
+configure the named extension explicitly:
+
+```kotlin
+import com.keecon.restdocs.apispec.gradle.OpenApi3Extension
+
+extensions.configure<OpenApi3Extension>("openapi3") {
+    server("https://api.example.com")
+    contact {
+        name = "API Support"
+        email = "support@example.com"
+    }
+}
+```
+
+### Migrating from 1.x to 2.x
+
+The 2.x line moves to Spring Boot 4, Spring REST Docs 4, and Jackson 3. Extension-level Groovy
+configuration remains compatible. Code that configures the `openapi3` task directly must adapt to
+its managed Gradle properties: scalar task getters now return `Property<T>` and directory getters
+return `DirectoryProperty`, so set values with `.set(...)` instead of assigning the 1.x
+`String`/`Boolean` task properties directly.
 
 ### 2.1.0 features
 

@@ -23,3 +23,29 @@ updates:
     labels:
       - "dependencies"
       - "actions"
+
+  - package-ecosystem: "gradle"
+    directory: "/"
+    target-branch: "v1.x"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "10:00"
+      timezone: "Asia/Seoul"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "gradle"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "v1.x"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "10:00"
+      timezone: "Asia/Seoul"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "actions"
