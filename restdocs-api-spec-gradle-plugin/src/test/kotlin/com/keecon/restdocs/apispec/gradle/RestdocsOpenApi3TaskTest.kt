@@ -74,6 +74,41 @@ class RestdocsOpenApi3TaskTest : RestdocsOpenApiTaskTestBase() {
         then(result.output).contains("Reusing configuration cache")
     }
 
+    @Test
+    fun `should remove public specification when separate public api is disabled`() {
+        separatePublicApi = true
+        givenBuildFileWithOpenApiClosureWithSingleServerString()
+        givenResourceSnippet()
+
+        whenPluginExecuted()
+        thenOutputFileForPublicResourceSpecificationFound()
+
+        separatePublicApi = false
+        givenBuildFileWithOpenApiClosureWithSingleServerString()
+        whenPluginExecuted()
+
+        thenApiSpecTaskSuccessful()
+        thenOutputFileForPublicResourceSpecificationNotFound()
+    }
+
+    @Test
+    fun `should remove specification in previous format`() {
+        format = "yaml"
+        givenBuildFileWithOpenApiClosureWithSingleServerString()
+        givenResourceSnippet()
+
+        whenPluginExecuted()
+        then(outputFolder.resolve("$outputFileNamePrefix.yaml")).exists()
+
+        format = "json"
+        givenBuildFileWithOpenApiClosureWithSingleServerString()
+        whenPluginExecuted()
+
+        thenApiSpecTaskSuccessful()
+        then(outputFolder.resolve("$outputFileNamePrefix.yaml")).doesNotExist()
+        thenOutputFileFound()
+    }
+
     private fun thenSingleServerContainedInOutput() {
         with(outputFileContext()) {
             then(read<List<String>>("servers[*].url")).containsOnly("http://some.api")

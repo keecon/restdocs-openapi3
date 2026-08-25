@@ -60,6 +60,8 @@ internal class JwtSecurityHandler : SecurityRequirementsExtractor {
                 val scope = jwtMap["scope"]
                 if (scope is List<*>)
                     return scope as List<String>
+                if (scope is String)
+                    return scope.trim().split("\\s+".toRegex())
             } catch (e: IOException) {
                 // probably not JWT
             }

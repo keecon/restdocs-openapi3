@@ -6,6 +6,9 @@ import org.springframework.restdocs.hypermedia.LinkDescriptor
 import org.springframework.restdocs.hypermedia.LinksSnippet
 import org.springframework.restdocs.payload.AbstractFieldsSnippet
 import org.springframework.restdocs.payload.FieldDescriptor
+import org.springframework.restdocs.payload.FieldPathPayloadSubsectionExtractor
+import org.springframework.restdocs.payload.PayloadDocumentation
+import org.springframework.restdocs.payload.PayloadSubsectionExtractor
 import org.springframework.restdocs.request.AbstractParametersSnippet
 import org.springframework.restdocs.request.ParameterDescriptor
 import org.springframework.restdocs.request.RequestPartDescriptor
@@ -28,8 +31,26 @@ internal object DescriptorExtractor {
         }
     }
 
-    private fun extractFields(snippet: AbstractFieldsSnippet): List<FieldDescriptor> =
-        invokeDescriptorAccessor(snippet, AbstractFieldsSnippet::class.java, "getFieldDescriptors")
+    private fun extractFields(snippet: AbstractFieldsSnippet): List<FieldDescriptor> {
+        val descriptors = invokeDescriptorAccessor<List<FieldDescriptor>>(
+            snippet,
+            AbstractFieldsSnippet::class.java,
+            "getFieldDescriptors"
+        )
+        val subsectionExtractor = invokeDescriptorAccessor<PayloadSubsectionExtractor<*>?>(
+            snippet,
+            AbstractFieldsSnippet::class.java,
+            "getSubsectionExtractor"
+        )
+        if (subsectionExtractor !is FieldPathPayloadSubsectionExtractor) return descriptors
+
+        val fieldPath = invokeDescriptorAccessor<String>(
+            subsectionExtractor,
+            FieldPathPayloadSubsectionExtractor::class.java,
+            "getFieldPath"
+        )
+        return PayloadDocumentation.applyPathPrefix("$fieldPath.", descriptors)
+    }
 
     private fun extractLinks(snippet: LinksSnippet): List<LinkDescriptor> =
         invokeDescriptorAccessor<Map<String, LinkDescriptor>>(

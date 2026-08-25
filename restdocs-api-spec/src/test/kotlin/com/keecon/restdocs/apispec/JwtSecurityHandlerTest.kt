@@ -24,6 +24,16 @@ class JwtSecurityHandlerTest {
     }
 
     @Test
+    fun `should split standard oauth2 string scope claim`() {
+        givenRequestWithStandardOAuth2JwtInAuthorizationHeader()
+
+        whenSecurityRequirementsExtracted(operation)
+
+        then(securityRequirement).isInstanceOf(Oauth2::class.java)
+        then((securityRequirement as Oauth2).requiredScopes).containsExactly("scope1", "scope2")
+    }
+
+    @Test
     fun `should return SecurityType of JWTBearer when non oauth2 jwt is found in Authorization header`() {
         givenRequestWithNonOAuth2JwtInAuthorizationHeader()
 
@@ -87,6 +97,18 @@ class JwtSecurityHandlerTest {
                 "Bearer eyJhbGciOiJIUzI1NiJ9" +
                     ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.Guo" +
                     "Ue6tw79bJlbU1HU0ADX0pr0u2kf3r_4OdrDufSfQ"
+            )
+            .build()
+    }
+
+    private fun givenRequestWithStandardOAuth2JwtInAuthorizationHeader() {
+        operation = OperationBuilder().request("/some")
+            .header(
+                AUTHORIZATION,
+                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" +
+                    ".eyJzY29wZSI6InNjb3BlMSBzY29wZTIiLCJleHAiOjE1MDc3NTg0OTgsImlhdCI6MTUwNzcxNTI5" +
+                    "OCwianRpIjoiNDJhMGE5MWEtZDZlZC00MGNjLWIxMDYtZTkwY2RhZTQzZDZkIn0" +
+                    ".yLPUhfQ5IIWaTwLO1qcGzAjXtqXnx-FRiF_yGQkiO2M"
             )
             .build()
     }

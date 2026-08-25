@@ -245,6 +245,19 @@ class JsonSchemaGeneratorTest {
     }
 
     @Test
+    fun should_use_field_descriptor_optional_flag_for_required_properties() {
+        fieldDescriptors = listOf(
+            FieldDescriptor("requiredField", "required", "STRING", optional = false),
+            FieldDescriptor("optionalField", "optional", "STRING", optional = true)
+        )
+
+        whenSchemaGenerated()
+
+        val objectSchema = schema as ObjectSchema
+        then(objectSchema.requiredProperties).containsExactly("requiredField")
+    }
+
+    @Test
     fun should_fail_on_unknown_field_type() {
         givenFieldDescriptorWithInvalidType()
 
@@ -653,7 +666,7 @@ class JsonSchemaGeneratorTest {
             ),
 
             FieldDescriptor("lineItems[*].quantity.unit", "some", "STRING"),
-            FieldDescriptor("shippingAddress", "some", "OBJECT"),
+            FieldDescriptor("shippingAddress", "some", "OBJECT", optional = true),
             FieldDescriptor("billingAddress", "some", "OBJECT"),
             FieldDescriptor(
                 "billingAddress.firstName", "some", "STRING",

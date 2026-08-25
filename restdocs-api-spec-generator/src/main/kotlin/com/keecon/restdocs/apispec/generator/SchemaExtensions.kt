@@ -35,7 +35,7 @@ internal object SchemaExtensions {
     }
 
     internal fun IntegerSchema.applyDefaultValue(descriptor: AbstractParameterDescriptor?) = apply {
-        descriptor?.defaultValue?.let { _default(it as Int) }
+        descriptor?.defaultValue?.let { _default(toIntExact(it)) }
     }
 
     internal fun BooleanSchema.applyEnumValues(descriptor: AbstractDescriptor) = apply {
@@ -58,7 +58,7 @@ internal object SchemaExtensions {
 
     internal fun IntegerSchema.applyEnumValues(descriptor: AbstractDescriptor) = apply {
         descriptor.attributes.enumValues
-            .map { it as Int }
+            .map { toIntExact(it) }
             .forEach { addEnumItem(it) }
     }
 
@@ -69,7 +69,15 @@ internal object SchemaExtensions {
     private fun toBigDecimal(value: Any) = when (value) {
         is String -> BigDecimal(value)
         is Int -> value.toBigDecimal()
+        is Long -> value.toBigDecimal()
+        is Float -> BigDecimal(value.toString())
         is Double -> value.toBigDecimal()
         else -> value as BigDecimal
+    }
+
+    private fun toIntExact(value: Any) = when (value) {
+        is Int -> value
+        is Long -> Math.toIntExact(value)
+        else -> value as Int
     }
 }

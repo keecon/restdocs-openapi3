@@ -7,7 +7,8 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
@@ -22,7 +23,7 @@ abstract class ApiSpecTask : DefaultTask() {
     @get:Input
     abstract val separatePublicApi: Property<Boolean>
 
-    @get:OutputDirectory
+    @get:Internal
     abstract val outputDirectory: DirectoryProperty
 
     @get:InputDirectory
@@ -38,6 +39,15 @@ abstract class ApiSpecTask : DefaultTask() {
     private val snippetsDirectoryFile
         get() = snippetsDirectory.get().asFile
 
+    @get:OutputFiles
+    val specificationFiles: List<File>
+        get() = buildList {
+            add(specificationFile(outputFileNamePrefix.get()))
+            if (separatePublicApi.get()) {
+                add(specificationFile("${outputFileNamePrefix.get()}-public"))
+            }
+        }
+
     open fun applyExtension(extension: ApiSpecExtension) {
         outputDirectory.set(extension.outputDirectoryProperty)
         snippetsDirectory.set(extension.snippetsDirectoryProperty)
@@ -47,6 +57,8 @@ abstract class ApiSpecTask : DefaultTask() {
 
     @TaskAction
     fun aggregateResourceModels() {
+        removeStaleSpecificationFiles()
+
         val objectMapper = jacksonMapperBuilder()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .build()
@@ -66,10 +78,30 @@ abstract class ApiSpecTask : DefaultTask() {
 
     private fun writeSpecificationFile(outputFilenamePrefix: String, content: String) {
         outputDirectoryFile.mkdirs()
-        File(outputDirectoryFile, "$outputFilenamePrefix.${outputFileExtension()}").writeText(content)
+        specificationFile(outputFilenamePrefix).writeText(content)
+    }
+
+    private fun specificationFile(outputFilenamePrefix: String) =
+        File(outputDirectoryFile, "$outputFilenamePrefix.${outputFileExtension()}")
+
+    private fun removeStaleSpecificationFiles() {
+        val expectedFiles = specificationFiles.toSet()
+        val filenamePrefixes = listOf(
+            outputFileNamePrefix.get(),
+            "${outputFileNamePrefix.get()}-public"
+        )
+
+        filenamePrefixes
+            .flatMap { prefix -> SUPPORTED_OUTPUT_FORMATS.map { format -> File(outputDirectoryFile, "$prefix.$format") } }
+            .filterNot(expectedFiles::contains)
+            .forEach(File::delete)
     }
 
     protected abstract fun outputFileExtension(): String
 
     protected abstract fun generateSpecification(resourceModels: List<ResourceModel>): String
+
+    private companion object {
+        val SUPPORTED_OUTPUT_FORMATS = setOf("json", "yaml", "yml")
+    }
 }

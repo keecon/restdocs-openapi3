@@ -338,6 +338,21 @@ class OpenApi3GeneratorTest {
     }
 
     @Test
+    fun `should not treat an optional parameter as nullable`() {
+        val descriptor = ParameterDescriptor(
+            name = "locale",
+            description = "locale",
+            type = "STRING",
+            optional = true,
+            ignored = false
+        )
+
+        val schema = OpenApi3Generator.simpleTypeToSchema(descriptor)
+
+        then(schema?.nullable).isNull()
+    }
+
+    @Test
     fun `should fail for default value request parameter with wrong type`() {
         givenResourcesWithRequestParameterWithWrongDefaultValue()
 
@@ -632,11 +647,7 @@ class OpenApi3GeneratorTest {
         ).isNotNull
 
         then(
-            openApiJsonPathContext.read<List<List<String>>>("$productGetByIdPath.security[*].oauth2_clientCredentials")
-                .flatMap { it }
-        ).containsOnly("prod:r")
-        then(
-            openApiJsonPathContext.read<List<List<String>>>("$productGetByIdPath.security[*].oauth2_authorizationCode")
+            openApiJsonPathContext.read<List<List<String>>>("$productGetByIdPath.security[*].oauth2")
                 .flatMap { it }
         ).containsOnly("prod:r")
     }
@@ -726,11 +737,12 @@ class OpenApi3GeneratorTest {
 
     private fun thenCustomSchemaNameOfMultipleOperationsAreSet() {
         val schemas = openApiJsonPathContext.read<Map<String, Any>>("components.schemas")
-        then(schemas.keys).size().isEqualTo(4)
-        then(schemas.keys).contains("ProductRequest1")
-        then(schemas.keys).contains("ProductResponse1")
-        then(schemas.keys).contains("ProductRequest2")
-        then(schemas.keys).contains("ProductResponse2")
+        then(schemas.keys).containsExactly(
+            "ProductRequest1",
+            "ProductResponse1",
+            "ProductRequest2",
+            "ProductResponse2"
+        )
     }
 
     private fun thenEnumValuesAreSetInRequestAndResponse() {

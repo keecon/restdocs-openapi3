@@ -16,12 +16,13 @@ internal object SecuritySchemeGenerator {
     private const val API_KEY_SECURITY_NAME = "api_key"
     private const val BASIC_SECURITY_NAME = "basic"
     private const val JWT_BEARER_SECURITY_NAME = "bearerAuthJWT"
+    private const val OAUTH2_SECURITY_NAME = "oauth2"
 
     fun OpenAPI.addSecurityDefinitions(oauth2SecuritySchemeDefinition: Oauth2Configuration?) {
         if (oauth2SecuritySchemeDefinition?.flows?.isNotEmpty() == true) {
             val flows = OAuthFlows()
             components.addSecuritySchemes(
-                "oauth2",
+                OAUTH2_SECURITY_NAME,
                 SecurityScheme().apply {
                     type = SecurityScheme.Type.OAUTH2
                     this.flows = flows
@@ -94,20 +95,16 @@ internal object SecuritySchemeGenerator {
         }
     }
 
-    fun Operation.addSecurityItemFromSecurityRequirements(
-        securityRequirements: SecurityRequirements?,
-        oauth2SecuritySchemeDefinition: Oauth2Configuration?
-    ) {
+    fun Operation.addSecurityItemFromSecurityRequirements(securityRequirements: SecurityRequirements?) {
         if (securityRequirements != null) {
             when (securityRequirements.type) {
-                SecurityType.OAUTH2 -> oauth2SecuritySchemeDefinition?.flows?.map {
+                SecurityType.OAUTH2 ->
                     addSecurityItem(
                         SecurityRequirement().addList(
-                            oauth2SecuritySchemeDefinition.securitySchemeName(it),
+                            OAUTH2_SECURITY_NAME,
                             securityRequirements2ScopesList(securityRequirements)
                         )
                     )
-                }
 
                 SecurityType.BASIC -> addSecurityItem(SecurityRequirement().addList(BASIC_SECURITY_NAME))
                 SecurityType.API_KEY -> addSecurityItem(SecurityRequirement().addList(API_KEY_SECURITY_NAME))
