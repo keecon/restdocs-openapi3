@@ -10,6 +10,7 @@ class StringAnyFormatValidator(val format: String) : FormatValidator {
 
     override fun validate(subject: String?): Optional<String> {
         if (format != DataFormat.DATE.lowercase()) return Optional.empty()
+        if (subject == null) return Optional.empty()
 
         return try {
             LocalDate.parse(subject)

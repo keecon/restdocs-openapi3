@@ -26,4 +26,9 @@ class StringAnyFormatValidatorTest {
 
         then(result).isEmpty()
     }
+
+    @Test
+    fun `should ignore null subjects`() {
+        then(StringAnyFormatValidator(DataFormat.DATE.lowercase()).validate(null)).isEmpty()
+    }
 }
