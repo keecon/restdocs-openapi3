@@ -18,11 +18,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up JDK
+      - name: Set up JDKs
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: ${{ matrix.java }}
+          java-version: |
+            17
+            ${{ matrix.java }}
           cache: gradle
 
       - name: Verify tag ancestry
@@ -32,7 +34,7 @@ jobs:
           git merge-base --is-ancestor "$GITHUB_SHA" origin/main
 
       - name: Run full build
-        run: ./gradlew clean check testCodeCoverageReport :restdocs-api-spec-example:openapi3 --no-daemon
+        run: ./gradlew -Dorg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64 clean check testCodeCoverageReport :restdocs-api-spec-example:openapi3 --no-daemon
 
   release:
     needs: verify
