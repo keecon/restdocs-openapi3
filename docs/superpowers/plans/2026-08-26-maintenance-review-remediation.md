@@ -39,8 +39,8 @@
 git fetch origin --prune
 test "$(git rev-parse origin/v0)" = "b0672470f411c0039addd3f3b11d8b50d8f3b83d"
 test "$(git rev-parse origin/1.x)" = "1b0bc1af7f1ac7f4c0eac35356da1ad5d9e34dd7"
-test "$(git rev-parse 0.19.3)" = "$(git rev-parse origin/v0)"
-test "$(git rev-parse 1.1.0)" = "$(git rev-parse origin/1.x)"
+test "$(git rev-parse '0.19.3^{commit}')" = "$(git rev-parse origin/v0)"
+test "$(git rev-parse '1.1.0^{commit}')" = "$(git rev-parse origin/1.x)"
 ```
 
 Expected: all assertions pass. Stop if an old branch moved.
