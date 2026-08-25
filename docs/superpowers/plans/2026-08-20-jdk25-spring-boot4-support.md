@@ -2,11 +2,15 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+**Status:** 2026-08-25 완료. `1.1.0`/`1.x`, `2.0.0`, `2.0.1` 릴리스가 원격에 반영되었으며,
+`2.1.0` 릴리스 트리의 별도 브랜치 검증도 완료했다. 후속 유지보수에서 Gradle은 9.7.0,
+Axion Release는 1.21.3, Guava는 33.7.0-jre로 갱신되었다.
+
 **Goal:** 기존 `com.keecon` 공개 API와 플러그인 ID를 유지하면서, `1.x`는 Spring Boot 3.5 유지보수선으로 고정하고 `main`/`2.x`는 Spring Boot 4.1 및 JDK 25에서 빌드·테스트·사용할 수 있게 한다.
 
 **Architecture:** 현재 동작을 계약 테스트로 고정한 뒤 Gradle/JDK 기반을 현대화하고 Boot 3.5용 `1.1.0` 기준점을 만든다. 이후 `main`에서 Spring Framework 7·REST Docs 4·Jackson 3 전환을 수행하되 Swagger가 요구하는 Jackson 2는 generator/plugin 내부 경계로 격리한다. 모든 산출물은 Java 17 바이트코드를 유지하며 JDK 17·21·25에서 검증한다.
 
-**Tech Stack:** Temurin JDK 17/21/25, Java bytecode 17, Gradle 9.5.0, Kotlin 2.4.10, Spring Boot 3.5.16 (`1.x`), Spring Boot 4.1.0 (`2.x`), Spring REST Docs 3.0.6/4.0.1, Jackson 2.21.4/3.1.4, Swagger Core 2.2.51/2.2.54, Swagger Parser 2.1.44/2.1.47, JUnit 6.0.3, Spock 2.4-groovy-4.0/2.4-groovy-5.0, JaCoCo 0.8.15.
+**Tech Stack:** Temurin JDK 17/21/25, Java bytecode 17, Gradle 9.7.0, Kotlin 2.4.10, Spring Boot 3.5.16 (`1.x`), Spring Boot 4.1.0 (`2.x`), Spring REST Docs 3.0.6/4.0.1, Jackson 2.21.4/3.1.4, Swagger Core 2.2.51/2.2.54, Swagger Parser 2.1.44/2.1.47, JUnit 6.0.3, Spock 2.4-groovy-4.0/2.4-groovy-5.0, JaCoCo 0.8.15.
 
 **Spec:** `/Users/iwaltgen/syncthing/handoffs/MAINTENANCE_2026-08.md`와 2026-08-20 사용자 승인 사항. 승인된 핵심 결정은 `1.x=Boot 3.5`, `main/2.x=Boot 4.1`, `com.keecon.*` 호환 유지, Java 17 바이트코드, JDK 25 지원, 초기 배포는 기존 JitPack 유지이다.
 
@@ -31,12 +35,12 @@
 | Spring REST Docs | 3.0.6 | 4.0.1 |
 | Spring Framework | Boot BOM | 7.0.8 이상, Boot BOM |
 | Jackson | 2.21.4, Boot BOM | 3.1.4, Boot BOM; Swagger 경계만 Jackson 2 |
-| Gradle / Kotlin | 9.5.0 / 2.4.10 | 9.5.0 / 2.4.10 |
+| Gradle / Kotlin | 9.5.0 / 2.4.10 | 9.7.0 / 2.4.10 |
 | JUnit / Spock | Boot BOM / 2.4-groovy-4.0 | 6.0.3, Boot BOM / 2.4-groovy-5.0 |
 | Swagger Core / Parser | 2.2.51 / 2.1.44 | 2.2.54 / 2.1.47 |
 | JaCoCo | 0.8.15 | 0.8.15 |
 | 바이트코드 | Java 17 | Java 17 |
-| CI JDK | 17, 21, 25 | 17, 21, 25; 26 비차단 canary |
+| CI JDK | 17, 21, 25 | 17, 21, 25 |
 | 첫 릴리스 | 1.1.0 | 2.0.0 |
 
 ## Release and Branch Sequence
@@ -129,7 +133,7 @@ org.gradle.warning.mode=all
 
 `org.gradle.configuration-cache=true`는 Gradle plugin을 lazy configuration으로 전환하는 Task 9에서 검증 후 추가한다.
 
-- [ ] **Step 5: 승인 시 체크포인트 커밋**
+- [x] **Step 5: 승인 시 체크포인트 커밋**
 
 ```bash
 git add gradle.properties restdocs-api-spec/src/test docs/superpowers/plans
@@ -198,7 +202,7 @@ javap -verbose restdocs-api-spec/build/classes/kotlin/main/com/keecon/restdocs/a
 
 Expected: 세 JDK에서 통과하고 `javap`은 Java 17 major version 61을 출력한다.
 
-- [ ] **Step 5: 승인 시 체크포인트 커밋**
+- [x] **Step 5: 승인 시 체크포인트 커밋**
 
 ```bash
 git add gradle build.gradle.kts gradlew gradlew.bat restdocs-api-spec-gradle-plugin/build.gradle.kts
@@ -264,7 +268,7 @@ Expected: 공개 API에 필요한 의존성만 `api`, 내부 구현은 `implemen
 
 Expected: Spring은 Boot 3.5.16 BOM, Jackson 2는 Boot BOM의 2.21.4로 정렬된다.
 
-- [ ] **Step 5: 승인 시 체크포인트 커밋**
+- [x] **Step 5: 승인 시 체크포인트 커밋**
 
 ```bash
 git add gradle/libs.versions.toml build.gradle.kts */build.gradle.kts
@@ -338,7 +342,7 @@ for java_version in temurin-17.0.18+8 temurin-21.0.10+7.0.LTS temurin-25.0.4+7.0
 done
 ```
 
-- [ ] **Step 5: 승인 시 체크포인트 커밋**
+- [x] **Step 5: 승인 시 체크포인트 커밋**
 
 ```bash
 git add .github/workflows/build.yml settings.gradle restdocs-api-spec-example
@@ -381,7 +385,7 @@ Expected: 예제를 제외한 공개 모듈 POM이 생성되고 불필요한 sta
 
 전체 테스트, JDK matrix, 생성 POM, example OpenAPI, dependencyInsight와 경고를 보고한다. 이 단계에서 실행을 중단한다. 승인 후에만 변경을 `main`에 반영하고 그 동일 commit에 `1.1.0` 태그와 `1.x` 브랜치를 만든다. 태그·브랜치·푸시·GitHub Release는 각각 승인 범위 안에서만 실행한다.
 
-- [ ] **Step 5: 승인 시 체크포인트 커밋**
+- [x] **Step 5: 승인 시 체크포인트 커밋**
 
 ```bash
 git add README.md jitpack.yml
@@ -420,7 +424,7 @@ test "$(git rev-parse 1.1.0)" = "$(git rev-parse 1.x)"
 
 Expected: exit code 0. tag 또는 branch가 없거나 commit이 다르면 Task 6을 시작하지 않는다.
 
-- [ ] **Step 2: Boot 4 버전으로 카탈로그를 바꾼다**
+- [x] **Step 2: Boot 4 버전으로 카탈로그를 바꾼다**
 
 ```toml
 spring-boot = "4.1.0"
@@ -432,7 +436,7 @@ spock = "2.4-groovy-5.0"
 
 JUnit 6.0.3, Jackson 3.1.4, Spring Framework 7.0.8 이상은 Boot BOM에서 선택되게 하고 별도 버전을 선언하지 않는다.
 
-- [ ] **Step 3: starter를 최소 Spring/Jackson 모듈로 교체한다**
+- [x] **Step 3: starter를 최소 Spring/Jackson 모듈로 교체한다**
 
 ```toml
 spring-web = { module = "org.springframework:spring-web" }
@@ -446,7 +450,7 @@ jackson2-annotations = { module = "com.fasterxml.jackson.core:jackson-annotation
 
 Swagger Core가 Jackson 2를 요구하는 generator/plugin에는 Swagger 전이 Jackson 2와 필요한 `com.fasterxml.jackson` 모듈만 둔다. Jackson 2/3 `ObjectMapper`를 같은 소스 파일에서 섞지 않는다.
 
-- [ ] **Step 4: 컴파일 실패를 분류한다**
+- [x] **Step 4: 컴파일 실패를 분류한다**
 
 ```bash
 ./gradlew compileKotlin compileTestKotlin --no-daemon --stacktrace
@@ -454,7 +458,7 @@ Swagger Core가 Jackson 2를 요구하는 generator/plugin에는 Swagger 전이 
 
 Expected: 실패를 Spring/REST Docs 4 API, Jackson 3 package, Boot 4 test slice, Gradle 9 API로 분류한다. 무차별 import 치환은 하지 않는다.
 
-- [ ] **Step 5: 의존성 그래프의 Jackson 경계를 확인한다**
+- [x] **Step 5: 의존성 그래프의 Jackson 경계를 확인한다**
 
 ```bash
 ./gradlew :restdocs-api-spec:dependencies --configuration runtimeClasspath
@@ -464,7 +468,7 @@ Expected: 실패를 Spring/REST Docs 4 API, Jackson 3 package, Boot 4 test slice
 
 Expected: Jackson 2 databind는 Swagger 연동이 있는 generator/plugin을 넘어 불필요하게 전이되지 않는다.
 
-- [ ] **Step 6: 승인 시 체크포인트 커밋**
+- [x] **Step 6: 승인 시 체크포인트 커밋**
 
 ```bash
 git add gradle/libs.versions.toml build.gradle.kts */build.gradle.kts
@@ -485,7 +489,7 @@ git commit -m "build: align main with Spring Boot 4.1"
 - Modify: `restdocs-api-spec-mockmvc/src/test/kotlin/com/keecon/restdocs/apispec/ListSomethingIntegrationTest.kt`
 - Modify: `restdocs-api-spec-mockmvc/src/test/kotlin/com/keecon/restdocs/apispec/ResourceSnippetIntegrationTest.kt`
 
-- [ ] **Step 1: read-only headers 회귀를 재현한다**
+- [x] **Step 1: read-only headers 회귀를 재현한다**
 
 ```bash
 ./gradlew :restdocs-api-spec:test --tests '*ResourceSnippetTest*' --stacktrace
@@ -493,7 +497,7 @@ git commit -m "build: align main with Spring Boot 4.1"
 
 Expected before fix: Task 1의 read-only headers 계약이 class cast 또는 content type 처리 실패를 드러낸다. 통과하면 프로덕션 코드를 바꾸지 않고 Framework 7의 실제 Operation headers 타입이 fixture에 반영됐는지 확인한다.
 
-- [ ] **Step 2: headers를 공개 API로만 읽는다**
+- [x] **Step 2: headers를 공개 API로만 읽는다**
 
 ```kotlin
 private fun getContentTypeOrDefault(headers: HttpHeaders): String =
@@ -505,7 +509,7 @@ private fun getContentTypeOrDefault(headers: HttpHeaders): String =
 
 Expected: mutable/read-only headers가 같은 결과를 내고 media type parameters를 보존한다.
 
-- [ ] **Step 3: REST Docs reflection 실패를 명시적으로 처리한다**
+- [x] **Step 3: REST Docs reflection 실패를 명시적으로 처리한다**
 
 `DescriptorExtractor`의 반복 reflection을 단일 helper로 모으고 `printStackTrace()` 후 빈 목록을 반환하는 동작을 제거한다.
 
@@ -526,7 +530,7 @@ private fun <T> invokeDescriptorAccessor(target: Any, owner: Class<*>, name: Str
 
 REST Docs 4에 안정적인 public accessor가 있으면 reflection 대신 그 API를 사용한다. 필수 descriptor를 조용히 유실하는 fallback은 두지 않는다.
 
-- [ ] **Step 4: descriptor 종류별 계약을 실행한다**
+- [x] **Step 4: descriptor 종류별 계약을 실행한다**
 
 ```bash
 ./gradlew :restdocs-api-spec:test --tests '*FieldDescriptorsTest' --tests '*ResourceSnippetTest' --tests '*SecurityRequirementsHandlerTest' --stacktrace
@@ -535,7 +539,7 @@ REST Docs 4에 안정적인 public accessor가 있으면 reflection 대신 그 A
 
 Expected: fields, headers, links, path/query/form parameters, request parts, security metadata가 누락 없이 resource snippet에 기록된다.
 
-- [ ] **Step 5: 승인 시 체크포인트 커밋**
+- [x] **Step 5: 승인 시 체크포인트 커밋**
 
 ```bash
 git add restdocs-api-spec/src restdocs-api-spec-mockmvc/src/test
@@ -557,7 +561,7 @@ git commit -m "fix: support Spring REST Docs 4 operations"
 - Modify: `restdocs-api-spec-generator/src/test/kotlin/com/keecon/restdocs/apispec/generator/OpenApi3GeneratorTest.kt`
 - Modify: `restdocs-api-spec-gradle-plugin/src/test/kotlin/com/keecon/restdocs/apispec/gradle/ApiSpecTaskTest.kt`
 
-- [ ] **Step 1: import inventory를 기준으로 경계를 정한다**
+- [x] **Step 1: import inventory를 기준으로 경계를 정한다**
 
 ```bash
 rg -n '^import (com\.fasterxml\.jackson|tools\.jackson)' --glob '*.kt'
@@ -565,11 +569,11 @@ rg -n '^import (com\.fasterxml\.jackson|tools\.jackson)' --glob '*.kt'
 
 Expected: `com.fasterxml.jackson.annotation`은 공개 model annotation/Swagger 경계에 남을 수 있고 일반 JSON 읽기/쓰기는 `tools.jackson` 대상이다.
 
-- [ ] **Step 2: core와 jsonschema를 Jackson 3로 옮긴다**
+- [x] **Step 2: core와 jsonschema를 Jackson 3로 옮긴다**
 
 일반 serializer/deserializer는 Jackson 3 Kotlin module을 사용한다. 실제 3.1 API의 builder/feature signature에 맞추되 JSON 필드와 공개 model 계약은 변경하지 않는다.
 
-- [ ] **Step 3: Swagger 직렬화를 전용 adapter에 격리한다**
+- [x] **Step 3: Swagger 직렬화를 전용 adapter에 격리한다**
 
 `ApiSpecificationWriter`만 `io.swagger.v3.core.util.Json`/`Yaml`과 Jackson 2를 알도록 한다.
 
@@ -585,7 +589,7 @@ internal object ApiSpecificationWriter {
 
 공개 model에는 Jackson databind 타입을 추가하지 않는다.
 
-- [ ] **Step 4: Jackson 2/3 상호운용 회귀를 실행한다**
+- [x] **Step 4: Jackson 2/3 상호운용 회귀를 실행한다**
 
 ```bash
 ./gradlew :restdocs-api-spec:test :restdocs-api-spec-jsonschema:test :restdocs-api-spec-generator:test --stacktrace
@@ -594,7 +598,7 @@ internal object ApiSpecificationWriter {
 
 Expected: resource JSON을 Jackson 3로 기록/읽고 Swagger는 JSON/YAML OpenAPI를 만들며 parser 검증이 통과한다.
 
-- [ ] **Step 5: 승인 시 체크포인트 커밋**
+- [x] **Step 5: 승인 시 체크포인트 커밋**
 
 ```bash
 git add restdocs-api-spec/src restdocs-api-spec-jsonschema/src restdocs-api-spec-generator/src restdocs-api-spec-gradle-plugin/src
@@ -615,7 +619,7 @@ git commit -m "refactor: isolate Jackson 2 from Jackson 3 runtime"
 - Modify: `restdocs-api-spec-gradle-plugin/src/test/kotlin/com/keecon/restdocs/apispec/gradle/RestdocsOpenApiTaskTestBase.kt`
 - Modify: `gradle.properties`
 
-- [ ] **Step 1: configuration cache 실패를 먼저 재현한다**
+- [x] **Step 1: configuration cache 실패를 먼저 재현한다**
 
 ```bash
 ./gradlew :restdocs-api-spec-gradle-plugin:test --configuration-cache --configuration-cache-problems=fail --stacktrace
@@ -623,7 +627,7 @@ git commit -m "refactor: isolate Jackson 2 from Jackson 3 runtime"
 
 Expected before fix: eager `afterEvaluate`, mutable task input, task action의 `project.file` 접근 중 하나 이상이 Gradle 9 validation 문제로 드러난다.
 
-- [ ] **Step 2: task inputs/outputs를 Provider API로 바꾼다**
+- [x] **Step 2: task inputs/outputs를 Provider API로 바꾼다**
 
 ```kotlin
 abstract class ApiSpecTask : DefaultTask() {
@@ -641,7 +645,7 @@ abstract class ApiSpecTask : DefaultTask() {
 
 `@TaskAction`은 `.get().asFile`만 사용하고 `project`를 참조하지 않는다. 출력 파일별 annotation 대신 public/private 변형을 포함하는 output directory를 선언한다.
 
-- [ ] **Step 3: extension을 Provider 기반으로 만들되 Groovy DSL을 유지한다**
+- [x] **Step 3: extension을 Provider 기반으로 만들되 Groovy DSL을 유지한다**
 
 ```kotlin
 abstract class ApiSpecExtension @Inject constructor(objects: ObjectFactory) {
@@ -654,7 +658,7 @@ abstract class ApiSpecExtension @Inject constructor(objects: ObjectFactory) {
 
 convention은 기존 값(`build/api-spec`, `build/generated-snippets`, `openapi3`, `false`)과 동일하게 둔다. 기존 Groovy assignment가 깨지면 adapter setter를 유지한다.
 
-- [ ] **Step 4: `afterEvaluate`와 `tasks.create`를 제거한다**
+- [x] **Step 4: `afterEvaluate`와 `tasks.create`를 제거한다**
 
 ```kotlin
 val extension = extensions.create<OpenApi3Extension>(OpenApi3Extension.name)
@@ -671,7 +675,7 @@ tasks.register<OpenApi3Task>("openapi3") {
 
 OpenAPI 전용 title/version/format/server는 provider 또는 immutable serializable value로 연결한다.
 
-- [ ] **Step 5: TestKit 두 번째 실행에서 cache 재사용을 검증한다**
+- [x] **Step 5: TestKit 두 번째 실행에서 cache 재사용을 검증한다**
 
 테스트의 `withDebug(true)`를 제거하고 같은 fixture를 `--configuration-cache`로 두 번 실행한다.
 
@@ -686,7 +690,7 @@ then(second.output).contains("Reusing configuration cache")
 
 릴리스 전 example은 공개된 구버전 플러그인을 외부 소비하므로 저장소 전체에 configuration cache를 강제하지 않는다. 현재 2.0.0 플러그인은 TestKit의 두 번째 실행과 `help --configuration-cache --configuration-cache-problems=fail`로 명시 검증한다.
 
-- [ ] **Step 6: 승인 시 체크포인트 커밋**
+- [x] **Step 6: 승인 시 체크포인트 커밋**
 
 ```bash
 git add restdocs-api-spec-gradle-plugin
@@ -703,13 +707,13 @@ git commit -m "refactor: make Gradle plugin compatible with Gradle 9"
 - Modify: `restdocs-api-spec-mockmvc/src/test/kotlin/com/keecon/restdocs/apispec/ResourceSnippetIntegrationTest.kt`
 - Modify: `README.md`
 
-- [ ] **Step 1: Boot 4 test slice import 실패를 재현한다**
+- [x] **Step 1: Boot 4 test slice import 실패를 재현한다**
 
 ```bash
 ./gradlew :restdocs-api-spec-example:compileTestGroovy :restdocs-api-spec-mockmvc:compileTestKotlin --stacktrace
 ```
 
-- [ ] **Step 2: Boot 4 공식 test starter/import로 최소 전환한다**
+- [x] **Step 2: Boot 4 공식 test starter/import로 최소 전환한다**
 
 `WebMvcTest`가 필요하면 다음 패키지를 사용한다.
 
@@ -719,7 +723,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 
 `spring-boot-starter-test`만으로 부족하면 Boot 4의 `spring-boot-starter-webmvc-test`를 testImplementation으로 추가한다. 이는 승인된 Spring 세분화 의존성 범위 안이다.
 
-- [ ] **Step 3: example 전체 흐름을 실행한다**
+- [x] **Step 3: example 전체 흐름을 실행한다**
 
 ```bash
 ./gradlew clean :restdocs-api-spec-example:test :restdocs-api-spec-example:openapi3 --no-daemon
@@ -729,11 +733,11 @@ rg '^openapi:|^paths:|/products' restdocs-api-spec-example/build/api-spec/openap
 
 Expected: 테스트가 resource snippets를 만들고 `openapi3` task가 parser로 읽을 수 있는 YAML을 생성한다.
 
-- [ ] **Step 4: README Boot 4 사용 예시를 갱신한다**
+- [x] **Step 4: README Boot 4 사용 예시를 갱신한다**
 
 `2.0.0` dependency/plugin 예, Java 17 minimum, JDK 17/21/25 tested, `1.x` 정책을 기록한다. Plugin Portal 배포 전에는 Portal에서 plugins DSL version lookup이 된다고 쓰지 않고 JitPack 좌표를 안내한다. 같은 multi-project build의 sibling plugin은 Gradle 9 buildscript classpath에 직접 넣을 수 없으므로 example은 외부 소비자 흐름을 유지하고, 현재 로컬 plugin 코드는 TestKit과 Task 12의 독립 소비자 local publication으로 검증한다.
 
-- [ ] **Step 5: 승인 시 체크포인트 커밋**
+- [x] **Step 5: 승인 시 체크포인트 커밋**
 
 ```bash
 git add restdocs-api-spec-example restdocs-api-spec-mockmvc/src/test README.md
@@ -748,25 +752,15 @@ git commit -m "test: verify Spring Boot 4 consumer workflow"
 - Create: `.github/dependabot.yml`
 - Modify or Delete: `.github/workflows/merge-deps.yml`
 
-- [ ] **Step 1: JDK 26 non-blocking canary를 분리한다**
+- [x] **Step 1: LTS JDK 검증 범위를 고정한다**
 
 ```yaml
-jdk-26-canary:
-  continue-on-error: true
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-java@v4
-      with:
-        distribution: temurin
-        java-version: |
-          17
-          26
-    - uses: gradle/actions/wrapper-validation@v4
-    - run: ./gradlew -Dorg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64 clean check --no-daemon
+strategy:
+  matrix:
+    java: ['17', '21', '25']
 ```
 
-- [ ] **Step 2: Dependabot을 공식 설정으로 복원한다**
+- [x] **Step 2: Dependabot을 공식 설정으로 복원한다**
 
 ```yaml
 version: 2
@@ -784,7 +778,7 @@ updates:
 
 `dependabot.yml.old`는 제거한다. `akheron/dependabot-cron-action@v1` 기반 자동 병합은 새 승인이 없으면 제거하고 PR 생성까지만 자동화한다.
 
-- [ ] **Step 3: release workflow를 결정적으로 만든다**
+- [x] **Step 3: release workflow를 결정적으로 만든다**
 
 `git-chglog@latest`와 존재하지 않는 `build/dist/*` 업로드를 제거한다. 새 changelog 도구 없이 GitHub generated notes를 사용한다.
 
@@ -797,7 +791,7 @@ updates:
     generate_release_notes: true
 ```
 
-- [ ] **Step 4: workflow와 wrapper를 정적 검증한다**
+- [x] **Step 4: workflow와 wrapper를 정적 검증한다**
 
 ```bash
 ./gradlew help --configuration-cache --configuration-cache-problems=fail
@@ -807,7 +801,7 @@ rg -n '@latest|build/dist/\*|fix example module test' .github jitpack.yml
 
 Expected: 검색 결과가 없고 configuration cache 검증이 통과한다.
 
-- [ ] **Step 5: 승인 시 체크포인트 커밋**
+- [x] **Step 5: 승인 시 체크포인트 커밋**
 
 ```bash
 git add .github jitpack.yml
@@ -868,7 +862,120 @@ Expected: 의도하지 않은 package 변경이 없고 plugin ID가 source/test/
 
 - [x] **Step 5: 최종 보고와 릴리스 승인 요청**
 
-보고 항목은 JDK 17/21/25 결과, JDK 26 canary, resolved dependency 버전, class major 61, POM, 독립 소비자 결과, 공개 API/Groovy DSL 호환성, 알려진 제한이다. 검증 보고 후 명시 승인된 경우에만 최종 커밋, `2.0.0` 태그, 푸시와 GitHub Release를 실행한다.
+보고 항목은 LTS JDK 17/21/25 결과, resolved dependency 버전, class major 61, POM, 독립 소비자 결과, 공개 API/Groovy DSL 호환성, 알려진 제한이다. 검증 보고 후 명시 승인된 경우에만 최종 커밋, `2.0.0` 태그, 푸시와 GitHub Release를 실행한다.
+
+### Task 13: ePages 후속 변경 선별 동기화
+
+**릴리스 분류:** 기존 출력/동작을 바로잡는 OAuth2, JWT scope, `beneathPath`, 결정적 스키마 순서,
+required/optional 처리는 `2.0.x` 호환성 수정 후보이다. Contact DSL, `LocalDate` date 추론 및
+WebTestClient 공개 모듈은 새 API·기능이므로 `2.1.0`에서 릴리스한다. 한 브랜치에서 검증하더라도
+릴리스 커밋은 두 범주를 분리한다.
+
+- [x] **Step 1: 출력 변경이 없는 항목부터 적용한다**
+
+OAuth2 component/requirement 키를 `oauth2`로 일치시키고, 표준 공백 구분 JWT `scope`를 처리하며,
+REST Docs `beneathPath` prefix를 보존한다. 스키마 수집 map은 `LinkedHashMap`으로 바꿔 출력 순서를
+결정적으로 만든다. 각 항목은 먼저 실패하는 회귀 테스트를 추가한 뒤 최소 구현으로 통과시킨다.
+
+- [x] **Step 2: required/optional 출력 호환성을 게이트로 확인한다**
+
+필드 descriptor의 `optional` 플래그를 required 판정에 반영하기 전후 example OpenAPI의 SHA-256과
+모든 schema `required` 배열을 비교한다. 기존 fixture가 descriptor 계약과 모순될 때만 근거를 남기고
+fixture를 수정한다. 비교 결과가 같을 때만 구현을 유지한다.
+
+- [x] **Step 3: 새 기능을 `2.1.0` 범위로 추가한다**
+
+Gradle DSL의 OpenAPI Contact, `LocalDate`의 OpenAPI `string/date` 추론, 별도
+`restdocs-api-spec-webtestclient` 모듈을 추가한다. 기존 generator 메서드와 Kotlin 기본 인자용
+바이너리 시그니처는 유지하고 Contact용 overload만 추가한다. 새 모듈은 실제 WebTestClient 통합 테스트와
+게시 POM을 사용하는 독립 Java 소비자 컴파일 테스트로 검증한다.
+
+- [x] **Step 4: 원 저작권과 사용자 문서를 정합화한다**
+
+MIT LICENSE에 ePages 저작권을 보존하고 README에는 태그 전까지 `2.1.0` 기능이 미출시임을 명시하며,
+릴리스 태그 커밋에서 현재 버전을 갱신한다. CI와 문서의 검증 대상은 LTS JDK 17·21·25로만 유지한다.
+
+- [x] **Step 5: 세 LTS JDK에서 최종 검증한다**
+
+```bash
+for java_version in temurin-17.0.18+8 temurin-21.0.10+7.0.LTS temurin-25.0.4+7.0.LTS; do
+  mise exec java@${java_version} -- ./gradlew \
+    -Dorg.gradle.java.installations.paths=/Users/iwaltgen/.local/share/mise/installs/java/temurin-17.0.18+8 \
+    clean check testCodeCoverageReport :restdocs-api-spec-example:openapi3 --no-daemon --stacktrace
+done
+```
+
+Expected: 세 실행이 모두 통과하고, 공개 클래스는 Java 17 major version 61이며, example OpenAPI와
+게시 artifact 소비자 테스트가 유효하다.
+
+### Task 14: fork 동기화 정책과 추가 포팅 후보
+
+**Git 이력 정책:** origin과 ePages upstream은 공통 Git 조상이 없는 독립 이력이므로 upstream branch를
+일반 merge하거나 upstream commit을 그대로 cherry-pick하지 않는다. 각 upstream commit의 의도와
+테스트를 분석한 뒤 `com.keecon` 네임스페이스, OpenAPI 3.0.1 전용 범위, 공개 모델과 출력 계약에 맞게
+의미 단위로 다시 구현한다.
+
+**메이저 버전 정책:** 프로젝트 메이저 버전은 지원하는 Spring Boot 메이저 버전이 바뀔 때 함께 올린다.
+공개 ABI를 깨는 개별 기능 때문에 프로젝트 메이저를 독립적으로 올리지 않는다. 현재 `2.x`는 Spring
+Boot 4 전용 릴리스선이므로 `schemaName`을 포함한 새 기능은 2.x ABI 호환 구현이 입증될 때만 도입한다.
+입증되지 않으면 해당 기능을 제외하고, 다음 Spring Boot 메이저 전환 시점의 프로젝트 메이저 후보에서
+재검토한다.
+
+| upstream 변경 | origin 판정 | 릴리스선 |
+|---|---|---|
+| OAuth2 scheme/ref key (`e1bddea`) | origin 모델에 맞게 적용 | 2.0.x |
+| JWT 표준 공백 구분 scope (`dbd1788`) | 적용 | 2.0.x |
+| REST Docs `beneathPath` (`fb47811`) | fail-fast 정책을 유지해 적용 | 2.0.x |
+| 결정적 schema 순서 (`68aa231`) | 적용 | 2.0.x |
+| required/optional (`4c735ca`) | 출력 호환성 확인 후 적용 | 2.0.x |
+| Contact (`2842c43`) | 기존 generator ABI를 보존한 overload로 적용 | 2.1.x |
+| 숫자 default/enum (`31bb1e1`) | 범위 검사와 안정적 decimal 변환을 추가해 포팅 후보 | 2.0.x |
+| nested `schemaName` (`437d7da`) | 생성자와 `copy$default` ABI가 깨지므로 현재 제외 | 다음 Boot 메이저 전환 시 재검토 |
+| optional을 nullable로 변환 (`2900374`) | origin 정책과 충돌하므로 제외 | 제외 |
+| 최신 DATE/validation (`295992f`) | `string` + `format=date`와 Jakarta 정책만 선별 | 2.x 선별 |
+
+- [x] **Step 1: origin 호환 불변조건을 회귀 테스트로 고정한다**
+
+`optional`과 `nullable`을 분리하고, rich `Attributes`/request parts, generator ABI, 결정적 출력,
+descriptor fail-fast가 유지되는지 기존 테스트를 확인한다. 이미 같은 소비자 동작을 검증하는 테스트가
+있으면 중복 테스트를 추가하지 않는다.
+
+- [x] **Step 2: descriptor merge의 ignored 판정을 수정한다**
+
+동일 path descriptor의 `ignored`와 `optional` 조합을 실패 테스트로 재현한 뒤, 두 descriptor가 모두
+ignored일 때만 결과를 ignored로 만드는 최소 변경을 적용한다.
+
+- [x] **Step 3: 숫자 default/enum 변환을 안전하게 확장한다**
+
+NUMBER의 `Long`/`Float`를 지원하되 Float는 문자열 기반 `BigDecimal`로 안정화한다. INTEGER의 Long은
+Int 범위에서만 정확히 변환하고 범위를 벗어나면 명시적으로 실패한다.
+
+- [x] **Step 4: validation 및 DATE 후보를 origin 정책으로 선별한다**
+
+Jakarta 제약조건을 우선하고 필요한 legacy annotation은 새 의존성 없이 이름 기반으로만 호환한다.
+DATE는 `DataType.STRING`과 `DataFormat.DATE`를 유지하며 원시 `DataType.DATE`는 추가하지 않는다.
+
+- [x] **Step 5: nested schemaName의 2.x ABI 가능성을 검증한다**
+
+현재와 후보 build의 `Attributes` 생성자, `copy`, `copy$default`를 `javap`으로 비교하고 기존 Java/Kotlin
+consumer를 재컴파일한다. 바이너리 호환 설계가 입증되지 않으면 구현하지 않고 다음 Spring Boot 메이저
+전환 시점까지 보류한다.
+
+검증 결과: nullable `schemaName`을 마지막 constructor parameter로 추가해도 기존 5인자 primary constructor와
+`copy(List, List, String, TypeDescriptor, Encoding)`, 기존 `copy$default` JVM descriptor가 모두 제거되고
+6인자 형태로 교체된다. 기존 바이너리 consumer에 `NoSuchMethodError` 위험이 있으므로 2.x에서는 도입하지
+않는다. 이 결론 때문에 프로젝트 메이저를 별도로 올리지 않는다.
+
+- [x] **Step 6: 2.0.x 패치와 2.1.x 기능을 격리해 검증한다**
+
+현재 혼합 worktree는 복구 기준으로 보존한다. Herdr worktree에서 patch-safe 변경과 새 기능을 별도
+릴리스 브랜치로 재구성하고 JDK 17·21·25, example 출력, 공개 bytecode와 게시 metadata를 검증한다.
+
+검증 결과: `2.0.1` 패치 트리와 `2.1.0` 기능 트리를 커밋 단위로 분리했다. 두 트리는 JDK 17·21·25의
+`clean check testCodeCoverageReport :restdocs-api-spec-example:openapi3`를 통과했고, `2.1.0` 후보의 세
+example 산출물 SHA-256은 `47927b1fb06183cd5a62b4d22cd321301784d14580850484df0a9236579f38c2`로
+동일했다. 공개 클래스는 Java 17 major version 61이고, 기존 generator 8인자 JVM descriptor와 Contact용
+9인자 overload가 함께 존재하며, 게시 POM 기반 독립 소비자 테스트도 통과했다.
 
 ## Definition of Done
 

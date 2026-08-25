@@ -16,14 +16,14 @@ And only support [OpenAPI 3.0.1] specs.
 | Artifact line | Spring Boot | Spring REST Docs | Java bytecode | Tested JDKs | Status |
 |---|---|---|---|---|---|
 | 1.x | 3.5.x | 3.0.x | 17 | 17, 21, 25 | Maintained |
-| 2.x | 4.1.x | 4.0.x | 17 | 17, 21, 25 | Released (2.0.0); 2.1.0 in development |
+| 2.x | 4.1.x | 4.0.x | 17 | 17, 21, 25 | Released (2.1.0) |
 | 0.x | 2.7.x | 2.0.x | — | — | Frozen, unsupported |
 
 The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin ID remains
 `com.keecon.restdocs-openapi3` across release lines.
 
 The 2.x line requires Java 17 or newer. CI verifies the LTS JDK releases 17, 21, and 25.
-Use 1.1.0 for Spring Boot 3.5 applications. Version 2.0.0 is available from JitPack; no Plugin
+Use 1.1.0 for Spring Boot 3.5 applications. Version 2.1.0 is available from JitPack; no Plugin
 Portal publication is assumed.
 
 ### Gradle
@@ -38,7 +38,7 @@ Portal publication is assumed.
       }
       dependencies {
         // ...
-        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.0.0'
+        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.1.0'
       }
     }
 
@@ -55,8 +55,8 @@ Portal publication is assumed.
 
     dependencies {
       //..
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:2.0.0'
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:2.0.0'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:2.1.0'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:2.1.0'
     }
 
     openapi3 {
@@ -68,6 +68,46 @@ Portal publication is assumed.
       format = 'yaml'
     }
     ```
+
+### 2.1.0 features
+
+OpenAPI contact metadata can be configured in the Gradle DSL.
+
+```groovy
+openapi3 {
+  contact = {
+    name = 'API Support'
+    email = 'support@example.com'
+    url = 'https://example.com/support'
+  }
+}
+```
+
+Fields declared as `java.time.LocalDate` are inferred as OpenAPI `string` values with
+`format: date`.
+
+The WebTestClient integration is available from the `restdocs-api-spec-webtestclient` module.
+
+```groovy
+dependencies {
+  testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-webtestclient:2.1.0'
+}
+```
+
+Replace Spring REST Docs' WebTestClient `document` consumer with the wrapper. It keeps the normal
+REST Docs snippets and adds `resource.json` from their descriptors.
+
+```groovy
+webTestClient.get()
+  .uri('/v1/products/{id}', 1)
+  .exchange()
+  .expectStatus().isOk()
+  .expectBody()
+  .consumeWith(WebTestClientRestDocumentationWrapper.document(
+    'products-id-get',
+    responseFields(fieldWithPath('id').description('product id'))
+  ))
+```
 
 ## Usage with Spring REST Docs
 
