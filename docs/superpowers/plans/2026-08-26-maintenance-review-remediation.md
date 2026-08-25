@@ -600,8 +600,10 @@ git merge-base --is-ancestor 1.1.0 origin/v1.x
 git merge-base --is-ancestor 2.1.0 origin/main
 git show origin/main:MAINTENANCE.md | rg 'v0.x|v1.x|main'
 git show origin/v1.x:.github/workflows/build.yml | rg 'v1.x'
-test -z "$(git ls-remote --heads origin refs/heads/v2.x)"
-if git ls-remote --tags origin | rg -i 'refs/tags/.*(rc|candidate|preview|beta|alpha)'; then
+remote_v2=$(git ls-remote --heads origin refs/heads/v2.x) || exit 1
+test -z "$remote_v2"
+remote_tags=$(git ls-remote --tags origin) || exit 1
+if printf '%s\n' "$remote_tags" | rg -i 'refs/tags/.*(rc|candidate|preview|beta|alpha)'; then
   printf '%s\n' 'Candidate release tag exists' >&2
   exit 1
 fi
@@ -625,8 +627,10 @@ Immediately before Step 3, rerun Steps 1 and 2 from Step 1's fresh `git fetch or
 ```bash
 git push origin --delete v0 1.x
 git fetch origin --prune
-test -z "$(git ls-remote --heads origin refs/heads/v0)"
-test -z "$(git ls-remote --heads origin refs/heads/1.x)"
+remote_v0=$(git ls-remote --heads origin refs/heads/v0) || exit 1
+remote_1x=$(git ls-remote --heads origin refs/heads/1.x) || exit 1
+test -z "$remote_v0"
+test -z "$remote_1x"
 ```
 
 Expected: `v0.x`, `v1.x`, and `main` remain; old names are absent.
