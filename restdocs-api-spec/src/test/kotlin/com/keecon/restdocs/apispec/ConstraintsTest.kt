@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
 import org.springframework.restdocs.constraints.Constraint
+import java.time.LocalDate
 
 internal class ConstraintsTest {
 
@@ -343,6 +344,25 @@ internal class ConstraintsTest {
             .containsValues(true, false)
     }
 
+    @Test
+    @Suppress("UNCHECKED_CAST")
+    fun `should infer local date type and format`() {
+        val model = Constraints.model(DateConstraints::class.java)
+
+        val date = model.withName("date")
+        then(date.type).isEqualTo(DataType.STRING)
+        then(date.attributes[Attributes.FORMAT_KEY]).isEqualTo(DataFormat.DATE)
+
+        val dates = model.withName("dates[]")
+        then(dates.type).isEqualTo(DataType.ARRAY)
+        then(dates.attributes[Attributes.ITEMS_KEY] as Map<String, *>).isEqualTo(
+            mapOf(
+                Attributes.TYPE_KEY to DataType.STRING,
+                Attributes.FORMAT_KEY to DataFormat.DATE
+            )
+        )
+    }
+
     private data class NonEmptyConstraints(
         @field:NotEmpty val nonEmpty: String,
         @field:Valid val nested: NonEmptyConstraints?,
@@ -386,6 +406,11 @@ internal class ConstraintsTest {
         @field:NotBlank val someEnum: SomeEnum,
         @field:Valid @field:NotEmpty @field:Max(10) val enumList: List<SomeEnum>?,
         @field:Valid @field:NotEmpty @field:Max(10) val stringList: List<String>?,
+    )
+
+    private data class DateConstraints(
+        val date: LocalDate,
+        val dates: List<LocalDate>
     )
 
     private enum class SomeEnum {

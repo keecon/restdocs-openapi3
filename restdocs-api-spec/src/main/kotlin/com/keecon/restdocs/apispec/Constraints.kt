@@ -10,6 +10,7 @@ import org.springframework.restdocs.snippet.AbstractDescriptor
 import org.springframework.web.multipart.MultipartFile
 import java.lang.reflect.Field
 import java.lang.reflect.ParameterizedType
+import java.time.LocalDate
 
 /**
  * Constraints can be used to add constraint information to a [FieldDescriptor], [ParameterDescriptorWithType]
@@ -178,6 +179,10 @@ class Constraints private constructor(private val rootType: Class<*>) {
                     attributes(Attributes.items(DataType.STRING))
                 }
 
+                LocalDate::class.java -> {
+                    attributes(Attributes.items(DataType.STRING, DataFormat.DATE))
+                }
+
                 MultipartFile::class.java -> {
                     attributes(Attributes.items(DataType.STRING, DataFormat.BINARY))
                 }
@@ -236,6 +241,16 @@ class Constraints private constructor(private val rootType: Class<*>) {
                     is ParameterDescriptorWithType -> type(DataType.STRING)
                     is RequestPartDescriptorWithType -> type(DataType.STRING)
                     is FieldDescriptor -> type(DataType.STRING)
+                }
+
+                LocalDate::class.java -> {
+                    when (this) {
+                        is HeaderDescriptorWithType -> type(DataType.STRING)
+                        is ParameterDescriptorWithType -> type(DataType.STRING)
+                        is RequestPartDescriptorWithType -> type(DataType.STRING)
+                        is FieldDescriptor -> type(DataType.STRING)
+                    }
+                    attributes(Attributes.format(DataFormat.DATE))
                 }
 
                 MultipartFile::class.java -> {
