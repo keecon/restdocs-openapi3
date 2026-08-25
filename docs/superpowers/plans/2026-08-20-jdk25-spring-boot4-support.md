@@ -878,3 +878,9 @@ Expected: 의도하지 않은 package 변경이 없고 plugin ID가 source/test/
 - [ ] 생성 POM과 독립 소비자 테스트로 JitPack 배포 전 metadata를 검증했다.
 - [ ] README, CI, Dependabot, release workflow가 실제 지원/배포 정책과 일치한다.
 - [ ] 사용자 승인 없이 커밋, 태그, 브랜치 푸시, PR 또는 GitHub Release를 만들지 않았다.
+
+## 2026-08-26 branch naming addendum
+
+Maintenance branch naming is now `v0` → `v0.x` and `1.x` → `v1.x`. The active 2.x line remains on
+`main`; `v2.x` will be created only at the next Spring Boot and project major transition. Commands
+already completed and recorded in this historical plan are intentionally retained unchanged.

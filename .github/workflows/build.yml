@@ -3,12 +3,12 @@ name: build
 on:
   push:
     branches:
-      - main
+      - v1.x
     paths-ignore:
       - '**.md'
   pull_request:
     branches:
-      - main
+      - v1.x
     paths-ignore:
       - '**.md'
 
@@ -46,4 +46,4 @@ jobs:
           token: ${{secrets.CODECOV_TOKEN}}
           files: ./build/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml
           flags: tests
-          name: main-tests-jdk-17
+          name: v1.x-tests-jdk-17

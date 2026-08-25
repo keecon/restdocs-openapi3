@@ -15,12 +15,25 @@ And only support [OpenAPI 3.0.1] specs.
 
 | Artifact line | Spring Boot | Spring REST Docs | Java bytecode | Tested JDKs | Status |
 |---|---|---|---|---|---|
-| 1.x | 3.5.x | 3.0.x | 17 | 17, 21, 25 | Maintained |
-| 2.x | 4.1.x | 4.0.x | 17 | — (target: 17, 21, 25) | Planned, not released |
-| 0.x | 2.7.x | 2.0.x | — | — | Frozen, unsupported |
+| [1.x (`v1.x`)](https://github.com/keecon/restdocs-openapi3/tree/v1.x) | 3.5.x | 3.0.x | 17 | 17, 21, 25 | Maintained |
+| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | Active (2.1.0) |
+| [0.x (`v0.x`)](https://github.com/keecon/restdocs-openapi3/tree/v0.x) | 2.7.x | 2.0.x | — | — | Frozen, unsupported |
 
 The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin ID remains
 `com.keecon.restdocs-openapi3` across release lines.
+
+The supported release lines require Java 17 or newer and produce Java 17 bytecode. CI verifies the
+LTS JDK releases 17, 21, and 25. Use 1.1.0 for Spring Boot 3.5 applications.
+
+### Maintenance policy
+
+The `v1.x` branch receives security, compatibility, and managed dependency fixes. Fixes specific to
+1.x start on `v1.x` and are forward-ported to `main`; shared defects are validated on `main` first
+and only compatible parts are backported. The `v0.x` branch is frozen, while the active 2.x line
+stays on `main` until the next Spring Boot and project major transition creates `v2.x`.
+
+Tags matching `1.*` must belong to `v1.x`, and tags matching `2.*` must belong to `main`. Releases
+run the full build on JDK 17, 21, and 25 with the Java 17 compilation toolchain.
 
 ### Gradle
 
@@ -196,7 +209,7 @@ resultActions
 
 [build-badge]: https://github.com/keecon/restdocs-openapi3/actions/workflows/build.yml/badge.svg
 
-[codecov-badge]: https://codecov.io/gh/keecon/restdocs-openapi3/branch/main/graph/badge.svg?token=TRQZ6GOVK4
+[codecov-badge]: https://codecov.io/gh/keecon/restdocs-openapi3/branch/v1.x/graph/badge.svg?token=TRQZ6GOVK4
 
 [sonarcloud-badge]: https://sonarcloud.io/api/project_badges/measure?project=keecon_restdocs-openapi3&metric=alert_status
 
