@@ -17,7 +17,13 @@ class PublishedConsumerTest {
             """
             pluginManagement {
                 repositories {
-                    maven { url = uri('$repositoryUri') }
+                    maven {
+                        url = uri('$repositoryUri')
+                        metadataSources {
+                            mavenPom()
+                            artifact()
+                        }
+                    }
                     gradlePluginPortal()
                 }
             }
@@ -32,7 +38,13 @@ class PublishedConsumerTest {
             }
 
             repositories {
-                maven { url = uri('$repositoryUri') }
+                maven {
+                    url = uri('$repositoryUri')
+                    metadataSources {
+                        mavenPom()
+                        artifact()
+                    }
+                }
                 mavenCentral()
             }
 

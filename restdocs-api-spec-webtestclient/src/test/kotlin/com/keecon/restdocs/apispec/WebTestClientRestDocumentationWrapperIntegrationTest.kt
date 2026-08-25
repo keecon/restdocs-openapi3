@@ -53,6 +53,8 @@ class WebTestClientRestDocumentationWrapperIntegrationTest {
 
         val resource = File("build/generated-snippets/$identifier/resource.json")
         then(resource).exists()
+        then(File("build/generated-snippets/$identifier/path-parameters.adoc")).exists()
+        then(File("build/generated-snippets/$identifier/response-fields.adoc")).exists()
         with(JsonPath.parse(resource.readText())) {
             then(read<String>("summary")).isEqualTo("Get greeting")
             then(read<String>("request.pathParameters[0].name")).isEqualTo("id")
