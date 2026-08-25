@@ -297,6 +297,28 @@ class JsonSchemaGeneratorTest {
     }
 
     @Test
+    fun `should deduplicate mixed descriptor types regardless of duplicate order`() {
+        val string = FieldDescriptor("value", "string", "STRING")
+        val duplicateString = FieldDescriptor("value", "duplicate string", "STRING")
+        val boolean = FieldDescriptor("value", "boolean", "BOOLEAN")
+
+        listOf(
+            listOf(string, duplicateString, boolean),
+            listOf(boolean, duplicateString, string)
+        ).forEach { descriptors ->
+            val generated = SchemaLoader.load(JSONObject(generator.generateSchema(descriptors))) as ObjectSchema
+            val valueSchema = generated.propertySchemas["value"] as CombinedSchema
+
+            then(valueSchema.subschemas).extracting("class").containsExactlyInAnyOrder(
+                BooleanSchema::class.java,
+                StringSchema::class.java
+            )
+            generated.validate(JSONObject("""{"value": "text"}"""))
+            generated.validate(JSONObject("""{"value": true}"""))
+        }
+    }
+
+    @Test
     fun should_handle_field_with_different_types() {
         givenDifferentFieldDescriptorsWithSamePathAndDifferentTypes()
 
