@@ -28,7 +28,8 @@ abstract class ApiSpecExtension(protected val project: Project) {
         set(value) = separatePublicApiProperty.set(value)
 
     init {
-        snippetsDirectory = "build/generated-snippets"
+        outputDirectoryProperty.convention(project.layout.buildDirectory.dir("api-spec"))
+        snippetsDirectoryProperty.convention(project.layout.buildDirectory.dir("generated-snippets"))
         separatePublicApi = false
     }
 }

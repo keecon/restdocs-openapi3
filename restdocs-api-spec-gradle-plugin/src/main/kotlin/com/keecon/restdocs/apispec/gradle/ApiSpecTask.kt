@@ -3,10 +3,11 @@ package com.keecon.restdocs.apispec.gradle
 import com.keecon.restdocs.apispec.model.ResourceModel
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileTree
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
@@ -26,9 +27,13 @@ abstract class ApiSpecTask : DefaultTask() {
     @get:Internal
     abstract val outputDirectory: DirectoryProperty
 
-    @get:InputDirectory
-    @get:PathSensitive(PathSensitivity.RELATIVE)
+    @get:Internal
     abstract val snippetsDirectory: DirectoryProperty
+
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    val resourceSnippetFiles: FileTree
+        get() = snippetsDirectory.asFileTree.matching { it.include("**/resource.json") }
 
     @get:Input
     abstract val outputFileNamePrefix: Property<String>
@@ -63,8 +68,9 @@ abstract class ApiSpecTask : DefaultTask() {
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .build()
 
-        val resourceModels = snippetsDirectoryFile.walkTopDown()
-            .filter { it.name == "resource.json" }
+        val resourceModels = resourceSnippetFiles.files
+            .sortedBy { it.relativeTo(snippetsDirectoryFile).invariantSeparatorsPath }
+            .asSequence()
             .map { objectMapper.readValue<ResourceModel>(it.readText()) }
             .toList()
 

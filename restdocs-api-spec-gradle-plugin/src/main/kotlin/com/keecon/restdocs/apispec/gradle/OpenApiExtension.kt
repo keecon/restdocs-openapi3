@@ -65,7 +65,6 @@ abstract class OpenApiBaseExtension(project: Project) : ApiSpecExtension(project
     }
 
     init {
-        outputDirectory = "build/api-spec"
         title = "API documentation"
         version = (project.version as? String)?.let { if (it == "unspecified") null else it } ?: "1.0.0"
         format = "json"

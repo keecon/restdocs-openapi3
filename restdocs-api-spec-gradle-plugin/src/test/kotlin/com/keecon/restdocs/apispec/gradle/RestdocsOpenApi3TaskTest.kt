@@ -2,9 +2,11 @@ package com.keecon.restdocs.apispec.gradle
 
 import com.jayway.jsonpath.JsonPath
 import org.assertj.core.api.BDDAssertions.then
+import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junitpioneer.jupiter.TempDirectory
+import java.io.File
 import java.lang.Boolean.FALSE
 
 @ExtendWith(TempDirectory::class)
@@ -117,6 +119,36 @@ class RestdocsOpenApi3TaskTest : RestdocsOpenApiTaskTestBase() {
         whenPluginExecuted()
 
         then(result.output).contains("Reusing configuration cache")
+    }
+
+    @Test
+    fun `should respect custom build directory for default paths`() {
+        buildFile.writeText(
+            baseBuildFile() + """
+            layout.buildDirectory = layout.projectDirectory.dir('custom-build')
+            """.trimIndent()
+        )
+        snippetsFolder = testProjectDir.resolve("custom-build/generated-snippets").toFile().apply { mkdirs() }
+        outputFolder = testProjectDir.resolve("custom-build/api-spec").toFile()
+        givenResourceSnippet()
+
+        whenPluginExecuted()
+
+        thenApiSpecTaskSuccessful()
+        then(outputFolder.resolve("openapi3.json")).exists()
+    }
+
+    @Test
+    fun `should ignore irrelevant snippet files for task inputs`() {
+        givenBuildFileWithOpenApiClosureWithSingleServerString()
+        givenResourceSnippet()
+
+        whenPluginExecuted()
+        thenApiSpecTaskSuccessful()
+        File(snippetsFolder.resolve("some-operation"), "http-request.adoc").writeText("irrelevant")
+        whenPluginExecuted()
+
+        then(result.task(":$taskName")!!.outcome).isIn(TaskOutcome.UP_TO_DATE, TaskOutcome.FROM_CACHE)
     }
 
     @Test
