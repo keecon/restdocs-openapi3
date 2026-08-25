@@ -28,7 +28,8 @@ internal class FieldDescriptorWithSchema(
             jsonSchemaType(type),
             FieldDescriptor(path, description, type, optional, ignored, attributes)
         ),
-    )
+    ),
+    private val schemaTypes: Set<String> = setOf(jsonSchemaType(type))
 ) : FieldDescriptor(path, description, type, optional, ignored, attributes) {
 
     fun jsonSchemaType(): Schema {
@@ -41,14 +42,22 @@ internal class FieldDescriptorWithSchema(
         if (this.path != other.path)
             throw IllegalArgumentException("path of fieldDescriptor is not equal to ${this.path}")
 
+        val otherSchemaType = jsonSchemaType(other.type)
+        val mergedSchemaBuilders = if (otherSchemaType in schemaTypes) {
+            schemaBuilders
+        } else {
+            schemaBuilders + toSchemaBuilder(otherSchemaType, other)
+        }
+
         return FieldDescriptorWithSchema(
             path = this.path,
             description = this.description,
             type = this.type,
             optional = this.optional || other.optional, // optional if one is optional
-            ignored = this.ignored && other.optional, // ignored if both are optional
+            ignored = this.ignored && other.ignored, // ignored if both are ignored
             attributes = this.attributes,
-            schemaBuilders = this.schemaBuilders + toSchemaBuilder(jsonSchemaType(other.type), other)
+            schemaBuilders = mergedSchemaBuilders,
+            schemaTypes = schemaTypes + otherSchemaType
         )
     }
 

@@ -4,6 +4,7 @@ import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.restdocs.operation.Operation
+import java.util.Base64
 
 class JwtSecurityHandlerTest {
 
@@ -59,6 +60,107 @@ class JwtSecurityHandlerTest {
         then(securityRequirement).isNull()
     }
 
+    @Test
+    fun `should ignore malformed jwt parts`() {
+        operation = OperationBuilder().request("/some")
+            .header(AUTHORIZATION, "Bearer e.e")
+            .build()
+
+        whenSecurityRequirementsExtracted(operation)
+
+        then(securityRequirement).isNull()
+    }
+
+    @Test
+    fun `should extract scopes from an unpadded base64url jwt`() {
+        operation = OperationBuilder().request("/some")
+            .header(
+                AUTHORIZATION,
+                "Bearer ${base64Url("""{"alg":"HS256","kid":"ÿ"}""")}" +
+                    ".${base64Url("""{"scope":["scope1","scope2"]}""")}.signature"
+            )
+            .build()
+
+        whenSecurityRequirementsExtracted(operation)
+
+        then(securityRequirement).isInstanceOf(Oauth2::class.java)
+        then((securityRequirement as Oauth2).requiredScopes).containsExactly("scope1", "scope2")
+    }
+
+    @Test
+    fun `should extract nonblank scopes from a string claim`() {
+        operation = OperationBuilder().request("/some")
+            .header(
+                AUTHORIZATION,
+                "Bearer ${base64Url("""{"alg":"HS256"}""")}" +
+                    ".${base64Url("""{"scope":"scope1  scope2"}""")}.signature"
+            )
+            .build()
+
+        whenSecurityRequirementsExtracted(operation)
+
+        then(securityRequirement).isInstanceOf(Oauth2::class.java)
+        then((securityRequirement as Oauth2).requiredScopes).containsExactly("scope1", "scope2")
+    }
+
+    @Test
+    fun `should return JWTBearer when scope is blank`() {
+        operation = OperationBuilder().request("/some")
+            .header(
+                AUTHORIZATION,
+                "Bearer ${base64Url("""{"alg":"HS256"}""")}.${base64Url("""{"scope":"   "}""")}.signature"
+            )
+            .build()
+
+        whenSecurityRequirementsExtracted(operation)
+
+        then(securityRequirement).isEqualTo(JWTBearer)
+    }
+
+    @Test
+    fun `should return JWTBearer when scope list contains only blank strings`() {
+        operation = OperationBuilder().request("/some")
+            .header(
+                AUTHORIZATION,
+                "Bearer ${base64Url("""{"alg":"HS256"}""")}.${base64Url("""{"scope":["  "]}""")}.signature"
+            )
+            .build()
+
+        whenSecurityRequirementsExtracted(operation)
+
+        then(securityRequirement).isEqualTo(JWTBearer)
+    }
+
+    @Test
+    fun `should return JWTBearer when jwt payload is not an object`() {
+        operation = OperationBuilder().request("/some")
+            .header(
+                AUTHORIZATION,
+                "Bearer ${base64Url("""{"alg":"HS256"}""")}.bnVsbA.signature"
+            )
+            .build()
+
+        whenSecurityRequirementsExtracted(operation)
+
+        then(securityRequirement).isEqualTo(JWTBearer)
+    }
+
+    @Test
+    fun `should ignore non-string and blank list scopes`() {
+        operation = OperationBuilder().request("/some")
+            .header(
+                AUTHORIZATION,
+                "Bearer ${base64Url("""{"alg":"HS256"}""")}" +
+                    ".${base64Url("""{"scope":["scope1",1,null,"  ","scope2"]}""")}.signature"
+            )
+            .build()
+
+        whenSecurityRequirementsExtracted(operation)
+
+        then(securityRequirement).isInstanceOf(Oauth2::class.java)
+        then((securityRequirement as Oauth2).requiredScopes).containsExactly("scope1", "scope2")
+    }
+
     private fun whenSecurityRequirementsExtracted(operation: Operation) {
         securityRequirement = jwtSecurityHandler.extractSecurityRequirements(operation)
     }
@@ -107,4 +209,7 @@ class JwtSecurityHandlerTest {
             .header(AUTHORIZATION, "Basic dGVzdDpwd2QK")
             .build()
     }
+
+    private fun base64Url(value: String): String = Base64.getUrlEncoder().withoutPadding()
+        .encodeToString(value.toByteArray(Charsets.UTF_8))
 }

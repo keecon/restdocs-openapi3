@@ -33,10 +33,9 @@ internal class JwtSecurityHandler : SecurityRequirementsExtractor {
     private fun isJWT(jwt: String): Boolean {
         val jwtParts = jwt.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }
         if (jwtParts.size >= 2) { // JWT = header, payload, signature; at least the first two should be there
-            val jwtHeader = jwtParts[0]
-            val decodedJwtHeader = String(Base64.getDecoder().decode(jwtHeader))
+            val decodedJwtHeader = decodeJwtPart(jwtParts[0]) ?: return false
             try {
-                return ObjectMapper().readValue<Map<String, Any>>(decodedJwtHeader).containsKey("alg")
+                return ObjectMapper().readValue<Map<String, Any>?>(decodedJwtHeader)?.containsKey("alg") == true
             } catch (e: IOException) {
                 // probably not JWT
             }
@@ -48,22 +47,29 @@ internal class JwtSecurityHandler : SecurityRequirementsExtractor {
         return getJWT(operation).flatMap { jwt2scopes(it) }
     }
 
-    @Suppress("UNCHECKED_CAST")
     private fun jwt2scopes(jwt: String): List<String> {
         val jwtParts = jwt.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }
         if (jwtParts.size >= 2) { // JWT = header, payload, signature; at least the first two should be there
-            val jwtPayload = jwtParts[1]
-            val decodedPayload = String(Base64.getDecoder().decode(jwtPayload))
+            val decodedPayload = decodeJwtPart(jwtParts[1]) ?: return emptyList()
             try {
-                val jwtMap = ObjectMapper().readValue<Map<String, Any>>(decodedPayload)
+                val jwtMap = ObjectMapper().readValue<Map<String, Any>?>(decodedPayload) ?: return emptyList()
                 val scope = jwtMap["scope"]
-                if (scope is List<*>)
-                    return scope as List<String>
+                return when (scope) {
+                    is List<*> -> scope.filterIsInstance<String>().filter(String::isNotBlank)
+                    is String -> scope.trim().split("\\s+".toRegex()).filter(String::isNotBlank)
+                    else -> emptyList()
+                }
             } catch (e: IOException) {
                 // probably not JWT
             }
         }
 
         return emptyList()
+    }
+
+    private fun decodeJwtPart(value: String): String? = try {
+        String(Base64.getUrlDecoder().decode(value), Charsets.UTF_8)
+    } catch (@Suppress("SwallowedException") exception: IllegalArgumentException) {
+        null
     }
 }

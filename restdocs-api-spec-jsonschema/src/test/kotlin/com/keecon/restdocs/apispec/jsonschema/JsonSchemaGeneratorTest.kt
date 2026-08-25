@@ -261,6 +261,51 @@ class JsonSchemaGeneratorTest {
     }
 
     @Test
+    fun `should merge optional state for duplicate path and type regardless of order`() {
+        val required = FieldDescriptor("value", "required", "STRING", optional = false)
+        val optional = FieldDescriptor("value", "optional", "STRING", optional = true)
+
+        listOf(listOf(required, optional), listOf(optional, required)).forEach { descriptors ->
+            val generated = SchemaLoader.load(JSONObject(generator.generateSchema(descriptors))) as ObjectSchema
+            then(generated.requiredProperties).doesNotContain("value")
+            then(generated.definesProperty("value")).isTrue()
+        }
+    }
+
+    @Test
+    fun `should merge ignored state for duplicate path and type regardless of order`() {
+        val visible = FieldDescriptor("value", "visible", "STRING", ignored = false)
+        val ignored = FieldDescriptor("value", "ignored", "STRING", ignored = true)
+
+        listOf(listOf(visible, ignored), listOf(ignored, visible)).forEach { descriptors ->
+            val generated = SchemaLoader.load(JSONObject(generator.generateSchema(descriptors))) as ObjectSchema
+            then(generated.definesProperty("value")).isTrue()
+        }
+    }
+
+    @Test
+    fun `should deduplicate mixed descriptor types regardless of duplicate order`() {
+        val string = FieldDescriptor("value", "string", "STRING")
+        val duplicateString = FieldDescriptor("value", "duplicate string", "STRING")
+        val boolean = FieldDescriptor("value", "boolean", "BOOLEAN")
+
+        listOf(
+            listOf(string, duplicateString, boolean),
+            listOf(boolean, duplicateString, string)
+        ).forEach { descriptors ->
+            val generated = SchemaLoader.load(JSONObject(generator.generateSchema(descriptors))) as ObjectSchema
+            val valueSchema = generated.propertySchemas["value"] as CombinedSchema
+
+            then(valueSchema.subschemas).extracting("class").containsExactlyInAnyOrder(
+                BooleanSchema::class.java,
+                StringSchema::class.java
+            )
+            generated.validate(JSONObject("""{"value": "text"}"""))
+            generated.validate(JSONObject("""{"value": true}"""))
+        }
+    }
+
+    @Test
     fun should_handle_field_with_different_types() {
         givenDifferentFieldDescriptorsWithSamePathAndDifferentTypes()
 
