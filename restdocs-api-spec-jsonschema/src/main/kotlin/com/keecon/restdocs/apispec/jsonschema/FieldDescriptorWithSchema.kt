@@ -41,6 +41,12 @@ internal class FieldDescriptorWithSchema(
         if (this.path != other.path)
             throw IllegalArgumentException("path of fieldDescriptor is not equal to ${this.path}")
 
+        val mergedSchemaBuilders = if (type == other.type) {
+            schemaBuilders
+        } else {
+            schemaBuilders + toSchemaBuilder(jsonSchemaType(other.type), other)
+        }
+
         return FieldDescriptorWithSchema(
             path = this.path,
             description = this.description,
@@ -48,7 +54,7 @@ internal class FieldDescriptorWithSchema(
             optional = this.optional || other.optional, // optional if one is optional
             ignored = this.ignored && other.ignored, // ignored if both are ignored
             attributes = this.attributes,
-            schemaBuilders = this.schemaBuilders + toSchemaBuilder(jsonSchemaType(other.type), other)
+            schemaBuilders = mergedSchemaBuilders
         )
     }
 

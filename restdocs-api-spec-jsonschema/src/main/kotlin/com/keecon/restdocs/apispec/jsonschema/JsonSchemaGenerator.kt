@@ -34,7 +34,7 @@ class JsonSchemaGenerator {
             .map { FieldDescriptorWithSchema.fromFieldDescriptor(it) }
             .foldRight(listOf()) { fieldDescriptor, groups ->
                 groups.firstOrNull { it.equalsOnPathAndType(fieldDescriptor) }
-                    ?.let { groups } // omit the descriptor it is considered equal and can be omitted
+                    ?.let { groups - it + it.merge(fieldDescriptor) }
                     ?: groups.firstOrNull { it.path == fieldDescriptor.path }
                         ?.let { groups - it + it.merge(fieldDescriptor) } // merge the type with the descriptor with the same name
                     ?: (groups + fieldDescriptor) // it is new just add it

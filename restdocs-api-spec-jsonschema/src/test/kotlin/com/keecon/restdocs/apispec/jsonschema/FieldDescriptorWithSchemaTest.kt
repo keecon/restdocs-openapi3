@@ -2,6 +2,7 @@ package com.keecon.restdocs.apispec.jsonschema
 
 import com.keecon.restdocs.apispec.model.FieldDescriptor
 import org.assertj.core.api.BDDAssertions.then
+import org.everit.json.schema.StringSchema
 import org.junit.jupiter.api.Test
 
 class FieldDescriptorWithSchemaTest {
@@ -22,6 +23,15 @@ class FieldDescriptorWithSchemaTest {
         val merged = first.merge(descriptor(optional = true, ignored = false))
 
         then(merged.ignored).isFalse()
+    }
+
+    @Test
+    fun `should retain one schema builder when duplicate descriptors have the same type`() {
+        val first = FieldDescriptorWithSchema.fromFieldDescriptor(descriptor(ignored = false))
+
+        val merged = first.merge(descriptor(ignored = false))
+
+        then(merged.jsonSchemaType()).isInstanceOf(StringSchema::class.java)
     }
 
     private fun descriptor(optional: Boolean = false, ignored: Boolean) = FieldDescriptor(
