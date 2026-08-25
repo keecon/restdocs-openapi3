@@ -1,9 +1,14 @@
 package com.keecon.restdocs.apispec.gradle
 
+import com.jayway.jsonpath.JsonPath
+import org.assertj.core.api.BDDAssertions.then
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.writeText
 
 class PublishedConsumerTest {
 
@@ -108,6 +113,116 @@ class PublishedConsumerTest {
             .withProjectDir(projectDir.toFile())
             .withArguments("compileTestJava", "--stacktrace")
             .build()
+    }
+
+    @Test
+    fun `published plugin executes kotlin dsl configuration`(@TempDir projectDir: Path) {
+        val repository = requiredSystemProperty("consumerTestRepository")
+        val version = requiredSystemProperty("consumerTestVersion")
+        val repositoryUri = Path.of(repository).toUri()
+
+        projectDir.resolve("settings.gradle.kts").writeText(
+            """
+            pluginManagement {
+                repositories {
+                    maven {
+                        url = uri("$repositoryUri")
+                        metadataSources {
+                            mavenPom()
+                            artifact()
+                        }
+                    }
+                    gradlePluginPortal()
+                }
+            }
+            rootProject.name = "published-kotlin-consumer"
+            """.trimIndent()
+        )
+        projectDir.resolve("build.gradle.kts").writeText(
+            """
+            plugins {
+                java
+                id("com.keecon.restdocs-openapi3") version "$version"
+            }
+
+            repositories {
+                maven {
+                    url = uri("$repositoryUri")
+                    metadataSources {
+                        mavenPom()
+                        artifact()
+                    }
+                }
+                mavenCentral()
+            }
+
+            openapi3 {
+                server("https://api.example.com")
+                contact {
+                    name = "API Support"
+                    email = "support@example.com"
+                }
+                oauth2SecuritySchemeDefinition {
+                    flows = arrayOf("authorizationCode")
+                    tokenUrl = "https://example.com/token"
+                    authorizationUrl = "https://example.com/authorize"
+                }
+            }
+            """.trimIndent()
+        )
+        writeResourceSnippet(projectDir)
+
+        val result = GradleRunner.create()
+            .withProjectDir(projectDir.toFile())
+            .withArguments("openapi3", "--stacktrace")
+            .build()
+
+        then(result.task(":openapi3")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        with(JsonPath.parse(projectDir.resolve("build/api-spec/openapi3.json").toFile().readText())) {
+            then(read<String>("servers[0].url")).isEqualTo("https://api.example.com")
+            then(read<String>("info.contact.name")).isEqualTo("API Support")
+            then(read<String>("info.contact.email")).isEqualTo("support@example.com")
+            then(read<String>("components.securitySchemes.oauth2.type")).isEqualTo("oauth2")
+            then(read<String>("components.securitySchemes.oauth2.flows.authorizationCode.tokenUrl"))
+                .isEqualTo("https://example.com/token")
+            then(read<String>("components.securitySchemes.oauth2.flows.authorizationCode.authorizationUrl"))
+                .isEqualTo("https://example.com/authorize")
+        }
+    }
+
+    private fun writeResourceSnippet(projectDir: Path) {
+        val operationDirectory = projectDir.resolve("build/generated-snippets/some-operation")
+        operationDirectory.createDirectories()
+        operationDirectory.resolve("resource.json").writeText(
+            """
+            {
+              "operationId": "product-get",
+              "privateResource": false,
+              "deprecated": false,
+              "request": {
+                "path": "/products/{id}",
+                "method": "GET",
+                "securityRequirements": {
+                  "type": "OAUTH2",
+                  "requiredScopes": []
+                },
+                "headers": [],
+                "pathParameters": [],
+                "queryParameters": [],
+                "formParameters": [],
+                "requestParts": [],
+                "requestFields": []
+              },
+              "response": {
+                "status": 200,
+                "contentType": "application/json",
+                "headers": [],
+                "responseFields": [],
+                "example": "{}"
+              }
+            }
+            """.trimIndent()
+        )
     }
 
     private fun requiredSystemProperty(name: String): String =

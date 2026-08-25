@@ -78,6 +78,36 @@ class RestdocsOpenApi3TaskTest : RestdocsOpenApiTaskTestBase() {
     }
 
     @Test
+    fun `should include oauth2 configured with direct object`() {
+        buildFile.writeText(
+            "import com.keecon.restdocs.apispec.gradle.PluginOauth2Configuration\n\n" +
+                baseBuildFile() +
+                """
+                openapi3 {
+                    server = 'http://some.api'
+                    oauth2SecuritySchemeDefinition = new PluginOauth2Configuration().tap {
+                        flows = ['authorizationCode']
+                        tokenUrl = 'https://example.com/token'
+                        authorizationUrl = 'https://example.com/authorize'
+                    }
+                }
+                """.trimIndent()
+        )
+        givenResourceSnippet()
+
+        whenPluginExecuted()
+
+        thenApiSpecTaskSuccessful()
+        with(outputFileContext()) {
+            then(read<String>("components.securitySchemes.oauth2.type")).isEqualTo("oauth2")
+            then(read<String>("components.securitySchemes.oauth2.flows.authorizationCode.tokenUrl"))
+                .isEqualTo("https://example.com/token")
+            then(read<String>("components.securitySchemes.oauth2.flows.authorizationCode.authorizationUrl"))
+                .isEqualTo("https://example.com/authorize")
+        }
+    }
+
+    @Test
     fun `should reuse configuration cache`() {
         givenBuildFileWithOpenApiClosureWithSingleServerString()
         givenResourceSnippet()

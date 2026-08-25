@@ -4,6 +4,7 @@ import com.keecon.restdocs.apispec.model.Oauth2Configuration
 import groovy.lang.Closure
 import io.swagger.v3.oas.models.info.Contact
 import io.swagger.v3.oas.models.servers.Server
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
 import tools.jackson.dataformat.yaml.YAMLMapper
@@ -44,16 +45,23 @@ abstract class OpenApiBaseExtension(project: Project) : ApiSpecExtension(project
         set(value) = formatProperty.set(value)
 
     var oauth2SecuritySchemeDefinition: PluginOauth2Configuration? = null
+        set(value) {
+            field = value
+            oauth2ScopeDescriptionsFile.unset()
+            value?.scopeDescriptionsPropertiesFile?.let {
+                oauth2ScopeDescriptionsFile.set(project.layout.projectDirectory.file(it))
+            }
+            if (value == null) serializedOauth2ConfigurationProperty.unset()
+            else serializedOauth2ConfigurationProperty.set(objectMapper.writeValueAsString(value))
+        }
 
     fun setOauth2SecuritySchemeDefinition(closure: Closure<PluginOauth2Configuration>) {
         oauth2SecuritySchemeDefinition =
             project.configure(PluginOauth2Configuration(), closure) as PluginOauth2Configuration
-        oauth2SecuritySchemeDefinition?.scopeDescriptionsPropertiesFile?.let {
-            oauth2ScopeDescriptionsFile.set(project.layout.projectDirectory.file(it))
-        }
-        serializedOauth2ConfigurationProperty.set(
-            objectMapper.writeValueAsString(oauth2SecuritySchemeDefinition)
-        )
+    }
+
+    fun oauth2SecuritySchemeDefinition(action: Action<in PluginOauth2Configuration>) {
+        oauth2SecuritySchemeDefinition = PluginOauth2Configuration().also(action::execute)
     }
 
     init {
@@ -77,6 +85,15 @@ open class OpenApi3Extension(project: Project) : OpenApiBaseExtension(project) {
     val servers
         get() = _servers
 
+    fun server(serverUrl: String) = setServer(serverUrl)
+
+    fun server(serverAction: Closure<Server>) = setServer(serverAction)
+
+    fun server(action: Action<in Server>) {
+        _servers = listOf(Server().also(action::execute))
+        updateSerializedServers()
+    }
+
     fun setServer(serverAction: Closure<Server>) {
         _servers = listOf(project.configure(Server(), serverAction) as Server)
         updateSerializedServers()
@@ -92,8 +109,15 @@ open class OpenApi3Extension(project: Project) : OpenApiBaseExtension(project) {
         updateSerializedServers()
     }
 
-    fun setContact(contactAction: Closure<Contact>) {
-        val contact = project.configure(Contact(), contactAction) as Contact
+    fun setContact(contactAction: Closure<Contact>) = contact(contactAction)
+
+    fun contact(contactAction: Closure<Contact>) =
+        updateSerializedContact(project.configure(Contact(), contactAction) as Contact)
+
+    fun contact(action: Action<in Contact>) =
+        updateSerializedContact(Contact().also(action::execute))
+
+    private fun updateSerializedContact(contact: Contact) {
         serializedContactProperty.set(objectMapper.writeValueAsString(contact))
     }
 
