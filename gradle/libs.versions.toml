@@ -24,14 +24,17 @@ spring-dependency-management = { id = "io.spring.dependency-management", version
 spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
 spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
 spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
+spring-boot-starter-webflux-test = { module = "org.springframework.boot:spring-boot-starter-webflux-test" }
 spring-boot-restdocs = { module = "org.springframework.boot:spring-boot-restdocs" }
 spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 spring-boot-starter-hateoas = { module = "org.springframework.boot:spring-boot-starter-hateoas" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 spring-web = { module = "org.springframework:spring-web" }
 spring-webmvc = { module = "org.springframework:spring-webmvc" }
+spring-webflux = { module = "org.springframework:spring-webflux" }
 spring-restdocs-core = { module = "org.springframework.restdocs:spring-restdocs-core" }
 spring-restdocs-mockmvc = { module = "org.springframework.restdocs:spring-restdocs-mockmvc" }
+spring-restdocs-webtestclient = { module = "org.springframework.restdocs:spring-restdocs-webtestclient" }
 jackson2-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations" }
 jackson3-databind = { module = "tools.jackson.core:jackson-databind" }
 jackson3-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin" }

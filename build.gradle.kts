@@ -1,4 +1,5 @@
 import org.gradle.api.JavaVersion
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -31,6 +32,21 @@ val scmVer = scmVersion.version!!
 val jacocoToolVersion = libs.versions.jacoco.get()
 val junitPlatformLauncher = libs.junit.platform.launcher
 val springBootBom = libs.spring.boot.dependencies
+val consumerTestRepository = layout.buildDirectory.dir("consumer-test-repository")
+val cleanConsumerTestRepository = tasks.register<Delete>("cleanConsumerTestRepository") {
+    delete(consumerTestRepository)
+}
+val publishConsumerTestArtifacts = tasks.register("publishConsumerTestArtifacts") {
+    subprojects
+        .filterNot { it.isExampleProject() }
+        .forEach { subproject ->
+            dependsOn(
+                subproject.tasks.withType<PublishToMavenRepository>().matching {
+                    it.name.endsWith("ToConsumerTestRepository")
+                }
+            )
+        }
+}
 
 fun Project.isPluginProject() = this.name.contains("plugin")
 fun Project.isExampleProject() = this.name.contains("example")
@@ -48,6 +64,21 @@ allprojects {
     if (!isExampleProject()) {
         apply(plugin = "maven-publish")
         apply(plugin = "org.jlleitschuh.gradle.ktlint")
+
+        publishing {
+            repositories {
+                maven {
+                    name = "consumerTest"
+                    url = uri(consumerTestRepository.get().asFile)
+                }
+            }
+        }
+
+        tasks.withType<PublishToMavenRepository>().configureEach {
+            if (name.endsWith("ToConsumerTestRepository")) {
+                dependsOn(cleanConsumerTestRepository)
+            }
+        }
     }
 
     apply(plugin = "java")
@@ -93,6 +124,12 @@ allprojects {
         testLogging {
             events("passed", "skipped", "failed")
         }
+
+        if (isPluginProject()) {
+            dependsOn(publishConsumerTestArtifacts)
+            systemProperty("consumerTestRepository", consumerTestRepository.get().asFile)
+            systemProperty("consumerTestVersion", scmVer)
+        }
     }
 }
 
@@ -128,6 +165,7 @@ dependencies {
     jacocoAggregation(project(":restdocs-api-spec-gradle-plugin"))
     jacocoAggregation(project(":restdocs-api-spec-jsonschema"))
     jacocoAggregation(project(":restdocs-api-spec-mockmvc"))
+    jacocoAggregation(project(":restdocs-api-spec-webtestclient"))
     jacocoAggregation(project(":restdocs-api-spec-model"))
 }
 
