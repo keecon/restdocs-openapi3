@@ -12,12 +12,12 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Set up JDKs
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: |
@@ -29,6 +29,6 @@ jobs:
         run: ./gradlew -Dorg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64 clean check testCodeCoverageReport :restdocs-api-spec-example:openapi3 --no-daemon
 
       - name: Publish release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           generate_release_notes: true

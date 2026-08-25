@@ -16,15 +16,15 @@ And only support [OpenAPI 3.0.1] specs.
 | Artifact line | Spring Boot | Spring REST Docs | Java bytecode | Tested JDKs | Status |
 |---|---|---|---|---|---|
 | 1.x | 3.5.x | 3.0.x | 17 | 17, 21, 25 | Maintained |
-| 2.x | 4.1.x | 4.0.x | 17 | 17, 21, 25 | In development, not released |
+| 2.x | 4.1.x | 4.0.x | 17 | 17, 21, 25 | Released (2.0.0); 2.1.0 in development |
 | 0.x | 2.7.x | 2.0.x | — | — | Frozen, unsupported |
 
 The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin ID remains
 `com.keecon.restdocs-openapi3` across release lines.
 
-The 2.x line requires Java 17 or newer. CI verifies JDK 17, 21, and 25; JDK 26 is a non-blocking
-canary. Use 1.1.0 for Spring Boot 3.5 applications. The 2.0.0 coordinates below become available
-from JitPack after the `2.0.0` tag is published; no Plugin Portal publication is assumed.
+The 2.x line requires Java 17 or newer. CI verifies the LTS JDK releases 17, 21, and 25.
+Use 1.1.0 for Spring Boot 3.5 applications. Version 2.0.0 is available from JitPack; no Plugin
+Portal publication is assumed.
 
 ### Gradle
 
@@ -200,7 +200,7 @@ resultActions
 
 [build-badge]: https://github.com/keecon/restdocs-openapi3/actions/workflows/build.yml/badge.svg
 
-[codecov-badge]: https://codecov.io/gh/keecon/restdocs-openapi3/branch/main/graph/badge.svg?token=TRQZ6GOVK4
+[codecov-badge]: https://codecov.io/gh/keecon/restdocs-openapi3/branch/main/graph/badge.svg
 
 [sonarcloud-badge]: https://sonarcloud.io/api/project_badges/measure?project=keecon_restdocs-openapi3&metric=alert_status
 

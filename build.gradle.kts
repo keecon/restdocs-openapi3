@@ -56,7 +56,7 @@ allprojects {
 
     dependencies {
         if (!isExampleProject()) {
-            add("implementation", platform(springBootBom))
+            add("api", platform(springBootBom))
             add("testImplementation", platform(springBootBom))
         }
         add("testRuntimeOnly", junitPlatformLauncher)

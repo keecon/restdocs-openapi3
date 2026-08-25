@@ -3,7 +3,7 @@ dependencies {
     compileOnly(kotlin("reflect"))
 
     implementation(libs.spring.web)
-    implementation(libs.spring.restdocs.core)
+    api(libs.spring.restdocs.core)
     implementation(libs.bundles.jackson3)
     implementation(libs.jackson2.annotations)
     implementation(libs.guava)

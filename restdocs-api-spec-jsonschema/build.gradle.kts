@@ -1,9 +1,9 @@
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
 
-    implementation(project(":restdocs-api-spec-model"))
+    api(project(":restdocs-api-spec-model"))
+    api(libs.everit.json.schema)
 
-    implementation(libs.everit.json.schema)
     implementation(libs.bundles.jackson3)
 
     testImplementation(libs.jsonpath)
