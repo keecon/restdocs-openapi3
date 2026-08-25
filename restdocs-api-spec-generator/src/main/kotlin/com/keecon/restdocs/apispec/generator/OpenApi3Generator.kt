@@ -28,6 +28,7 @@ import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.Paths
 import io.swagger.v3.oas.models.examples.Example
 import io.swagger.v3.oas.models.headers.Header
+import io.swagger.v3.oas.models.info.Contact
 import io.swagger.v3.oas.models.info.Info
 import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.BooleanSchema
@@ -63,7 +64,8 @@ object OpenApi3Generator {
         description: String? = null,
         tagDescriptions: Map<String, String> = emptyMap(),
         version: String = "1.0.0",
-        oauth2SecuritySchemeDefinition: Oauth2Configuration? = null
+        oauth2SecuritySchemeDefinition: Oauth2Configuration? = null,
+        contact: Contact? = null
     ): OpenAPI {
         return OpenAPI().apply {
 
@@ -72,6 +74,7 @@ object OpenApi3Generator {
                 this.title = title
                 this.description = description
                 this.version = version
+                this.contact = contact
             }
             this.tags(
                 tagDescriptions.map {
@@ -99,6 +102,28 @@ object OpenApi3Generator {
         version: String = "1.0.0",
         oauth2SecuritySchemeDefinition: Oauth2Configuration? = null,
         format: String
+    ) = generateAndSerialize(
+        resources = resources,
+        servers = servers,
+        title = title,
+        description = description,
+        tagDescriptions = tagDescriptions,
+        version = version,
+        oauth2SecuritySchemeDefinition = oauth2SecuritySchemeDefinition,
+        format = format,
+        contact = null
+    )
+
+    fun generateAndSerialize(
+        resources: List<ResourceModel>,
+        servers: List<Server>,
+        title: String,
+        description: String?,
+        tagDescriptions: Map<String, String>,
+        version: String,
+        oauth2SecuritySchemeDefinition: Oauth2Configuration?,
+        format: String,
+        contact: Contact?
     ) =
         ApiSpecificationWriter.serialize(
             format,
@@ -109,7 +134,8 @@ object OpenApi3Generator {
                 description = description,
                 tagDescriptions = tagDescriptions,
                 version = version,
-                oauth2SecuritySchemeDefinition = oauth2SecuritySchemeDefinition
+                oauth2SecuritySchemeDefinition = oauth2SecuritySchemeDefinition,
+                contact = contact
             )
         )
 

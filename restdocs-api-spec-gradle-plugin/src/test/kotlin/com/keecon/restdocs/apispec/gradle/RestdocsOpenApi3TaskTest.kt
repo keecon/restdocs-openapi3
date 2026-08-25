@@ -63,6 +63,21 @@ class RestdocsOpenApi3TaskTest : RestdocsOpenApiTaskTestBase() {
     }
 
     @Test
+    fun `should include contact configured by groovy dsl`() {
+        givenBuildFileWithContact()
+        givenResourceSnippet()
+
+        whenPluginExecuted()
+
+        thenApiSpecTaskSuccessful()
+        with(outputFileContext()) {
+            then(read<String>("info.contact.name")).isEqualTo("API Support")
+            then(read<String>("info.contact.email")).isEqualTo("support@example.com")
+            then(read<String>("info.contact.url")).isEqualTo("https://example.com/support")
+        }
+    }
+
+    @Test
     fun `should reuse configuration cache`() {
         givenBuildFileWithOpenApiClosureWithSingleServerString()
         givenResourceSnippet()
@@ -136,6 +151,25 @@ class RestdocsOpenApi3TaskTest : RestdocsOpenApiTaskTestBase() {
         givenBuildFileWithOpenApiClosure(
             "server",
             """{ url = 'http://some.api' }"""
+        )
+    }
+
+    private fun givenBuildFileWithContact() {
+        buildFile.writeText(
+            baseBuildFile() + """
+            openapi3 {
+                server = 'http://some.api'
+                contact = {
+                    name = 'API Support'
+                    email = 'support@example.com'
+                    url = 'https://example.com/support'
+                }
+                title = '$title'
+                version = '$version'
+                format = '$format'
+                outputFileNamePrefix = '$outputFileNamePrefix'
+            }
+            """.trimIndent()
         )
     }
 

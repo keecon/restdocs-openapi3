@@ -2,6 +2,7 @@ package com.keecon.restdocs.apispec.gradle
 
 import com.keecon.restdocs.apispec.model.Oauth2Configuration
 import groovy.lang.Closure
+import io.swagger.v3.oas.models.info.Contact
 import io.swagger.v3.oas.models.servers.Server
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
@@ -71,6 +72,7 @@ open class OpenApi3Extension(project: Project) : OpenApiBaseExtension(project) {
 
     private var _servers: List<Server> = mutableListOf(Server().apply { url = "http://localhost" })
     internal val serializedServersProperty = project.objects.property(String::class.java)
+    internal val serializedContactProperty = project.objects.property(String::class.java)
 
     val servers
         get() = _servers
@@ -88,6 +90,11 @@ open class OpenApi3Extension(project: Project) : OpenApiBaseExtension(project) {
     fun setServers(serversActions: List<Closure<Server>>) {
         _servers = serversActions.map { project.configure(Server(), it) as Server }
         updateSerializedServers()
+    }
+
+    fun setContact(contactAction: Closure<Contact>) {
+        val contact = project.configure(Contact(), contactAction) as Contact
+        serializedContactProperty.set(objectMapper.writeValueAsString(contact))
     }
 
     private fun updateSerializedServers() {
