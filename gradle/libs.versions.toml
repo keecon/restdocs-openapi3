@@ -10,7 +10,7 @@ junit-pioneer = "0.3.3"
 swagger = "2.2.51"
 swagger-parser = "2.1.44"
 json-schema-validator = "2.2.14"
-everit-json-schema = "1.11.0"
+everit-json-schema = "1.14.6"
 spock = "2.4-groovy-4.0"
 
 [plugins]
