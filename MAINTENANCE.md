@@ -18,6 +18,8 @@ fix must then be forward-ported to `main` so the active line does not regress.
 For defects shared by both lines, validate the fix on `main` first and backport
 only the compatible parts to `v1.x`. The frozen `v0.x` line receives neither
 fixes nor dependency updates.
+Gradle major dependency updates are excluded from `v1.x` because Spring Boot
+and project major transitions happen on `main`.
 
 ## Releases and Java support
 
