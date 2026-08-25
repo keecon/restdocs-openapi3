@@ -600,6 +600,13 @@ git merge-base --is-ancestor 1.1.0 origin/v1.x
 git merge-base --is-ancestor 2.1.0 origin/main
 git show origin/main:MAINTENANCE.md | rg 'v0.x|v1.x|main'
 git show origin/v1.x:.github/workflows/build.yml | rg 'v1.x'
+test -z "$(git ls-remote --heads origin refs/heads/v2.x)"
+if git ls-remote --tags origin | rg -i 'refs/tags/.*(rc|candidate|preview|beta|alpha)'; then
+  printf '%s\n' 'Candidate release tag exists' >&2
+  exit 1
+fi
+curl -fsSL 'https://api.github.com/repos/keecon/restdocs-openapi3/pulls?state=open&base=v0&per_page=100' | ruby -rjson -e 'data = JSON.parse(STDIN.read); abort "GitHub API error: #{data}" if data.is_a?(Hash); abort "open PRs for base v0: #{data.length}" unless data.is_a?(Array) && data.empty?'
+curl -fsSL 'https://api.github.com/repos/keecon/restdocs-openapi3/pulls?state=open&base=1.x&per_page=100' | ruby -rjson -e 'data = JSON.parse(STDIN.read); abort "GitHub API error: #{data}" if data.is_a?(Hash); abort "open PRs for base 1.x: #{data.length}" unless data.is_a?(Array) && data.empty?'
 ```
 
 - [ ] **Step 2: Confirm old refs did not move**
@@ -610,6 +617,8 @@ test "$(git rev-parse origin/1.x)" = "1b0bc1af7f1ac7f4c0eac35356da1ad5d9e34dd7"
 ```
 
 Stop if either old ref moved.
+
+Immediately before Step 3, rerun Steps 1 and 2 from Step 1's fresh `git fetch origin --prune`; do not delete if any check fails.
 
 - [ ] **Step 3: Delete only obsolete remote refs**
 
