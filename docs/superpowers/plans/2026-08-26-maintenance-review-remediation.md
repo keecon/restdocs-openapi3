@@ -466,7 +466,7 @@ git commit -m "docs: align maintenance and release policy"
 
 - [ ] **Step 1: Compare 2.1.0 and candidate JVM APIs**
 
-Use `javap -p -s` for `ApiSpecTask`, `OpenApiBaseTask`, `OpenApi3Extension`, and `OpenApi3Generator`. Download the immutable JitPack 2.1.0 jars into a `mktemp -d` directory and compare them with candidate classes; do not create another Git worktree. Existing descriptors must remain and only designed additive methods may appear. Move the temporary directory to Trash after comparison.
+Use `javap -p -s` for `ApiSpecTask`, `OpenApiBaseTask`, `OpenApi3Extension`, and `OpenApi3Generator`. Download the immutable JitPack 2.1.0 jars into a `mktemp -d` directory and compare them with candidate classes; do not create another Git worktree. Existing public and protected descriptors and externally callable Kotlin `$default` bridges must remain, and only designed additive methods may appear. Use `javap -p` to observe and record private or synthetic compiler changes; compiler-generated private implementation members are not compatibility contracts or blockers. Move the temporary directory to Trash after comparison.
 
 - [ ] **Step 2: Run the exact candidate on every LTS JDK**
 
