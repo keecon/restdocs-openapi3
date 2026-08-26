@@ -41,7 +41,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: matrix.java == '17'
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           files: ./build/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml
