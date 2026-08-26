@@ -8,7 +8,7 @@ import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junitpioneer.jupiter.TempDirectory
+import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -36,7 +36,7 @@ abstract class ApiSpecTaskTest {
     abstract val taskName: String
 
     @BeforeEach
-    fun init(@TempDirectory.TempDir tempDir: Path) {
+    fun init(@TempDir tempDir: Path) {
         with(tempDir) {
             testProjectDir = tempDir
             buildFile = resolve("build.gradle").toFile()
