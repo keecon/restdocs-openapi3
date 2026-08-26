@@ -15,8 +15,8 @@ And only support [OpenAPI 3.0.1] specs.
 
 | Artifact line | Spring Boot | Spring REST Docs | Java bytecode | Tested JDKs | Status |
 |---|---|---|---|---|---|
+| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | Active (latest release: 2.1.0) |
 | [1.x (`v1.x`)](https://github.com/keecon/restdocs-openapi3/tree/v1.x) | 3.5.x | 3.0.x | 17 | 17, 21, 25 | Maintained |
-| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | Active (2.1.0) |
 | [0.x (`v0.x`)](https://github.com/keecon/restdocs-openapi3/tree/v0.x) | 2.7.x | 2.0.x | — | — | Frozen, unsupported |
 
 The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin ID remains
@@ -71,7 +71,17 @@ See [MAINTENANCE.md](MAINTENANCE.md) for the branch lifecycle, backport, and rel
     }
     ```
 
-The existing assignment syntax remains supported. Groovy builds can also use method syntax:
+#### Current `main` DSL (unreleased)
+
+On the current `main` branch, the `openapi3` task resolves its default input and output directories
+from the project's Gradle `layout.buildDirectory`. With the standard `build` directory, it reads
+snippets from `build/generated-snippets` and writes `build/api-spec/openapi3.json` or
+`build/api-spec/openapi3.yaml`, depending on `format`.
+
+This build-directory-aware behavior and the additive method and Gradle `Action` syntax below are
+not part of the 2.1.0 release. With 2.1.0, use the assignment syntax shown above.
+
+Groovy builds can use method syntax:
 
 ```groovy
 openapi3 {
@@ -94,6 +104,11 @@ extensions.configure<OpenApi3Extension>("openapi3") {
     contact {
         name = "API Support"
         email = "support@example.com"
+    }
+    oauth2SecuritySchemeDefinition {
+        flows = arrayOf("authorizationCode")
+        tokenUrl = "https://example.com/token"
+        authorizationUrl = "https://example.com/authorize"
     }
 }
 ```
