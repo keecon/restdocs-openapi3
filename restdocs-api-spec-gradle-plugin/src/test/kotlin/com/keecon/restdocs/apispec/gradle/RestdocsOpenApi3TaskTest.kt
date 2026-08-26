@@ -3,11 +3,8 @@ package com.keecon.restdocs.apispec.gradle
 import com.jayway.jsonpath.JsonPath
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.junitpioneer.jupiter.TempDirectory
 import java.lang.Boolean.FALSE
 
-@ExtendWith(TempDirectory::class)
 class RestdocsOpenApi3TaskTest : RestdocsOpenApiTaskTestBase() {
 
     override val taskName = "openapi3"
