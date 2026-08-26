@@ -4,7 +4,7 @@
 
 **Goal:** Review and integrate every open Dependabot pull request targeting `main` and `v1.x` without weakening the repository's Java, Spring Boot, ABI, or CI guarantees.
 
-**Architecture:** Preserve each Dependabot commit by merging its PR ref into the target branch. Apply dependency updates before workflow updates, run focused tests after each merge, then run the branch's complete verification suite before pushing. Treat already-applied updates as no-op merges so the corresponding PR is closed without changing resolved versions.
+**Architecture:** Preserve each compatible Dependabot commit by merging its PR ref into the target branch. Reject updates that break compilation or generated-output compatibility, replace obsolete test-only dependencies with framework-standard APIs, and run the branch's complete verification suite before pushing. Treat already-applied updates as no-op merges so the corresponding PR is closed without changing resolved versions.
 
 **Tech Stack:** Gradle 9.7.x, Kotlin 2.4.10, Java toolchain 17, Temurin JDK 17/21/25, Spring Boot 4.1 on `main`, Spring Boot 3.5 on `v1.x`, GitHub Actions, Dependabot.
 
@@ -14,8 +14,8 @@
 
 - Keep 2.x on `main` with Spring Boot 4.1 and 1.x on `v1.x` with Spring Boot 3.5.
 - Produce Java 17 bytecode and test only LTS JDK 17, 21, and 25.
-- Do not introduce new dependencies, source changes, API changes, or unrelated refactors.
-- Preserve every Dependabot commit and use one merge commit per PR.
+- Do not introduce new dependencies, production API changes, or unrelated refactors. Test-source migrations are allowed when they remove an obsolete test-only dependency.
+- Preserve every compatible Dependabot commit and use one merge commit per merged PR.
 - Verify Gradle wrapper checksums against the official distribution checksum.
 - Do not push a target branch until its focused and full local verification passes.
 - Stop at the failing PR if a merge conflict, compatibility regression, or test failure occurs.
@@ -61,12 +61,16 @@ Expected: dependency PRs modify only `gradle/libs.versions.toml`, wrapper PR #21
 
 - [ ] **Step 3: Review upstream compatibility and CI evidence**
 
-Confirm that Gradle 9.7.1 is a recommended patch, Spring Boot 4.1.1 and Guava 33.7.1 are patch releases, the action majors support GitHub-hosted runners, and JUnit Pioneer `TempDirectory` plus Everit public classes used by this repository remain available. Record any unsupported runner or public API change as a blocker.
+Confirm that Gradle 9.7.1 is a recommended patch, Spring Boot 4.1.1 and Guava 33.7.1 are patch releases, and the action majors support GitHub-hosted runners. Verify that test-only extension updates still compile and that runtime library updates preserve generated output; replace obsolete test extensions with framework-standard APIs and record any output or public API change as a blocker.
 
 ### Task 2: Integrate `main` dependency updates
 
 **Files:**
+- Modify: `.github/dependabot.yml`
 - Modify: `gradle/libs.versions.toml`
+- Modify: `restdocs-api-spec/src/test/kotlin/com/keecon/restdocs/apispec/ResourceSnippetTest.kt`
+- Modify: `restdocs-api-spec-gradle-plugin/src/test/kotlin/com/keecon/restdocs/apispec/gradle/ApiSpecTaskTest.kt`
+- Modify: `restdocs-api-spec-gradle-plugin/src/test/kotlin/com/keecon/restdocs/apispec/gradle/RestdocsOpenApi3TaskTest.kt`
 - Modify: `gradle/wrapper/gradle-wrapper.properties`
 - Modify: `gradlew.bat`
 
@@ -137,14 +141,14 @@ test "$(git rev-parse main)" = "$(git rev-parse origin/main)"
 
 Expected: `origin/main` contains the four PR commits and the branch workflow starts.
 
-### Task 4: Integrate `v1.x` library and plugin updates
+### Task 4: Integrate compatible `v1.x` updates and resolve incompatible updates
 
 **Files:**
 - Modify: `gradle/libs.versions.toml`
 
 **Interfaces:**
 - Consumes: PRs #224, #225, #229, #232, and #233.
-- Produces: `v1.x` on Axion 1.21.3, Guava 33.7.1-jre, Swagger Parser 2.1.47, Everit JSON Schema 1.14.6, and JUnit Pioneer 0.9.2.
+- Produces: `v1.x` on Axion 1.21.3, Guava 33.7.1-jre, and Swagger Parser 2.1.47; keeps Everit JSON Schema 1.11.0 for output compatibility; removes JUnit Pioneer in favor of JUnit Jupiter `@TempDir`.
 
 - [ ] **Step 1: Merge the low-risk Axion, Guava, and Swagger Parser updates**
 
@@ -158,23 +162,22 @@ JAVA_HOME=/Users/iwaltgen/.local/share/mise/installs/java/temurin-17.0.18+8 ./gr
 
 Expected: release version calculation, core tests, and parser-backed generator tests pass.
 
-- [ ] **Step 2: Merge and verify Everit JSON Schema 1.14.6**
+- [ ] **Step 2: Reject Everit JSON Schema 1.14.6 after output compatibility verification**
 
 ```bash
-git merge --no-ff origin/pr/224 -m "Merge pull request #224 from keecon/dependabot/gradle/v1.x/com.github.erosb-everit-json-schema-1.14.6"
-JAVA_HOME=/Users/iwaltgen/.local/share/mise/installs/java/temurin-17.0.18+8 ./gradlew :restdocs-api-spec-jsonschema:test :restdocs-api-spec-gradle-plugin:test --no-daemon
+# Run in a disposable worktree with origin/pr/224 checked out.
+JAVA_HOME=/Users/iwaltgen/.local/share/mise/installs/java/temurin-17.0.18+8 ./gradlew :restdocs-api-spec-jsonschema:test :restdocs-api-spec-generator:test --rerun-tasks --no-daemon
 ```
 
-Expected: schema behavior and the published consumer's Everit-facing public API compile and pass.
+Expected: the PR experiment fails because generated enum ordering changes. Keep 1.11.0, close PR #224 without merging, and ignore only version 1.14.6 in the `v1.x` Dependabot configuration. Do not weaken the output-order assertion.
 
-- [ ] **Step 3: Merge and verify JUnit Pioneer 0.9.2**
+- [ ] **Step 3: Remove JUnit Pioneer and use JUnit Jupiter `@TempDir`**
 
 ```bash
-git merge --no-ff origin/pr/232 -m "Merge pull request #232 from keecon/dependabot/gradle/v1.x/org.junit-pioneer-junit-pioneer-0.9.2"
 JAVA_HOME=/Users/iwaltgen/.local/share/mise/installs/java/temurin-17.0.18+8 ./gradlew test --rerun-tasks --no-daemon
 ```
 
-Expected: all `TempDirectory`-based tests compile and pass.
+Expected: all temporary-directory tests use `org.junit.jupiter.api.io.TempDir`, the JUnit Pioneer catalog entries are absent, and PR #232 is closed without merging.
 
 ### Task 5: Integrate `v1.x` GitHub Actions updates
 
@@ -211,7 +214,7 @@ Expected: JDK 17/21/25, `JAVA_HOME_17_X64`, Codecov inputs, branch filters, and 
 
 **Interfaces:**
 - Consumes: integrated `v1.x` from Tasks 4 and 5.
-- Produces: verified `origin/v1.x` with all nine PR commits reachable.
+- Produces: verified `origin/v1.x` with the seven compatible PR commits reachable and incompatible PRs #224 and #232 closed without merging.
 
 - [ ] **Step 1: Run complete maintenance-line verification**
 
@@ -229,8 +232,8 @@ git fetch origin
 test "$(git rev-parse v1.x)" = "$(git rev-parse origin/v1.x)"
 ```
 
-Expected: all nine PR commits are reachable from `origin/v1.x`; GitHub closes the PRs and starts JDK 17/21/25 checks.
+Expected: the seven compatible PR commits are reachable from `origin/v1.x`; GitHub closes the integrated PRs and starts JDK 17/21/25 checks.
 
 - [ ] **Step 3: Confirm all PRs and branch checks**
 
-Query the GitHub Pull Requests and Checks APIs until every PR is closed or merged and every target-branch JDK check completes successfully. Report any delayed or failed Codecov upload separately because it is external to the local build result.
+Query the GitHub Pull Requests and Checks APIs until compatible PRs are merged, PRs #224 and #232 are closed without merging, and every target-branch JDK check completes successfully. Report any delayed or failed Codecov upload separately because it is external to the local build result.
