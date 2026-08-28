@@ -365,6 +365,120 @@ class JsonSchemaGeneratorTest {
     }
 
     @Test
+    fun `should preserve scalar enum value order`() {
+        val generatedSchema = generator.generateSchema(
+            listOf(
+                FieldDescriptor(
+                    "stringEnum",
+                    "",
+                    "string",
+                    attributes = Attributes(enumValues = listOf("THIRD", "FIRST", "SECOND"))
+                ),
+                FieldDescriptor(
+                    "integerEnum",
+                    "",
+                    "integer",
+                    attributes = Attributes(enumValues = listOf(3, 1, 2))
+                ),
+                FieldDescriptor(
+                    "numberEnum",
+                    "",
+                    "number",
+                    attributes = Attributes(enumValues = listOf(0.3, 0.1, 0.2))
+                ),
+                FieldDescriptor(
+                    "booleanEnum",
+                    "",
+                    "boolean",
+                    attributes = Attributes(enumValues = listOf(true, false))
+                )
+            )
+        )
+
+        then(JsonPath.read<List<String>>(generatedSchema, "$.properties.stringEnum.enum"))
+            .containsExactly("THIRD", "FIRST", "SECOND")
+        then(JsonPath.read<List<Int>>(generatedSchema, "$.properties.integerEnum.enum"))
+            .containsExactly(3, 1, 2)
+        then(JsonPath.read<List<Double>>(generatedSchema, "$.properties.numberEnum.enum"))
+            .containsExactly(0.3, 0.1, 0.2)
+        then(JsonPath.read<List<Boolean>>(generatedSchema, "$.properties.booleanEnum.enum"))
+            .containsExactly(true, false)
+    }
+
+    @Test
+    fun `should preserve enum value order across generated schema shapes`() {
+        val enumValues = listOf("THIRD", "FIRST", "SECOND")
+        val generatedSchema = generator.generateSchema(
+            listOf(
+                FieldDescriptor("flat", "", "string", attributes = Attributes(enumValues = enumValues)),
+                FieldDescriptor("nested.value", "", "string", attributes = Attributes(enumValues = enumValues)),
+                FieldDescriptor(
+                    "values",
+                    "",
+                    "array",
+                    attributes = Attributes(
+                        items = TypeDescriptor(
+                            "string",
+                            attributes = Attributes(enumValues = enumValues)
+                        )
+                    )
+                )
+            )
+        )
+
+        then(JsonPath.read<List<String>>(generatedSchema, "$.properties.flat.enum"))
+            .containsExactly("THIRD", "FIRST", "SECOND")
+        then(JsonPath.read<List<String>>(generatedSchema, "$.properties.nested.properties.value.enum"))
+            .containsExactly("THIRD", "FIRST", "SECOND")
+        then(JsonPath.read<List<String>>(generatedSchema, "$.properties.values.items.enum"))
+            .containsExactly("THIRD", "FIRST", "SECOND")
+
+        val schema = SchemaLoader.load(JSONObject(generatedSchema))
+        schema.validate(
+            JSONObject(
+                """{
+                    "flat": "THIRD",
+                    "nested": { "value": "FIRST" },
+                    "values": ["SECOND"]
+                }""".trimIndent()
+            )
+        )
+        thenThrownBy {
+            schema.validate(
+                JSONObject(
+                    """{
+                        "flat": "UNKNOWN",
+                        "nested": { "value": "FIRST" },
+                        "values": ["SECOND"]
+                    }""".trimIndent()
+                )
+            )
+        }.isInstanceOf(ValidationException::class.java)
+    }
+
+    @Test
+    fun `should preserve enum order inside non synthetic combined schema`() {
+        val generatedSchema = generator.generateSchema(
+            listOf(
+                FieldDescriptor(
+                    "mixed",
+                    "",
+                    "string",
+                    attributes = Attributes(enumValues = listOf("THIRD", "FIRST", "SECOND"))
+                ),
+                FieldDescriptor("mixed", "", "boolean")
+            )
+        )
+
+        val branches = JsonPath.read<List<Map<String, Any>>>(generatedSchema, "$.properties.mixed.oneOf")
+        val enumBranches = branches.filter { "enum" in it }
+
+        then(enumBranches).hasSize(1)
+        then(enumBranches.single()["enum"] as List<*>)
+            .containsExactly("THIRD", "FIRST", "SECOND")
+    }
+
+    @Test
     fun should_generate_schema_for_top_level_array_with_size_constraint() {
         givenFieldDescriptorWithTopLevelArrayWithSizeConstraint()
 
