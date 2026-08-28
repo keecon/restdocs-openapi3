@@ -15,7 +15,7 @@ And only support [OpenAPI 3.0.1] specs.
 
 | Artifact line | Spring Boot | Spring REST Docs | Java bytecode | Tested JDKs | Status |
 |---|---|---|---|---|---|
-| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | Active (latest release: 2.1.1) |
+| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | Active (latest release: 2.1.2) |
 | [1.x (`v1.x`)](https://github.com/keecon/restdocs-openapi3/tree/v1.x) | 3.5.x | 3.0.x | 17 | 17, 21, 25 | Maintained |
 | [0.x (`v0.x`)](https://github.com/keecon/restdocs-openapi3/tree/v0.x) | 2.7.x | 2.0.x | — | — | Frozen, unsupported |
 
@@ -23,7 +23,7 @@ The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin 
 `com.keecon.restdocs-openapi3` across release lines.
 
 The 2.x line requires Java 17 or newer. CI verifies the LTS JDK releases 17, 21, and 25.
-Use 1.1.1 for Spring Boot 3.5 applications. Version 2.1.1 is available from JitPack; no Plugin
+Use 1.1.2 for Spring Boot 3.5 applications. Version 2.1.2 is available from JitPack; no Plugin
 Portal publication is assumed.
 
 See [MAINTENANCE.md](MAINTENANCE.md) for the branch lifecycle, backport, and release policy.
@@ -40,7 +40,7 @@ See [MAINTENANCE.md](MAINTENANCE.md) for the branch lifecycle, backport, and rel
       }
       dependencies {
         // ...
-        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.1.1'
+        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.1.2'
       }
     }
 
@@ -57,8 +57,8 @@ See [MAINTENANCE.md](MAINTENANCE.md) for the branch lifecycle, backport, and rel
 
     dependencies {
       //..
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:2.1.1'
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:2.1.1'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:2.1.2'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:2.1.2'
     }
 
     openapi3 {
@@ -142,7 +142,7 @@ The WebTestClient integration is available from the `restdocs-api-spec-webtestcl
 
 ```groovy
 dependencies {
-  testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-webtestclient:2.1.1'
+  testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-webtestclient:2.1.2'
 }
 ```
 
