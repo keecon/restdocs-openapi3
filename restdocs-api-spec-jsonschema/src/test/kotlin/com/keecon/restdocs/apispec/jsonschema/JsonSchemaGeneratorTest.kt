@@ -479,6 +479,15 @@ class JsonSchemaGeneratorTest {
     }
 
     @Test
+    fun `should format array schema without item schema`() {
+        val formattedSchema = EveritSchemaJsonFormatter().format(ArraySchema.builder().build())
+        val schemaJson = JSONObject(formattedSchema)
+
+        then(schemaJson.has("items")).isFalse()
+        SchemaLoader.load(schemaJson).validate(JSONArray("[1, \"value\", true]"))
+    }
+
+    @Test
     fun should_generate_schema_for_top_level_array_with_size_constraint() {
         givenFieldDescriptorWithTopLevelArrayWithSizeConstraint()
 
