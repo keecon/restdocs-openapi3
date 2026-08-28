@@ -4,7 +4,7 @@ buildscript {
 	}
 	dependencies {
 		// The example consumes the latest released plugin; the current source plugin is verified by TestKit.
-		classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.1.0'
+		classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.1.1'
 	}
 }
 
