@@ -40,11 +40,6 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
-      # Everit 1.14.6 changes generated enum ordering. Keep the v1.x output contract stable.
-      - dependency-name: "com.github.erosb:everit-json-schema"
-        versions:
-          - "1.14.6"
-
   - package-ecosystem: "github-actions"
     directory: "/"
     target-branch: "v1.x"

@@ -9,7 +9,7 @@ spring-dependency-management = "1.1.7"
 swagger = "2.2.54"
 swagger-parser = "2.1.47"
 json-schema-validator = "2.2.14"
-everit-json-schema = "1.11.0"
+everit-json-schema = "1.14.6"
 spock = "2.4-groovy-5.0"
 
 [plugins]

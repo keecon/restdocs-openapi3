@@ -6,14 +6,12 @@ import com.keecon.restdocs.apispec.model.FieldDescriptor
 import org.everit.json.schema.ArraySchema
 import org.everit.json.schema.ObjectSchema
 import org.everit.json.schema.Schema
-import org.everit.json.schema.internal.JSONPrinter
-import java.io.StringWriter
 import java.util.Collections.emptyList
 import java.util.function.Predicate
-import tools.jackson.databind.SerializationFeature
-import tools.jackson.module.kotlin.jacksonMapperBuilder
 
 class JsonSchemaGenerator {
+
+    private val schemaFormatter = EveritSchemaJsonFormatter()
 
     fun generateSchema(fieldDescriptors: List<FieldDescriptor>, title: String? = null): String {
         val jsonFieldPaths = reduceFieldDescriptors(fieldDescriptors)
@@ -21,7 +19,7 @@ class JsonSchemaGenerator {
 
         val schema = traverse(emptyList(), jsonFieldPaths, ObjectSchema.builder().title(title) as ObjectSchema.Builder)
 
-        return toFormattedString(unWrapRootArray(jsonFieldPaths, schema))
+        return schemaFormatter.format(unWrapRootArray(jsonFieldPaths, schema))
     }
 
     /**
@@ -58,14 +56,6 @@ class JsonSchemaGenerator {
             }
         }
         return schema
-    }
-
-    private fun toFormattedString(schema: Schema): String {
-        val objectMapper = jacksonMapperBuilder().enable(SerializationFeature.INDENT_OUTPUT).build()
-        return StringWriter().use {
-            schema.describeTo(JSONPrinter(it))
-            objectMapper.writeValueAsString(objectMapper.readTree(it.toString()))
-        }
     }
 
     private fun traverse(
