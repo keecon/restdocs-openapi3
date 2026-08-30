@@ -20,7 +20,6 @@ dependencies {
     implementation(project(":restdocs-api-spec-model"))
     implementation(project(":restdocs-api-spec-generator"))
 
-    implementation(libs.kotlin.gradle.plugin)
     implementation(libs.swagger.core)
     implementation(libs.bundles.jackson3)
     implementation(libs.jackson3.dataformat.yaml)
