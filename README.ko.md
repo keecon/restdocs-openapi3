@@ -17,7 +17,7 @@
 
 | 아티팩트 버전대 | Spring Boot | Spring REST Docs | Java 바이트코드 | 테스트 JDK | 상태 |
 |---|---|---|---|---|---|
-| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | 활성(최신 릴리스: 2.1.2) |
+| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | 활성(최신 릴리스: 2.1.3) |
 | [1.x (`v1.x`)](https://github.com/keecon/restdocs-openapi3/tree/v1.x) | 3.5.x | 3.0.x | 17 | 17, 21, 25 | 유지보수 중 |
 | [0.x (`v0.x`)](https://github.com/keecon/restdocs-openapi3/tree/v0.x) | 2.7.x | 2.0.x | — | — | 동결, 지원 종료 |
 
@@ -25,7 +25,7 @@
 `com.keecon.restdocs-openapi3`으로 유지됩니다.
 
 2.x 버전대는 Java 17 이상이 필요합니다. CI에서는 LTS JDK 릴리스 17, 21, 25를 검증합니다.
-Spring Boot 3.5 애플리케이션에서는 1.1.2를 사용하세요. 버전 2.1.2는 JitPack에서 제공되며
+Spring Boot 3.5 애플리케이션에서는 1.1.2를 사용하세요. 버전 2.1.3은 JitPack에서 제공되며
 Plugin Portal 배포는 전제하지 않습니다.
 
 브랜치 수명 주기, 백포트 및 릴리스 정책은 [MAINTENANCE.md](MAINTENANCE.md)를 참고하세요.
@@ -42,7 +42,7 @@ Plugin Portal 배포는 전제하지 않습니다.
       }
       dependencies {
         // ...
-        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.1.2'
+        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.1.3'
       }
     }
 
@@ -59,8 +59,8 @@ Plugin Portal 배포는 전제하지 않습니다.
 
     dependencies {
       //..
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:2.1.2'
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:2.1.2'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:2.1.3'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:2.1.3'
     }
 
     openapi3 {
@@ -146,7 +146,7 @@ WebTestClient 통합은 `restdocs-api-spec-webtestclient` 모듈에서 제공합
 
 ```groovy
 dependencies {
-  testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-webtestclient:2.1.2'
+  testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-webtestclient:2.1.3'
 }
 ```
 
