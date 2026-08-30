@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
+import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.writeText
 
 class PublishedConsumerTest {
@@ -18,9 +19,10 @@ class PublishedConsumerTest {
         val version = requiredSystemProperty("consumerTestVersion")
         val pluginPom = Path.of(repository)
             .resolve(
-                "com/keecon/restdocs-api-spec-gradle-plugin/$version/" +
-                    "restdocs-api-spec-gradle-plugin-$version.pom"
+                "com/keecon/restdocs-api-spec-gradle-plugin/$version"
             )
+            .listDirectoryEntries("restdocs-api-spec-gradle-plugin-*.pom")
+            .single()
 
         then(pluginPom).exists()
         then(pluginPom.toFile().readText()).doesNotContain(
