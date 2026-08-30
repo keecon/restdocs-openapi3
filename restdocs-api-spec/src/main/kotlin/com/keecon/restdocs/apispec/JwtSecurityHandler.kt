@@ -28,8 +28,8 @@ internal class JwtSecurityHandler : SecurityRequirementsExtractor {
 
     private fun getJWT(operation: Operation) = operation.request.headers
         .getOrEmpty(HttpHeaders.AUTHORIZATION)
-        .filter { it.startsWith("Bearer ") }
-        .map { it.replace("Bearer ", "") }
+        .filter { it.regionMatches(0, "Bearer ", 0, "Bearer ".length, ignoreCase = true) }
+        .map { it.substring("Bearer ".length) }
 
     private fun isJWT(jwt: String): Boolean {
         val jwtParts = jwt.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }

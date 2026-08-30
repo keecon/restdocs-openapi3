@@ -87,8 +87,22 @@ abstract class ApiSpecTask : DefaultTask() {
         specificationFile(outputFilenamePrefix).writeText(content)
     }
 
-    private fun specificationFile(outputFilenamePrefix: String) =
-        File(outputDirectoryFile, "$outputFilenamePrefix.${outputFileExtension()}")
+    private fun specificationFile(outputFilenamePrefix: String): File {
+        require(
+            outputFilenamePrefix.isNotBlank() &&
+                outputFilenamePrefix != "." &&
+                outputFilenamePrefix != ".." &&
+                '/' !in outputFilenamePrefix &&
+                '\\' !in outputFilenamePrefix
+        ) { "outputFileNamePrefix must be a simple file name" }
+
+        val outputDirectory = outputDirectoryFile.canonicalFile
+        val outputFile = File(outputDirectory, "$outputFilenamePrefix.${outputFileExtension()}").canonicalFile
+        require(outputFile.parentFile == outputDirectory) {
+            "Specification file must stay inside outputDirectory"
+        }
+        return outputFile
+    }
 
     private fun removeStaleSpecificationFiles() {
         val expectedFiles = specificationFiles.toSet()

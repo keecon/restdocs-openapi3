@@ -51,7 +51,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import tools.jackson.module.kotlin.jacksonObjectMapper
-import tools.jackson.module.kotlin.readValue
 
 object OpenApi3Generator {
 
@@ -444,11 +443,7 @@ object OpenApi3Generator {
                             if (!contentType.contains("json")) {
                                 value(it.value)
                             } else {
-                                if (it.value.startsWith("[")) {
-                                    value(objectMapper.readValue<List<Any>>(it.value))
-                                } else {
-                                    value(objectMapper.readValue<Map<Any, Any>>(it.value))
-                                }
+                                value(objectMapper.readValue(it.value, Any::class.java))
                             }
                         }
                     }

@@ -84,6 +84,19 @@ class OpenApi3GeneratorTest {
     }
 
     @Test
+    fun `should fail for OAuth2 security requirement without configuration`() {
+        givenGetProductResourceModelWithOAuth2SecurityRequirement()
+
+        val exception = assertThrows<IllegalArgumentException> {
+            whenOpenApiObjectGeneratedWithoutOAuth2()
+        }
+
+        then(exception).hasMessage(
+            "OAuth2 security requirements require oauth2SecuritySchemeDefinition with at least one flow"
+        )
+    }
+
+    @Test
     fun `should convert single delete resource model to openapi`() {
         givenDeleteProductResourceModel()
 
@@ -180,6 +193,46 @@ class OpenApi3GeneratorTest {
         ).isNotNull
 
         thenOpenApiSpecIsValid()
+    }
+
+    @Test
+    fun `should include JSON array example with leading whitespace`() {
+        givenGetProductResourceModelWithResponseExample("  [1, 2]")
+
+        whenOpenApiObjectGenerated()
+
+        then(
+            openApiJsonPathContext.read<List<Int>>(
+                "paths./products/{id}.get.responses.200.content.application/json.examples.test.value"
+            )
+        ).containsExactly(1, 2)
+    }
+
+    @Test
+    fun `should include JSON scalar examples`() {
+        mapOf(
+            "\"text\"" to "text",
+            "1" to 1,
+            "true" to true
+        ).forEach { (json, expected) ->
+            givenGetProductResourceModelWithResponseExample(json)
+
+            whenOpenApiObjectGenerated()
+
+            then(
+                openApiJsonPathContext.read<Any>(
+                    "paths./products/{id}.get.responses.200.content.application/json.examples.test.value"
+                )
+            ).isEqualTo(expected)
+        }
+
+        givenGetProductResourceModelWithResponseExample("null")
+        whenOpenApiObjectGenerated()
+        then(
+            openApiJsonPathContext.read<Map<String, Any?>>(
+                "paths./products/{id}.get.responses.200.content.application/json.examples.test"
+            )
+        ).containsEntry("value", null)
     }
 
     @Test
@@ -1130,6 +1183,13 @@ class OpenApi3GeneratorTest {
         )
     }
 
+    private fun givenGetProductResourceModelWithResponseExample(example: String) {
+        givenGetProductResourceModel()
+        resources = resources.map { resource ->
+            resource.copy(response = resource.response.copy(example = example))
+        }
+    }
+
     private fun givenGetProductResourceModelWithBasicSecurityRequirement() {
         resources = listOf(
             ResourceModel(
@@ -1170,6 +1230,21 @@ class OpenApi3GeneratorTest {
                 deprecated = false,
                 tags = setOf("tag1", "tag2"),
                 request = getProductRequest(::getJWTSecurityRequirement),
+                response = getProductResponse()
+            )
+        )
+    }
+
+    private fun givenGetProductResourceModelWithOAuth2SecurityRequirement() {
+        resources = listOf(
+            ResourceModel(
+                operationId = "test",
+                summary = "summary",
+                description = "description",
+                privateResource = false,
+                deprecated = false,
+                tags = setOf("tag1", "tag2"),
+                request = getProductRequest(::getOAuth2SecurityRequirement),
                 response = getProductResponse()
             )
         )

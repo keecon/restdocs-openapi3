@@ -22,6 +22,15 @@ class SecurityRequirementsHandlerTest {
     }
 
     @Test
+    fun `should return basic security requirements for mixed case scheme`() {
+        givenRequestWithBasicAuthHeader("bAsIc")
+
+        whenSecurityRequirementsExtracted()
+
+        then(securityRequirements).isEqualTo(Basic)
+    }
+
+    @Test
     fun `should return oauth security requirements`() {
         givenRequestWithJwtInAuthorizationHeader()
 
@@ -43,9 +52,9 @@ class SecurityRequirementsHandlerTest {
         securityRequirements = securityRequirementsHandler.extractSecurityRequirements(operation)
     }
 
-    private fun givenRequestWithBasicAuthHeader() {
+    private fun givenRequestWithBasicAuthHeader(scheme: String = "Basic") {
         operation = OperationBuilder().request("/some")
-            .header(HttpHeaders.AUTHORIZATION, "Basic dGVzdDpwd2QK")
+            .header(HttpHeaders.AUTHORIZATION, "$scheme dGVzdDpwd2QK")
             .build()
     }
 
