@@ -71,6 +71,20 @@ abstract class ApiSpecTaskTest {
             .build()
     }
 
+    protected fun whenPluginExecutionFails() {
+        result = GradleRunner.create()
+            .withProjectDir(testProjectDir.toFile())
+            .withArguments(
+                "--configuration-cache",
+                "--configuration-cache-problems=fail",
+                "--info",
+                "--stacktrace",
+                taskName
+            )
+            .withPluginClasspath()
+            .buildAndFail()
+    }
+
     protected fun outputFileContext(): DocumentContext =
         JsonPath.parse(outputFolder.resolve("$outputFileNamePrefix.$format").readText().also { println(it) })
 
@@ -83,6 +97,21 @@ abstract class ApiSpecTaskTest {
     """.trimIndent()
 
     protected fun givenResourceSnippet() {
+        givenResourceSnippet("null")
+    }
+
+    protected fun givenOAuth2ResourceSnippet() {
+        givenResourceSnippet(
+            """
+            {
+              "type": "OAUTH2",
+              "requiredScopes": ["prod:r"]
+            }
+            """.trimIndent()
+        )
+    }
+
+    private fun givenResourceSnippet(securityRequirements: String) {
         val operationDir = File(snippetsFolder, "some-operation").apply { mkdir() }
         File(operationDir, "resource.json").writeText(
             """
@@ -103,10 +132,7 @@ abstract class ApiSpecTaskTest {
                 "requestFields" : [ ],
                 "requestParts" : [ ],
                 "example" : null,
-                "securityRequirements" : {
-                  "type": "OAUTH2",
-                  "requiredScopes": ["prod:r"]
-                }
+                "securityRequirements" : $securityRequirements
               },
               "response" : {
                 "status" : 200,
@@ -149,10 +175,7 @@ abstract class ApiSpecTaskTest {
                 "requestFields" : [ ],
                 "requestParts" : [ ],
                 "example" : null,
-                "securityRequirements" : {
-                  "type": "OAUTH2",
-                  "requiredScopes": ["prod:r"]
-                }
+                "securityRequirements" : null
               },
               "response" : {
                 "status" : 200,

@@ -44,6 +44,15 @@ class JwtSecurityHandlerTest {
     }
 
     @Test
+    fun `should return JWTBearer for mixed case scheme`() {
+        givenRequestWithNonOAuth2JwtInAuthorizationHeader("bEaReR")
+
+        whenSecurityRequirementsExtracted(operation)
+
+        then(securityRequirement).isEqualTo(JWTBearer)
+    }
+
+    @Test
     fun should_do_nothing_when_authorization_header_missing() {
         givenRequestWithoutAuthorizationHeader()
 
@@ -161,12 +170,12 @@ class JwtSecurityHandlerTest {
             .build()
     }
 
-    private fun givenRequestWithNonOAuth2JwtInAuthorizationHeader() {
+    private fun givenRequestWithNonOAuth2JwtInAuthorizationHeader(scheme: String = "Bearer") {
         operation = OperationBuilder().request("/some")
             .header(
                 AUTHORIZATION,
                 // this jwt token doesn't contain typ header but is still valid format
-                "Bearer eyJhbGciOiJIUzI1NiJ9" +
+                "$scheme eyJhbGciOiJIUzI1NiJ9" +
                     ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.Guo" +
                     "Ue6tw79bJlbU1HU0ADX0pr0u2kf3r_4OdrDufSfQ"
             )

@@ -19,6 +19,11 @@ internal object SecuritySchemeGenerator {
     private const val OAUTH2_SECURITY_NAME = "oauth2"
 
     fun OpenAPI.addSecurityDefinitions(oauth2SecuritySchemeDefinition: Oauth2Configuration?) {
+        val hasOAuth2Requirement = hasAnyOperationWithSecurityName(this, OAUTH2_SECURITY_NAME)
+        require(!hasOAuth2Requirement || oauth2SecuritySchemeDefinition?.flows?.isNotEmpty() == true) {
+            "OAuth2 security requirements require oauth2SecuritySchemeDefinition with at least one flow"
+        }
+
         if (oauth2SecuritySchemeDefinition?.flows?.isNotEmpty() == true) {
             val flows = OAuthFlows()
             components.addSecuritySchemes(

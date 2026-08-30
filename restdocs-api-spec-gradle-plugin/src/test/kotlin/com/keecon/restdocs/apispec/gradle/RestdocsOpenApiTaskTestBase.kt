@@ -57,7 +57,7 @@ abstract class RestdocsOpenApiTaskTestBase : ApiSpecTaskTest() {
     fun `should consider security definitions`() {
         givenBuildFileWithOpenApiClosureAndSecurityDefinitions()
         givenTagsTextFile()
-        givenResourceSnippet()
+        givenOAuth2ResourceSnippet()
         givenScopeTextFile()
 
         whenPluginExecuted()

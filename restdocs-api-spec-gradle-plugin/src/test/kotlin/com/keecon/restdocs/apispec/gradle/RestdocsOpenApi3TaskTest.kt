@@ -183,6 +183,28 @@ class RestdocsOpenApi3TaskTest : RestdocsOpenApiTaskTestBase() {
         thenOutputFileFound()
     }
 
+    @Test
+    fun `should reject output prefix with forward slash`() {
+        assertInvalidOutputFileNamePrefixRejected("../escaped")
+    }
+
+    @Test
+    fun `should reject output prefix with backslash`() {
+        assertInvalidOutputFileNamePrefixRejected("..\\\\escaped")
+    }
+
+    private fun assertInvalidOutputFileNamePrefixRejected(prefix: String) {
+        outputFileNamePrefix = prefix
+        givenBuildFileWithOpenApiClosureWithSingleServerString()
+        givenResourceSnippet()
+
+        whenPluginExecutionFails()
+
+        then(result.output).contains("outputFileNamePrefix must be a simple file name")
+        then(outputFolder.parentFile.resolve("escaped.json")).doesNotExist()
+        then(outputFolder.parentFile.resolve("escaped.yaml")).doesNotExist()
+    }
+
     private fun thenSingleServerContainedInOutput() {
         with(outputFileContext()) {
             then(read<List<String>>("servers[*].url")).containsOnly("http://some.api")

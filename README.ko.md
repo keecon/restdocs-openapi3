@@ -1,6 +1,6 @@
 # Spring REST Docs OpenAPI 3 Specification
 
-English | [한국어](README.ko.md)
+[English](README.md) | 한국어
 
 [![jitpack-badge]](https://jitpack.io/#keecon/restdocs-openapi3)
 [![build-badge]](https://github.com/keecon/restdocs-openapi3/actions/workflows/build.yml)
@@ -8,31 +8,31 @@ English | [한국어](README.ko.md)
 [![sonarcloud-badge]](https://sonarcloud.io/summary/new_code?id=keecon_restdocs-openapi3)
 [![license-badge]](https://github.com/keecon/restdocs-openapi3/blob/main/LICENSE)
 
-A modified version of the [ePages-de/restdocs-api-spec] with class field type and constraint inference.
-And only support [OpenAPI 3.0.1] specs.
+이 프로젝트는 [ePages-de/restdocs-api-spec]을 수정하여 클래스 필드 타입과 제약 조건 추론을
+지원하는 버전입니다. [OpenAPI 3.0.1] 명세만 지원합니다.
 
-## Build configuration
+## 빌드 구성
 
-### Versions
+### 버전
 
-| Artifact line | Spring Boot | Spring REST Docs | Java bytecode | Tested JDKs | Status |
+| 아티팩트 버전대 | Spring Boot | Spring REST Docs | Java 바이트코드 | 테스트 JDK | 상태 |
 |---|---|---|---|---|---|
-| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | Active (latest release: 2.1.2) |
-| [1.x (`v1.x`)](https://github.com/keecon/restdocs-openapi3/tree/v1.x) | 3.5.x | 3.0.x | 17 | 17, 21, 25 | Maintained |
-| [0.x (`v0.x`)](https://github.com/keecon/restdocs-openapi3/tree/v0.x) | 2.7.x | 2.0.x | — | — | Frozen, unsupported |
+| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | 활성(최신 릴리스: 2.1.2) |
+| [1.x (`v1.x`)](https://github.com/keecon/restdocs-openapi3/tree/v1.x) | 3.5.x | 3.0.x | 17 | 17, 21, 25 | 유지보수 중 |
+| [0.x (`v0.x`)](https://github.com/keecon/restdocs-openapi3/tree/v0.x) | 2.7.x | 2.0.x | — | — | 동결, 지원 종료 |
 
-The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin ID remains
-`com.keecon.restdocs-openapi3` across release lines.
+모든 릴리스 버전대에서 공개 패키지는 `com.keecon.restdocs.*`로 유지되며 Gradle 플러그인 ID는
+`com.keecon.restdocs-openapi3`으로 유지됩니다.
 
-The 2.x line requires Java 17 or newer. CI verifies the LTS JDK releases 17, 21, and 25.
-Use 1.1.2 for Spring Boot 3.5 applications. Version 2.1.2 is available from JitPack; no Plugin
-Portal publication is assumed.
+2.x 버전대는 Java 17 이상이 필요합니다. CI에서는 LTS JDK 릴리스 17, 21, 25를 검증합니다.
+Spring Boot 3.5 애플리케이션에서는 1.1.2를 사용하세요. 버전 2.1.2는 JitPack에서 제공되며
+Plugin Portal 배포는 전제하지 않습니다.
 
-See [MAINTENANCE.md](MAINTENANCE.md) for the branch lifecycle, backport, and release policy.
+브랜치 수명 주기, 백포트 및 릴리스 정책은 [MAINTENANCE.md](MAINTENANCE.md)를 참고하세요.
 
 ### Gradle
 
-1. Add the plugin
+1. 플러그인을 추가합니다.
 
     ```groovy
     buildscript {
@@ -49,7 +49,7 @@ See [MAINTENANCE.md](MAINTENANCE.md) for the branch lifecycle, backport, and rel
     apply plugin: 'com.keecon.restdocs-openapi3'
     ```
 
-2. Add required dependencies to your tests
+2. 테스트에 필요한 의존성을 추가합니다.
 
     ```groovy
     repositories {
@@ -73,17 +73,17 @@ See [MAINTENANCE.md](MAINTENANCE.md) for the branch lifecycle, backport, and rel
     }
     ```
 
-#### 2.1.1 DSL additions
+#### 2.1.1 DSL 추가 기능
 
-On the current `main` branch, the `openapi3` task resolves its default input and output directories
-from the project's Gradle `layout.buildDirectory`. With the standard `build` directory, it reads
-snippets from `build/generated-snippets` and writes `build/api-spec/openapi3.json` or
-`build/api-spec/openapi3.yaml`, depending on `format`.
+현재 `main` 브랜치에서 `openapi3` 태스크는 프로젝트의 Gradle `layout.buildDirectory`를 기준으로
+기본 입력 및 출력 디렉터리를 결정합니다. 표준 `build` 디렉터리를 사용하는 경우
+`build/generated-snippets`에서 스니펫을 읽고 `format`에 따라
+`build/api-spec/openapi3.json` 또는 `build/api-spec/openapi3.yaml`에 결과를 작성합니다.
 
-This build-directory-aware behavior and the additive method and Gradle `Action` syntax below are
-available from 2.1.1. With 2.1.0, use the assignment syntax shown above.
+이 빌드 디렉터리 연동 동작과 아래의 추가 메서드 및 Gradle `Action` 구문은 2.1.1부터
+사용할 수 있습니다. 2.1.0에서는 위에 표시된 대입 구문을 사용하세요.
 
-Groovy builds can use method syntax:
+Groovy 빌드에서는 메서드 구문을 사용할 수 있습니다.
 
 ```groovy
 openapi3 {
@@ -95,8 +95,8 @@ openapi3 {
 }
 ```
 
-After adding the same JitPack buildscript classpath and applying the plugin, Kotlin builds can
-configure the named extension explicitly:
+동일한 JitPack 빌드스크립트 classpath를 추가하고 플러그인을 적용한 뒤, Kotlin 빌드에서는
+이름이 지정된 확장을 명시적으로 구성할 수 있습니다.
 
 ```kotlin
 import com.keecon.restdocs.apispec.gradle.OpenApi3Extension
@@ -115,20 +115,20 @@ extensions.configure<OpenApi3Extension>("openapi3") {
 }
 ```
 
-When documented JWT scopes create an OAuth2 security requirement, configure at least one OAuth2 flow.
-Specification generation fails if the matching OAuth2 security scheme definition is missing.
+문서화된 JWT scope가 OAuth2 보안 요구사항을 생성하는 경우 OAuth2 flow를 하나 이상 구성해야 합니다.
+이에 대응하는 OAuth2 보안 스킴 정의가 없으면 명세 생성이 실패합니다.
 
-### Migrating from 1.x to 2.x
+### 1.x에서 2.x로 마이그레이션
 
-The 2.x line moves to Spring Boot 4, Spring REST Docs 4, and Jackson 3. Extension-level Groovy
-configuration remains compatible. Code that configures the `openapi3` task directly must adapt to
-its managed Gradle properties: scalar task getters now return `Property<T>` and directory getters
-return `DirectoryProperty`, so set values with `.set(...)` instead of assigning the 1.x
-`String`/`Boolean` task properties directly.
+2.x 버전대는 Spring Boot 4, Spring REST Docs 4, Jackson 3으로 전환되었습니다. 확장 수준의
+Groovy 구성은 계속 호환됩니다. `openapi3` 태스크를 직접 구성하는 코드는 관리형 Gradle
+프로퍼티에 맞게 변경해야 합니다. 스칼라 태스크 getter는 이제 `Property<T>`를 반환하고
+디렉터리 getter는 `DirectoryProperty`를 반환하므로, 1.x의 `String`/`Boolean` 태스크
+프로퍼티처럼 대입하지 말고 `.set(...)`으로 값을 지정하세요.
 
-### 2.1.0 features
+### 2.1.0 기능
 
-OpenAPI contact metadata can be configured in the Gradle DSL.
+Gradle DSL에서 OpenAPI 연락처 메타데이터를 구성할 수 있습니다.
 
 ```groovy
 openapi3 {
@@ -140,10 +140,9 @@ openapi3 {
 }
 ```
 
-Fields declared as `java.time.LocalDate` are inferred as OpenAPI `string` values with
-`format: date`.
+`java.time.LocalDate`로 선언된 필드는 OpenAPI `string` 값과 `date` 형식으로 추론됩니다.
 
-The WebTestClient integration is available from the `restdocs-api-spec-webtestclient` module.
+WebTestClient 통합은 `restdocs-api-spec-webtestclient` 모듈에서 제공합니다.
 
 ```groovy
 dependencies {
@@ -151,8 +150,8 @@ dependencies {
 }
 ```
 
-Replace Spring REST Docs' WebTestClient `document` consumer with the wrapper. It keeps the normal
-REST Docs snippets and adds `resource.json` from their descriptors.
+Spring REST Docs의 WebTestClient `document` consumer를 wrapper로 교체하세요. 일반 REST Docs
+스니펫은 그대로 유지하면서 해당 descriptor에서 `resource.json`을 추가로 생성합니다.
 
 ```groovy
 webTestClient.get()
@@ -166,7 +165,7 @@ webTestClient.get()
   ))
 ```
 
-## Usage with Spring REST Docs
+## Spring REST Docs와 함께 사용하기
 
 ```groovy
 when:

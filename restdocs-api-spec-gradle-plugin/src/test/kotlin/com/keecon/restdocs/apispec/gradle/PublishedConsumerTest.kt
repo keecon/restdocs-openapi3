@@ -8,9 +8,28 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
+import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.writeText
 
 class PublishedConsumerTest {
+
+    @Test
+    fun `published plugin does not expose Kotlin Gradle Plugin as runtime dependency`() {
+        val repository = requiredSystemProperty("consumerTestRepository")
+        val version = requiredSystemProperty("consumerTestVersion")
+        val pluginPom = Path.of(repository)
+            .resolve(
+                "com/keecon/restdocs-api-spec-gradle-plugin/$version"
+            )
+            .listDirectoryEntries("restdocs-api-spec-gradle-plugin-*.pom")
+            .single()
+
+        then(pluginPom).exists()
+        then(pluginPom.toFile().readText()).doesNotContain(
+            "<groupId>org.jetbrains.kotlin</groupId>",
+            "<artifactId>kotlin-gradle-plugin</artifactId>"
+        )
+    }
 
     @Test
     fun `published artifacts expose dependencies required by their public api`(@TempDir projectDir: Path) {
