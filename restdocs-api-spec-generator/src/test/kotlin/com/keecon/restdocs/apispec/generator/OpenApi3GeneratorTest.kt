@@ -102,11 +102,11 @@ class OpenApi3GeneratorTest {
 
         whenOpenApiObjectGenerated()
 
-        then(openApiJsonPathContext.read<Any>("paths./products/{id}.delete".toString())).isNotNull
-        then(openApiJsonPathContext.read<Any>("paths./products/{id}.delete.requestBody".toString())).isNull()
+        then(openApiJsonPathContext.read<Any>("paths./products/{id}.delete")).isNotNull
+        then(openApiJsonPathContext.read<Any>("paths./products/{id}.delete.requestBody")).isNull()
 
-        then(openApiJsonPathContext.read<Any>("paths./products/{id}.delete.responses.204".toString())).isNotNull
-        then(openApiJsonPathContext.read<Any>("paths./products/{id}.delete.responses.204.content".toString())).isNull()
+        then(openApiJsonPathContext.read<Any>("paths./products/{id}.delete.responses.204")).isNotNull
+        then(openApiJsonPathContext.read<Any>("paths./products/{id}.delete.responses.204.content")).isNull()
         thenOpenApiSpecIsValid()
     }
 
@@ -269,9 +269,9 @@ class OpenApi3GeneratorTest {
         whenOpenApiObjectGenerated()
 
         val patchResponseSchemaRef = openApiJsonPathContext
-            .read<String>("paths./products/{id}.patch.responses.200.content.application/json.schema.\$ref".toString())
+            .read<String>("paths./products/{id}.patch.responses.200.content.application/json.schema.\$ref")
         val getResponseSchemaRef = openApiJsonPathContext
-            .read<String>("paths./products/{id}.get.responses.200.content.application/json.schema.\$ref".toString())
+            .read<String>("paths./products/{id}.get.responses.200.content.application/json.schema.\$ref")
         then(patchResponseSchemaRef).isEqualTo(getResponseSchemaRef)
 
         val schemaId = getResponseSchemaRef.removePrefix("#/components/schemas/")
@@ -287,7 +287,7 @@ class OpenApi3GeneratorTest {
         whenOpenApiObjectGenerated()
 
         val params = openApiJsonPathContext
-            .read<List<Map<String, String>>>("paths./products/{id}.get.parameters.*".toString())
+            .read<List<Map<String, String>>>("paths./products/{id}.get.parameters.*")
 
         then(params).anyMatch { it["name"] == "id" }
         then(params).anyMatch { it["name"] == "locale" }
@@ -376,7 +376,7 @@ class OpenApi3GeneratorTest {
 
         whenOpenApiObjectGenerated()
 
-        then(openApiJsonPathContext.read<String>("paths./products/{id}.get.operationId".toString())).isEqualTo("test")
+        then(openApiJsonPathContext.read<String>("paths./products/{id}.get.operationId")).isEqualTo("test")
     }
 
     @Test
@@ -386,7 +386,7 @@ class OpenApi3GeneratorTest {
         whenOpenApiObjectGenerated()
 
         then(
-            openApiJsonPathContext.read<String>("paths./products/{id}.get.operationId".toString())
+            openApiJsonPathContext.read<String>("paths./products/{id}.get.operationId")
         ).isEqualTo("firstsecond")
     }
 
@@ -425,7 +425,7 @@ class OpenApi3GeneratorTest {
 
         whenOpenApiObjectGenerated()
 
-        val params = openApiJsonPathContext.read<List<Map<*, *>>>("paths./products/{id}.get.parameters.*".toString())
+        val params = openApiJsonPathContext.read<List<Map<*, *>>>("paths./products/{id}.get.parameters.*")
 
         then(params).anyMatch { it["name"] == "id" }
         then(params).anyMatch {
@@ -503,7 +503,7 @@ class OpenApi3GeneratorTest {
 
         whenOpenApiObjectGenerated()
 
-        val params = openApiJsonPathContext.read<List<Map<*, *>>>("paths./metadata.get.parameters.*".toString())
+        val params = openApiJsonPathContext.read<List<Map<*, *>>>("paths./metadata.get.parameters.*")
 
         then(params).anyMatch {
             it["name"] == "X-SOME-BOOLEAN" &&
