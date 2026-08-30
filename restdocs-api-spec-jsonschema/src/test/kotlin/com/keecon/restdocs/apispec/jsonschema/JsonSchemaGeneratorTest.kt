@@ -479,6 +479,56 @@ class JsonSchemaGeneratorTest {
     }
 
     @Test
+    fun `should emit date-time format for scalar and array items`() {
+        val generatedSchema = generator.generateSchema(dateTimeDescriptors())
+
+        then(JsonPath.read<String>(generatedSchema, "$.properties.createdAt.format"))
+            .isEqualTo("date-time")
+        then(JsonPath.read<String>(generatedSchema, "$.properties.history.items.format"))
+            .isEqualTo("date-time")
+    }
+
+    @Test
+    fun `should validate canonical RFC 3339 date times with the in-memory schema`() {
+        listOf(
+            "2026-08-30T15:30:00+09:00",
+            "2026-08-30T06:30:00Z",
+            "2026-08-30T06:30:00.1Z",
+            "2026-08-30T06:30:00.123456789Z",
+            "2026-08-30T06:30:00+18:00",
+        ).forEach { value ->
+            generator.validate(
+                dateTimeDescriptors(),
+                """{"createdAt":"$value","history":["2026-08-30T06:30:00Z"]}"""
+            )
+        }
+    }
+
+    @Test
+    fun `should reject non canonical or invalid date times with the in-memory schema`() {
+        listOf(
+            "\"2026-08-30T15:30+09:00\"",
+            "\"2026-08-30T15:30:00\"",
+            "\"2026-08-30 15:30:00+09:00\"",
+            "\"2026-08-30t06:30:00z\"",
+            "\"2026-08-30T06:30:00.1234567890Z\"",
+            "\"2026-02-30T06:30:00Z\"",
+            "\"2026-08-30T24:00:00Z\"",
+            "\"2026-08-30T06:30:60Z\"",
+            "\"2026-08-30T06:30:00+18:01\"",
+            "\"2026-08-30T15:30:00+09:00[Asia/Seoul]\"",
+            "1788071400",
+        ).forEach { value ->
+            thenThrownBy {
+                generator.validate(
+                    dateTimeDescriptors(),
+                    """{"createdAt":$value,"history":["2026-08-30T06:30:00Z"]}"""
+                )
+            }.describedAs(value).isInstanceOf(ValidationException::class.java)
+        }
+    }
+
+    @Test
     fun `should format array schema without item schema`() {
         val formattedSchema = EveritSchemaJsonFormatter().format(ArraySchema.builder().build())
         val schemaJson = JSONObject(formattedSchema)
@@ -933,6 +983,26 @@ class JsonSchemaGeneratorTest {
             )
         )
     }
+
+    private fun dateTimeDescriptors() = listOf(
+        FieldDescriptor(
+            "createdAt",
+            "",
+            "string",
+            attributes = Attributes(format = "datetime")
+        ),
+        FieldDescriptor(
+            "history",
+            "",
+            "array",
+            attributes = Attributes(
+                items = TypeDescriptor(
+                    "string",
+                    attributes = Attributes(format = "datetime")
+                )
+            )
+        )
+    )
 
     private fun thenSchemaValidatesJson(json: String) {
         schema!!.validate(if (json.startsWith("[")) JSONArray(json) else JSONObject(json))

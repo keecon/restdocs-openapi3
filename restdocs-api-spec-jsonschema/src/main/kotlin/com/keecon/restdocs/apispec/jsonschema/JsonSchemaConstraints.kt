@@ -48,7 +48,7 @@ internal object JsonSchemaConstraints {
                     }
 
                     DataFormat.DATETIME.lowercase() -> {
-                        FormatValidator.forFormat("date-time")
+                        Rfc3339DateTimeFormatValidator()
                     }
 
                     DataFormat.UUID_ENCODED.lowercase() -> {

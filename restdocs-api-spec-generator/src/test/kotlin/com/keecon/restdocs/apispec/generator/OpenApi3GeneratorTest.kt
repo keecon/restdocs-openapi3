@@ -57,6 +57,32 @@ class OpenApi3GeneratorTest {
     }
 
     @Test
+    fun `should emit date-time schemas for canonical examples`() {
+        resources = listOf(dateTimeResource("2026-08-30T15:30:00+09:00"))
+
+        whenOpenApiObjectGeneratedWithoutOAuth2()
+
+        then(openApiJsonPathContext.read<List<String>>("$..createdAt.format"))
+            .contains("date-time")
+        then(openApiJsonPathContext.read<List<String>>("$..history.items.format"))
+            .contains("date-time")
+    }
+
+    @Test
+    fun `should fail generation for non canonical date-time examples`() {
+        resources = listOf(dateTimeResource("2026-08-30T15:30:00+09:00[Asia/Seoul]"))
+
+        val exception = assertThrows<IllegalArgumentException> {
+            whenOpenApiObjectGeneratedWithoutOAuth2()
+        }
+
+        then(exception)
+            .hasMessageContaining("dates-create")
+            .hasMessageContaining("request")
+            .hasMessageContaining("RFC 3339 date-time")
+    }
+
+    @Test
     fun `should convert resource model with Basic SecurityRequirements to openapi`() {
         givenGetProductResourceModelWithBasicSecurityRequirement()
 
@@ -1167,6 +1193,51 @@ class OpenApi3GeneratorTest {
             )
         )
     }
+
+    private fun dateTimeResource(requestDateTime: String) = ResourceModel(
+        operationId = "dates-create",
+        privateResource = false,
+        deprecated = false,
+        request = RequestModel(
+            path = "/dates",
+            method = HTTPMethod.POST,
+            contentType = "application/json",
+            securityRequirements = null,
+            headers = emptyList(),
+            pathParameters = emptyList(),
+            queryParameters = emptyList(),
+            formParameters = emptyList(),
+            requestParts = emptyList(),
+            requestFields = listOf(
+                FieldDescriptor(
+                    path = "createdAt",
+                    description = "",
+                    type = "string",
+                    attributes = Attributes(format = "datetime"),
+                )
+            ),
+            example = """{"createdAt":"$requestDateTime"}""",
+        ),
+        response = ResponseModel(
+            status = 200,
+            contentType = "application/json",
+            headers = emptyList(),
+            responseFields = listOf(
+                FieldDescriptor(
+                    path = "history[]",
+                    description = "",
+                    type = "array",
+                    attributes = Attributes(
+                        items = TypeDescriptor(
+                            type = "string",
+                            attributes = Attributes(format = "datetime"),
+                        )
+                    ),
+                )
+            ),
+            example = """{"history":["2026-08-30T06:30:00Z"]}""",
+        ),
+    )
 
     private fun givenGetProductResourceModel() {
         resources = listOf(

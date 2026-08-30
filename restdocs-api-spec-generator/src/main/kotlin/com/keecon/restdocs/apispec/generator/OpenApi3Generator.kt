@@ -66,6 +66,8 @@ object OpenApi3Generator {
         oauth2SecuritySchemeDefinition: Oauth2Configuration? = null,
         contact: Contact? = null
     ): OpenAPI {
+        Rfc3339DateTimeExampleValidator.validate(resources)
+
         return OpenAPI().apply {
 
             this.servers = servers
