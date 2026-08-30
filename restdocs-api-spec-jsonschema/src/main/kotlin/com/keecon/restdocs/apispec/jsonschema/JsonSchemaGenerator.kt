@@ -13,13 +13,16 @@ class JsonSchemaGenerator {
 
     private val schemaFormatter = EveritSchemaJsonFormatter()
 
-    fun generateSchema(fieldDescriptors: List<FieldDescriptor>, title: String? = null): String {
+    fun generateSchema(fieldDescriptors: List<FieldDescriptor>, title: String? = null): String =
+        schemaFormatter.format(buildSchema(fieldDescriptors, title))
+
+    private fun buildSchema(fieldDescriptors: List<FieldDescriptor>, title: String? = null): Schema {
         val jsonFieldPaths = reduceFieldDescriptors(fieldDescriptors)
             .map { JsonFieldPath.compile(it) }
 
         val schema = traverse(emptyList(), jsonFieldPaths, ObjectSchema.builder().title(title) as ObjectSchema.Builder)
 
-        return schemaFormatter.format(unWrapRootArray(jsonFieldPaths, schema))
+        return unWrapRootArray(jsonFieldPaths, schema)
     }
 
     /**
