@@ -140,8 +140,37 @@ openapi3 {
 }
 ```
 
-Fields declared as `java.time.LocalDate` are inferred as OpenAPI `string` values with
-`format: date`.
+Java time fields are inferred as follows:
+
+| Java type | OpenAPI type | OpenAPI format | Required JSON representation |
+|---|---|---|---|
+| `LocalDate` | `string` | `date` | `YYYY-MM-DD` |
+| `OffsetDateTime` | `string` | `date-time` | RFC 3339 with a numeric offset or `Z` |
+| `Instant` | `string` | `date-time` | RFC 3339 in UTC with `Z` |
+| `ZonedDateTime` | `string` | `date-time` | RFC 3339 with a numeric offset; the region ID must be omitted |
+
+`date-time` JSON examples are validated when the OpenAPI document is generated. The supported
+canonical RFC 3339 profile requires uppercase `T` and `Z`, seconds, and an offset. Fractions may
+contain from one to nine digits.
+
+```text
+accepted: 2026-08-30T15:30:00+09:00
+accepted: 2026-08-30T06:30:00.123456789Z
+rejected: 2026-08-30T15:30:00
+rejected: 2026-08-30T15:30:00+09:00[Asia/Seoul]
+rejected: 1788071400
+```
+
+This library does not configure the application's JSON serializer. Configure Jackson to emit
+textual date values rather than timestamps, and do not enable zone-ID output for `ZonedDateTime`.
+Generation fails if captured JSON request or response body examples violate this contract.
+This also tightens validation for fields that were already declared manually as `DATETIME`:
+examples using a missing offset, a numeric timestamp, or a bracketed region ID must fix their
+application serialization or stop declaring that field as `date-time`.
+
+`LocalDateTime` is intentionally not inferred as `date-time`: even its textual Jackson
+representation has no offset, while RFC 3339 `date-time` requires one. Use `Instant`,
+`OffsetDateTime`, or `ZonedDateTime` when the value represents an instant.
 
 The WebTestClient integration is available from the `restdocs-api-spec-webtestclient` module.
 
