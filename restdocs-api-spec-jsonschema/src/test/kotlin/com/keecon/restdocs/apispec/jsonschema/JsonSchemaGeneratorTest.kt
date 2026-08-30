@@ -5,6 +5,7 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory
 import com.jayway.jsonpath.JsonPath
 import com.keecon.restdocs.apispec.model.Attributes
 import com.keecon.restdocs.apispec.model.Constraint
+import com.keecon.restdocs.apispec.model.DataFormat
 import com.keecon.restdocs.apispec.model.FieldDescriptor
 import com.keecon.restdocs.apispec.model.TypeDescriptor
 import jakarta.validation.constraints.Max
@@ -14,6 +15,7 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import org.assertj.core.api.BDDAssertions.then
+import org.assertj.core.api.BDDAssertions.thenCode
 import org.assertj.core.api.BDDAssertions.thenThrownBy
 import org.everit.json.schema.ArraySchema
 import org.everit.json.schema.BooleanSchema
@@ -529,6 +531,22 @@ class JsonSchemaGeneratorTest {
     }
 
     @Test
+    fun `should preserve existing validation for manually declared date time`() {
+        val descriptors = listOf(
+            FieldDescriptor(
+                "createdAt",
+                "",
+                "string",
+                attributes = Attributes(format = DataFormat.DATETIME.lowercase())
+            )
+        )
+
+        thenCode {
+            generator.validate(descriptors, """{"createdAt":"2026-02-30T06:30:00Z"}""")
+        }.doesNotThrowAnyException()
+    }
+
+    @Test
     fun `should format array schema without item schema`() {
         val formattedSchema = EveritSchemaJsonFormatter().format(ArraySchema.builder().build())
         val schemaJson = JSONObject(formattedSchema)
@@ -989,7 +1007,7 @@ class JsonSchemaGeneratorTest {
             "createdAt",
             "",
             "string",
-            attributes = Attributes(format = "datetime")
+            attributes = Attributes(format = RFC3339_DATETIME_FORMAT)
         ),
         FieldDescriptor(
             "history",
@@ -998,7 +1016,7 @@ class JsonSchemaGeneratorTest {
             attributes = Attributes(
                 items = TypeDescriptor(
                     "string",
-                    attributes = Attributes(format = "datetime")
+                    attributes = Attributes(format = RFC3339_DATETIME_FORMAT)
                 )
             )
         )

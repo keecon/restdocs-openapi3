@@ -24,7 +24,7 @@ internal class Rfc3339DateTimeFormatValidator : FormatValidator {
     override fun formatName() = "date-time"
 
     private fun invalid(subject: String) = Optional.of(
-        "'$subject' is not a strict RFC 3339 date-time " +
+        "'$subject' does not match the Java-compatible RFC 3339 date-time profile " +
             "(expected yyyy-MM-dd'T'HH:mm:ss[.fraction](Z|+/-HH:mm))"
     )
 

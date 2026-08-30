@@ -15,7 +15,8 @@ internal object SchemaExtensions {
 
     internal fun Schema<*>.applyProperties(descriptor: AbstractDescriptor) = apply {
         when (val format = descriptor.attributes.format?.lowercase()) {
-            DataFormat.DATETIME.lowercase() -> format("date-time")
+            DataFormat.DATETIME.lowercase(),
+            RFC3339_DATETIME_FORMAT -> format("date-time")
             DataFormat.UUID_ENCODED.lowercase() -> format("uuid-encoded")
             is String -> format(format)
             else -> Unit

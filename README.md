@@ -142,16 +142,17 @@ openapi3 {
 
 Java time fields are inferred as follows:
 
-| Java type | OpenAPI type | OpenAPI format | Required JSON representation |
+| Java type | OpenAPI type | OpenAPI format | Typical Jackson text output |
 |---|---|---|---|
 | `LocalDate` | `string` | `date` | `YYYY-MM-DD` |
 | `OffsetDateTime` | `string` | `date-time` | RFC 3339 with a numeric offset or `Z` |
 | `Instant` | `string` | `date-time` | RFC 3339 in UTC with `Z` |
 | `ZonedDateTime` | `string` | `date-time` | RFC 3339 with a numeric offset; the region ID must be omitted |
 
-`date-time` JSON examples are validated when the OpenAPI document is generated. The supported
-canonical RFC 3339 profile requires uppercase `T` and `Z`, seconds, and an offset. Fractions may
-contain from one to nine digits.
+JSON examples for these inferred Java time fields are validated when the OpenAPI document is
+generated. The supported canonical RFC 3339 profile requires uppercase `T`, uppercase `Z` when
+used, seconds, and an offset. Fractions may contain from one to nine digits. All three types accept
+either `Z` or a numeric offset; the table shows the typical textual output produced by Jackson.
 
 ```text
 accepted: 2026-08-30T15:30:00+09:00
@@ -164,9 +165,8 @@ rejected: 1788071400
 This library does not configure the application's JSON serializer. Configure Jackson to emit
 textual date values rather than timestamps, and do not enable zone-ID output for `ZonedDateTime`.
 Generation fails if captured JSON request or response body examples violate this contract.
-This also tightens validation for fields that were already declared manually as `DATETIME`:
-examples using a missing offset, a numeric timestamp, or a bracketed region ID must fix their
-application serialization or stop declaring that field as `date-time`.
+Fields declared manually as `DATETIME` retain their existing validation behavior and are not
+subject to this Java-compatible canonical profile.
 
 `LocalDateTime` is intentionally not inferred as `date-time`: even its textual Jackson
 representation has no offset, while RFC 3339 `date-time` requires one. Use `Instant`,

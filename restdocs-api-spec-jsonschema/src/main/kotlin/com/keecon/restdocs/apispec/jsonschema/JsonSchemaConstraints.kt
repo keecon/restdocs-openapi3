@@ -8,6 +8,8 @@ import org.everit.json.schema.FormatValidator
 import org.everit.json.schema.NumberSchema
 import org.everit.json.schema.StringSchema
 
+internal const val RFC3339_DATETIME_FORMAT = "rfc3339_datetime"
+
 internal object JsonSchemaConstraints {
 
     internal fun ArraySchema.Builder.applyConstraints(descriptor: AbstractDescriptor?) = apply {
@@ -48,6 +50,10 @@ internal object JsonSchemaConstraints {
                     }
 
                     DataFormat.DATETIME.lowercase() -> {
+                        FormatValidator.forFormat("date-time")
+                    }
+
+                    RFC3339_DATETIME_FORMAT -> {
                         Rfc3339DateTimeFormatValidator()
                     }
 

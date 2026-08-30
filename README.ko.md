@@ -142,15 +142,17 @@ openapi3 {
 
 Java 시간 타입은 다음과 같이 추론됩니다.
 
-| Java 타입 | OpenAPI 타입 | OpenAPI 형식 | 필수 JSON 표현 |
+| Java 타입 | OpenAPI 타입 | OpenAPI 형식 | 대표적인 Jackson 문자열 출력 |
 |---|---|---|---|
 | `LocalDate` | `string` | `date` | `YYYY-MM-DD` |
 | `OffsetDateTime` | `string` | `date-time` | 숫자 오프셋 또는 `Z`가 있는 RFC 3339 |
 | `Instant` | `string` | `date-time` | UTC `Z`를 사용하는 RFC 3339 |
 | `ZonedDateTime` | `string` | `date-time` | 숫자 오프셋을 사용하고 지역 ID는 생략한 RFC 3339 |
 
-OpenAPI 문서를 생성할 때 `date-time` JSON 예제를 검증합니다. 지원하는 canonical RFC 3339
-프로필은 대문자 `T`와 `Z`, 초, 오프셋을 필수로 하며 소수 초는 1~9자리까지 허용합니다.
+OpenAPI 문서를 생성할 때 이 Java 시간 타입으로 추론된 필드의 JSON 예제를 검증합니다. 지원하는
+canonical RFC 3339 프로필은 대문자 `T`, `Z` 사용 시 대문자 표기, 초, 오프셋을 필수로 하며
+소수 초는 1~9자리까지 허용합니다. 세 타입 모두 `Z` 또는 숫자 오프셋을 허용하며, 표에는
+Jackson이 출력하는 대표적인 문자열 형태를 기재했습니다.
 
 ```text
 허용: 2026-08-30T15:30:00+09:00
@@ -163,9 +165,8 @@ OpenAPI 문서를 생성할 때 `date-time` JSON 예제를 검증합니다. 지�
 이 라이브러리는 애플리케이션의 JSON serializer를 설정하지 않습니다. Jackson이 타임스탬프가
 아닌 문자열 날짜를 출력하도록 구성하고, `ZonedDateTime`의 지역 ID 출력은 활성화하지 마세요.
 캡처된 JSON 요청·응답 본문 예제가 이 계약을 위반하면 OpenAPI 생성이 실패합니다.
-기존에 `DATETIME`으로 직접 선언한 필드에도 이 강화된 검증이 적용됩니다. 오프셋이 없거나,
-숫자 타임스탬프이거나, 대괄호로 감싼 지역 ID를 포함한 예제는 애플리케이션 직렬화를 수정하거나
-해당 필드를 `date-time`으로 선언하지 않아야 합니다.
+`DATETIME`으로 직접 선언한 필드는 기존 검증 동작을 유지하며 이 Java-compatible canonical
+프로필의 적용 대상이 아닙니다.
 
 `LocalDateTime`은 의도적으로 `date-time`으로 추론하지 않습니다. Jackson의 문자열 표현에도
 오프셋 정보가 없지만 RFC 3339 `date-time`에는 오프셋이 필수이기 때문입니다. 실제 시점을

@@ -1213,7 +1213,7 @@ class OpenApi3GeneratorTest {
                     path = "createdAt",
                     description = "",
                     type = "string",
-                    attributes = Attributes(format = "datetime"),
+                    attributes = Attributes(format = RFC3339_DATETIME_FORMAT),
                 )
             ),
             example = """{"createdAt":"$requestDateTime"}""",
@@ -1230,7 +1230,7 @@ class OpenApi3GeneratorTest {
                     attributes = Attributes(
                         items = TypeDescriptor(
                             type = "string",
-                            attributes = Attributes(format = "datetime"),
+                            attributes = Attributes(format = RFC3339_DATETIME_FORMAT),
                         )
                     ),
                 )

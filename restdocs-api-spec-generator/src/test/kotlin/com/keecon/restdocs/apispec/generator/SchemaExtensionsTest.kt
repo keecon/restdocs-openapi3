@@ -72,6 +72,19 @@ class SchemaExtensionsTest {
     }
 
     @Test
+    fun `should expose canonical RFC 3339 marker as OpenAPI date time`() {
+        val schema = OpenApi3Generator.simpleTypeToSchema(
+            TypeDescriptor(
+                type = "STRING",
+                attributes = Attributes(format = RFC3339_DATETIME_FORMAT)
+            )
+        )
+
+        then(schema?.type).isEqualTo("string")
+        then(schema?.format).isEqualTo("date-time")
+    }
+
+    @Test
     fun `should reject DATE as a raw descriptor type`() {
         assertThrows<IllegalArgumentException> {
             OpenApi3Generator.simpleTypeToSchema(TypeDescriptor(type = "DATE"))

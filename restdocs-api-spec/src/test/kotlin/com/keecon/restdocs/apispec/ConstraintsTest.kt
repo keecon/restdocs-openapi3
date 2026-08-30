@@ -375,7 +375,7 @@ internal class ConstraintsTest {
         listOf("offsetDateTime", "instant", "zonedDateTime").forEach { name ->
             val descriptor = model.withPath(name)
             then(descriptor.type).isEqualTo(DataType.STRING)
-            then(descriptor.attributes[Attributes.FORMAT_KEY]).isEqualTo(DataFormat.DATETIME)
+            then(descriptor.attributes[Attributes.FORMAT_KEY]).isEqualTo(Attributes.RFC3339_DATETIME_FORMAT)
         }
 
         listOf("offsetDateTimes[]", "instants[]", "zonedDateTimes[]").forEach { name ->
@@ -384,13 +384,15 @@ internal class ConstraintsTest {
             then(descriptor.attributes[Attributes.ITEMS_KEY] as Map<String, *>).isEqualTo(
                 mapOf(
                     Attributes.TYPE_KEY to DataType.STRING,
-                    Attributes.FORMAT_KEY to DataFormat.DATETIME
+                    Attributes.FORMAT_KEY to Attributes.RFC3339_DATETIME_FORMAT
                 )
             )
         }
 
-        then(model.withName("instant").attributes[Attributes.FORMAT_KEY]).isEqualTo(DataFormat.DATETIME)
-        then(model.withPart("zonedDateTime").attributes[Attributes.FORMAT_KEY]).isEqualTo(DataFormat.DATETIME)
+        then(model.withName("instant").attributes[Attributes.FORMAT_KEY])
+            .isEqualTo(Attributes.RFC3339_DATETIME_FORMAT)
+        then(model.withPart("zonedDateTime").attributes[Attributes.FORMAT_KEY])
+            .isEqualTo(Attributes.RFC3339_DATETIME_FORMAT)
     }
 
     @Test

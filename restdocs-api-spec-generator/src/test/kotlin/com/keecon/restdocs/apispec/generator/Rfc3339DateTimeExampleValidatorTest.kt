@@ -2,6 +2,7 @@ package com.keecon.restdocs.apispec.generator
 
 import com.keecon.restdocs.apispec.model.Attributes
 import com.keecon.restdocs.apispec.model.Constraint
+import com.keecon.restdocs.apispec.model.DataFormat
 import com.keecon.restdocs.apispec.model.FieldDescriptor
 import com.keecon.restdocs.apispec.model.HTTPMethod
 import com.keecon.restdocs.apispec.model.RequestModel
@@ -72,6 +73,19 @@ class Rfc3339DateTimeExampleValidatorTest {
     }
 
     @Test
+    fun `should report an invalid canonical date time array item`() {
+        val resource = resource(
+            responseExample = """{"history":["2026-08-30T06:30:00Z","not-a-date"]}""",
+            responseFields = listOf(dateTimeArray("history[]")),
+        )
+
+        thenThrownBy { Rfc3339DateTimeExampleValidator.validate(listOf(resource)) }
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessageContaining("response")
+            .hasMessageContaining("#/history/1")
+    }
+
+    @Test
     fun `should reject explicit null date time`() {
         val resource = resource(
             requestExample = """{"createdAt":null}""",
@@ -122,6 +136,56 @@ class Rfc3339DateTimeExampleValidatorTest {
         thenCode { Rfc3339DateTimeExampleValidator.validate(resources) }.doesNotThrowAnyException()
     }
 
+    @Test
+    fun `should preserve manually declared date time examples`() {
+        val resource = resource(
+            requestExample = """{"createdAt":"2026-08-30T15:30:00"}""",
+            requestFields = listOf(
+                FieldDescriptor(
+                    path = "createdAt",
+                    description = "",
+                    type = "string",
+                    attributes = Attributes(format = DataFormat.DATETIME.lowercase()),
+                )
+            ),
+        )
+
+        thenCode { Rfc3339DateTimeExampleValidator.validate(listOf(resource)) }.doesNotThrowAnyException()
+    }
+
+    @Test
+    fun `should ignore canonical date time descriptors marked ignored`() {
+        val resource = resource(
+            requestExample = """{"createdAt":"not-a-date"}""",
+            requestFields = listOf(dateTimeField("createdAt", ignored = true)),
+        )
+
+        thenCode { Rfc3339DateTimeExampleValidator.validate(listOf(resource)) }.doesNotThrowAnyException()
+    }
+
+    @Test
+    fun `should recognize JSON content type case insensitively`() {
+        val resource = resource(
+            requestExample = """{"createdAt":"2026-08-30T15:30:00"}""",
+            requestContentType = "Application/JSON",
+            requestFields = listOf(dateTimeField("createdAt")),
+        )
+
+        thenThrownBy { Rfc3339DateTimeExampleValidator.validate(listOf(resource)) }
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessageContaining("#/createdAt")
+    }
+
+    @Test
+    fun `should ignore structural violations before an optional canonical date time`() {
+        val resource = resource(
+            requestExample = """{"nested":"not-an-object"}""",
+            requestFields = listOf(dateTimeField("nested.createdAt", optional = true)),
+        )
+
+        thenCode { Rfc3339DateTimeExampleValidator.validate(listOf(resource)) }.doesNotThrowAnyException()
+    }
+
     private fun resource(
         requestExample: String? = null,
         responseExample: String? = null,
@@ -155,12 +219,17 @@ class Rfc3339DateTimeExampleValidatorTest {
         )
     )
 
-    private fun dateTimeField(path: String, optional: Boolean = false) = FieldDescriptor(
+    private fun dateTimeField(
+        path: String,
+        optional: Boolean = false,
+        ignored: Boolean = false,
+    ) = FieldDescriptor(
         path = path,
         description = "",
         type = "string",
         optional = optional,
-        attributes = Attributes(format = "datetime"),
+        ignored = ignored,
+        attributes = Attributes(format = RFC3339_DATETIME_FORMAT),
     )
 
     private fun dateTimeArray(path: String) = FieldDescriptor(
@@ -170,7 +239,7 @@ class Rfc3339DateTimeExampleValidatorTest {
         attributes = Attributes(
             items = TypeDescriptor(
                 type = "string",
-                attributes = Attributes(format = "datetime"),
+                attributes = Attributes(format = RFC3339_DATETIME_FORMAT),
             )
         ),
     )

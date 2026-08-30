@@ -193,7 +193,7 @@ class Constraints private constructor(private val rootType: Class<*>) {
                 }
 
                 in RFC3339_DATE_TIME_TYPES -> {
-                    attributes(Attributes.items(DataType.STRING, DataFormat.DATETIME))
+                    attributes(Attributes.rfc3339DateTimeItems())
                 }
 
                 MultipartFile::class.java -> {
@@ -273,7 +273,7 @@ class Constraints private constructor(private val rootType: Class<*>) {
                         is RequestPartDescriptorWithType -> type(DataType.STRING)
                         is FieldDescriptor -> type(DataType.STRING)
                     }
-                    attributes(Attributes.format(DataFormat.DATETIME))
+                    attributes(Attributes.rfc3339DateTimeFormat())
                 }
 
                 MultipartFile::class.java -> {

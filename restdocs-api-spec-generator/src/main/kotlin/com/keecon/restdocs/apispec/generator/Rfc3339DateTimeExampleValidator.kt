@@ -2,11 +2,12 @@ package com.keecon.restdocs.apispec.generator
 
 import com.keecon.restdocs.apispec.jsonschema.JsonSchemaGenerator
 import com.keecon.restdocs.apispec.model.Attributes
-import com.keecon.restdocs.apispec.model.DataFormat
 import com.keecon.restdocs.apispec.model.FieldDescriptor
 import com.keecon.restdocs.apispec.model.ResourceModel
 import com.keecon.restdocs.apispec.model.TypeDescriptor
 import org.everit.json.schema.ValidationException
+
+internal const val RFC3339_DATETIME_FORMAT = "rfc3339_datetime"
 
 internal object Rfc3339DateTimeExampleValidator {
 
@@ -38,28 +39,37 @@ internal object Rfc3339DateTimeExampleValidator {
         example: String?,
         fieldDescriptors: List<FieldDescriptor>,
     ) {
-        if (contentType?.contains("json") != true || example == null) return
+        if (contentType?.contains("json", ignoreCase = true) != true || example == null) return
 
         val dateTimeDescriptors = fieldDescriptors
-            .filter(::isDateTime)
+            .filterNot { it.ignored }
+            .filter(::isCanonicalDateTime)
             .map(::toValidationDescriptor)
         if (dateTimeDescriptors.isEmpty()) return
+        val dateTimePointers = dateTimeDescriptors.map(::dateTimePointer)
 
         try {
             jsonSchemaGenerator.validate(dateTimeDescriptors, example)
         } catch (exception: ValidationException) {
+            val violation = exception.leafViolations()
+                .firstOrNull { candidate ->
+                    dateTimePointers.any { pointer -> pointer.matches(candidate.pointerToViolation) }
+                }
+                ?: return
             throw IllegalArgumentException(
-                "Operation '$operationId' $direction example is not a strict RFC 3339 date-time " +
-                    "at ${exception.pointerToViolation}: ${exception.errorMessage}",
+                "Operation '$operationId' $direction example does not match the Java-compatible " +
+                    "RFC 3339 date-time profile at ${violation.pointerToViolation}: ${violation.errorMessage}",
                 exception,
             )
         }
     }
 
-    private fun isDateTime(descriptor: FieldDescriptor): Boolean =
-        descriptor.attributes.format.isDateTime() || descriptor.attributes.items?.attributes?.format.isDateTime()
+    private fun isCanonicalDateTime(descriptor: FieldDescriptor): Boolean =
+        descriptor.attributes.format.isCanonicalDateTime() ||
+            descriptor.attributes.items?.attributes?.format.isCanonicalDateTime()
 
-    private fun String?.isDateTime() = equals(DataFormat.DATETIME.lowercase(), ignoreCase = true)
+    private fun String?.isCanonicalDateTime() =
+        equals(RFC3339_DATETIME_FORMAT, ignoreCase = true)
 
     private fun toValidationDescriptor(descriptor: FieldDescriptor) = FieldDescriptor(
         path = descriptor.path,
@@ -81,4 +91,56 @@ internal object Rfc3339DateTimeExampleValidator {
             )
         },
     )
+
+    private fun ValidationException.leafViolations(): Sequence<ValidationException> =
+        if (causingExceptions.isEmpty()) sequenceOf(this)
+        else causingExceptions.asSequence().flatMap { it.leafViolations() }
+
+    private fun dateTimePointer(descriptor: FieldDescriptor): Regex {
+        val validatesArrayItems = descriptor.attributes.items?.attributes?.format.isCanonicalDateTime()
+        val path = if (validatesArrayItems && !descriptor.path.endsWithArraySegment()) {
+            "${descriptor.path}[]"
+        } else {
+            descriptor.path
+        }
+        val pointerSegments = pathSegments(path).joinToString(separator = "") { segment ->
+            val arraySegment = ARRAY_SEGMENT.matchEntire(segment)
+            val pointerSegment = if (arraySegment == null) {
+                Regex.escape(segment.toJsonPointerToken())
+            } else {
+                arraySegment.groups[1]?.value
+                    ?.takeUnless { it == "*" }
+                    ?.let(Regex::escape)
+                    ?: "\\d+"
+            }
+            "/$pointerSegment"
+        }
+        return Regex("^#$pointerSegments$")
+    }
+
+    private fun String.endsWithArraySegment(): Boolean =
+        ARRAY_SEGMENT.findAll(this).lastOrNull()?.range?.last == lastIndex
+
+    private fun pathSegments(path: String): List<String> {
+        val segments = mutableListOf<String>()
+        var previous = 0
+        BRACKETS_AND_ARRAY.findAll(path).forEach { match ->
+            if (previous != match.range.first) {
+                segments += dotSeparatedSegments(path.substring(previous, match.range.first))
+            }
+            segments += match.groups[1]?.value ?: match.value
+            previous = match.range.last + 1
+        }
+        if (previous < path.length) {
+            segments += dotSeparatedSegments(path.substring(previous))
+        }
+        return segments
+    }
+
+    private fun dotSeparatedSegments(path: String) = path.split('.').filter(String::isNotEmpty)
+
+    private fun String.toJsonPointerToken() = replace("~", "~0").replace("/", "~1")
+
+    private val BRACKETS_AND_ARRAY = Regex("""\['(.+?)']|\[([0-9]+|\*)?]""")
+    private val ARRAY_SEGMENT = Regex("""\[([0-9]+|\*)?]""")
 }

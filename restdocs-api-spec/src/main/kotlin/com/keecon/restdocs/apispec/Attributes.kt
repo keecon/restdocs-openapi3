@@ -18,6 +18,8 @@ object Attributes {
     @JvmStatic
     fun format(format: DataFormat): Attribute = key(FORMAT_KEY).value(format)
 
+    internal fun rfc3339DateTimeFormat(): Attribute = key(FORMAT_KEY).value(RFC3339_DATETIME_FORMAT)
+
     @JvmStatic
     fun items(type: DataType, format: DataFormat? = null, enums: List<*>? = null): Attribute {
         val items = mutableMapOf<String, Any>(TYPE_KEY to type)
@@ -25,6 +27,13 @@ object Attributes {
         if (enums != null) items[ATTRIBUTES_KEY] = mapOf(ENUM_VALUES_KEY to enums)
         return key(ITEMS_KEY).value(items)
     }
+
+    internal fun rfc3339DateTimeItems(): Attribute = key(ITEMS_KEY).value(
+        mapOf(
+            TYPE_KEY to DataType.STRING,
+            FORMAT_KEY to RFC3339_DATETIME_FORMAT,
+        )
+    )
 
     @JvmStatic
     fun encoding(style: EncodingStyle, explode: Boolean? = null, allowReserved: Boolean? = null): Attribute {
@@ -44,6 +53,7 @@ object Attributes {
     internal const val ENCODING_STYLE_KEY = "style"
     internal const val ENCODING_EXPLODE_KEY = "explode"
     internal const val ENCODING_ALLOW_RESERVED_KEY = "allowReserved"
+    internal const val RFC3339_DATETIME_FORMAT = "rfc3339_datetime"
 
     enum class EncodingStyle {
         MATRIX,
