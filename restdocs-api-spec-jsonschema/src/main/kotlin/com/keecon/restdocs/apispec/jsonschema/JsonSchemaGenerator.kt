@@ -6,6 +6,7 @@ import com.keecon.restdocs.apispec.model.FieldDescriptor
 import org.everit.json.schema.ArraySchema
 import org.everit.json.schema.ObjectSchema
 import org.everit.json.schema.Schema
+import org.json.JSONTokener
 import java.util.Collections.emptyList
 import java.util.function.Predicate
 
@@ -13,13 +14,20 @@ class JsonSchemaGenerator {
 
     private val schemaFormatter = EveritSchemaJsonFormatter()
 
-    fun generateSchema(fieldDescriptors: List<FieldDescriptor>, title: String? = null): String {
+    fun generateSchema(fieldDescriptors: List<FieldDescriptor>, title: String? = null): String =
+        schemaFormatter.format(buildSchema(fieldDescriptors, title))
+
+    fun validate(fieldDescriptors: List<FieldDescriptor>, jsonExample: String) {
+        buildSchema(fieldDescriptors).validate(JSONTokener(jsonExample).nextValue())
+    }
+
+    private fun buildSchema(fieldDescriptors: List<FieldDescriptor>, title: String? = null): Schema {
         val jsonFieldPaths = reduceFieldDescriptors(fieldDescriptors)
             .map { JsonFieldPath.compile(it) }
 
         val schema = traverse(emptyList(), jsonFieldPaths, ObjectSchema.builder().title(title) as ObjectSchema.Builder)
 
-        return schemaFormatter.format(unWrapRootArray(jsonFieldPaths, schema))
+        return unWrapRootArray(jsonFieldPaths, schema)
     }
 
     /**

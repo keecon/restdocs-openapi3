@@ -10,7 +10,10 @@ import org.springframework.restdocs.snippet.AbstractDescriptor
 import org.springframework.web.multipart.MultipartFile
 import java.lang.reflect.Field
 import java.lang.reflect.ParameterizedType
+import java.time.Instant
 import java.time.LocalDate
+import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 
 /**
  * Constraints can be used to add constraint information to a [FieldDescriptor], [ParameterDescriptorWithType]
@@ -125,6 +128,12 @@ class Constraints private constructor(private val rootType: Class<*>) {
             "jakarta.validation.constraints.NotNull"
         )
 
+        private val RFC3339_DATE_TIME_TYPES = setOf(
+            OffsetDateTime::class.java,
+            Instant::class.java,
+            ZonedDateTime::class.java,
+        )
+
         @JvmStatic
         fun model(rootType: Class<*>) = Constraints(rootType)
 
@@ -181,6 +190,10 @@ class Constraints private constructor(private val rootType: Class<*>) {
 
                 LocalDate::class.java -> {
                     attributes(Attributes.items(DataType.STRING, DataFormat.DATE))
+                }
+
+                in RFC3339_DATE_TIME_TYPES -> {
+                    attributes(Attributes.rfc3339DateTimeItems())
                 }
 
                 MultipartFile::class.java -> {
@@ -251,6 +264,16 @@ class Constraints private constructor(private val rootType: Class<*>) {
                         is FieldDescriptor -> type(DataType.STRING)
                     }
                     attributes(Attributes.format(DataFormat.DATE))
+                }
+
+                in RFC3339_DATE_TIME_TYPES -> {
+                    when (this) {
+                        is HeaderDescriptorWithType -> type(DataType.STRING)
+                        is ParameterDescriptorWithType -> type(DataType.STRING)
+                        is RequestPartDescriptorWithType -> type(DataType.STRING)
+                        is FieldDescriptor -> type(DataType.STRING)
+                    }
+                    attributes(Attributes.rfc3339DateTimeFormat())
                 }
 
                 MultipartFile::class.java -> {

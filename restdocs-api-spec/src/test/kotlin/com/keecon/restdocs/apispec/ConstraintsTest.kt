@@ -9,7 +9,11 @@ import jakarta.validation.constraints.NotNull
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
 import org.springframework.restdocs.constraints.Constraint
+import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 
 internal class ConstraintsTest {
 
@@ -363,6 +367,41 @@ internal class ConstraintsTest {
         )
     }
 
+    @Test
+    @Suppress("UNCHECKED_CAST")
+    fun `should infer RFC 3339 date time type and format`() {
+        val model = Constraints.model(DateConstraints::class.java)
+
+        listOf("offsetDateTime", "instant", "zonedDateTime").forEach { name ->
+            val descriptor = model.withPath(name)
+            then(descriptor.type).isEqualTo(DataType.STRING)
+            then(descriptor.attributes[Attributes.FORMAT_KEY]).isEqualTo(Attributes.RFC3339_DATETIME_FORMAT)
+        }
+
+        listOf("offsetDateTimes[]", "instants[]", "zonedDateTimes[]").forEach { name ->
+            val descriptor = model.withPath(name)
+            then(descriptor.type).isEqualTo(DataType.ARRAY)
+            then(descriptor.attributes[Attributes.ITEMS_KEY] as Map<String, *>).isEqualTo(
+                mapOf(
+                    Attributes.TYPE_KEY to DataType.STRING,
+                    Attributes.FORMAT_KEY to Attributes.RFC3339_DATETIME_FORMAT
+                )
+            )
+        }
+
+        then(model.withName("instant").attributes[Attributes.FORMAT_KEY])
+            .isEqualTo(Attributes.RFC3339_DATETIME_FORMAT)
+        then(model.withPart("zonedDateTime").attributes[Attributes.FORMAT_KEY])
+            .isEqualTo(Attributes.RFC3339_DATETIME_FORMAT)
+    }
+
+    @Test
+    fun `should not infer local date time as RFC 3339 date time`() {
+        val descriptor = Constraints.model(DateConstraints::class.java).withPath("localDateTime")
+
+        then(descriptor.attributes).doesNotContainKey(Attributes.FORMAT_KEY)
+    }
+
     private data class NonEmptyConstraints(
         @field:NotEmpty val nonEmpty: String,
         @field:Valid val nested: NonEmptyConstraints?,
@@ -410,7 +449,14 @@ internal class ConstraintsTest {
 
     private data class DateConstraints(
         val date: LocalDate,
-        val dates: List<LocalDate>
+        val dates: List<LocalDate>,
+        val offsetDateTime: OffsetDateTime,
+        val offsetDateTimes: List<OffsetDateTime>,
+        val instant: Instant,
+        val instants: List<Instant>,
+        val zonedDateTime: ZonedDateTime,
+        val zonedDateTimes: List<ZonedDateTime>,
+        val localDateTime: LocalDateTime,
     )
 
     private enum class SomeEnum {

@@ -1,5 +1,6 @@
 package com.keecon.restdocs.apispec.generator
 
+import com.keecon.restdocs.apispec.model.RFC3339_DATETIME_FORMAT
 import com.keecon.restdocs.apispec.model.Attributes
 import com.keecon.restdocs.apispec.model.DataFormat
 import com.keecon.restdocs.apispec.model.ParameterDescriptor
@@ -69,6 +70,19 @@ class SchemaExtensionsTest {
 
         then(schema?.type).isEqualTo("string")
         then(schema?.format).isEqualTo("date")
+    }
+
+    @Test
+    fun `should expose RFC 3339 marker as OpenAPI date time`() {
+        val schema = OpenApi3Generator.simpleTypeToSchema(
+            TypeDescriptor(
+                type = "STRING",
+                attributes = Attributes(format = RFC3339_DATETIME_FORMAT)
+            )
+        )
+
+        then(schema?.type).isEqualTo("string")
+        then(schema?.format).isEqualTo("date-time")
     }
 
     @Test

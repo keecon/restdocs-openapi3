@@ -140,8 +140,41 @@ openapi3 {
 }
 ```
 
-Fields declared as `java.time.LocalDate` are inferred as OpenAPI `string` values with
-`format: date`.
+Java time fields are inferred as follows:
+
+| Java type | OpenAPI type | OpenAPI format | Typical Jackson text output |
+|---|---|---|---|
+| `LocalDate` | `string` | `date` | `YYYY-MM-DD` |
+| `OffsetDateTime` | `string` | `date-time` | RFC 3339 with a numeric offset or `Z` |
+| `Instant` | `string` | `date-time` | RFC 3339 in UTC with `Z` |
+| `ZonedDateTime` | `string` | `date-time` | RFC 3339 with a numeric offset; the region ID must be omitted |
+
+JSON examples for these inferred Java time fields are validated when the OpenAPI document is
+generated. The full RFC 3339 syntax is accepted: seconds and an offset are required; `T` and `Z`
+may be uppercase or lowercase; fractions may contain any positive number of digits; numeric offsets
+range through `+23:59`/`-23:59`, including the unknown-local-offset form `-00:00`; and positive leap
+seconds are accepted at the UTC end of June or December. Uppercase `T` and `Z` are recommended for
+interoperability. All three types accept either `Z` or a numeric offset; the table shows the typical
+textual output produced by Jackson.
+
+```text
+accepted: 2026-08-30T15:30:00+09:00
+accepted: 2026-08-30t06:30:00.123456789012z
+accepted: 1990-12-31T23:59:60Z
+rejected: 2026-08-30T15:30:00
+rejected: 2026-08-30T15:30:00+09:00[Asia/Seoul]
+rejected: 1788071400
+```
+
+This library does not configure the application's JSON serializer. Configure Jackson to emit
+textual date values rather than timestamps, and do not enable zone-ID output for `ZonedDateTime`.
+Generation fails if captured JSON request or response body examples violate this contract.
+Fields declared manually as `DATETIME` retain their existing validation behavior and are not
+subject to this inferred-type RFC 3339 validation.
+
+`LocalDateTime` is intentionally not inferred as `date-time`: even its textual Jackson
+representation has no offset, while RFC 3339 `date-time` requires one. Use `Instant`,
+`OffsetDateTime`, or `ZonedDateTime` when the value represents an instant.
 
 The WebTestClient integration is available from the `restdocs-api-spec-webtestclient` module.
 

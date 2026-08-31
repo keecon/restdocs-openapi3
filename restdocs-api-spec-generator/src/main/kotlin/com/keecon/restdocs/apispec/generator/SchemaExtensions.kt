@@ -3,6 +3,7 @@ package com.keecon.restdocs.apispec.generator
 import com.keecon.restdocs.apispec.model.AbstractDescriptor
 import com.keecon.restdocs.apispec.model.AbstractParameterDescriptor
 import com.keecon.restdocs.apispec.model.DataFormat
+import com.keecon.restdocs.apispec.model.RFC3339_DATETIME_FORMAT
 import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.BooleanSchema
 import io.swagger.v3.oas.models.media.IntegerSchema
@@ -15,7 +16,8 @@ internal object SchemaExtensions {
 
     internal fun Schema<*>.applyProperties(descriptor: AbstractDescriptor) = apply {
         when (val format = descriptor.attributes.format?.lowercase()) {
-            DataFormat.DATETIME.lowercase() -> format("date-time")
+            DataFormat.DATETIME.lowercase(),
+            RFC3339_DATETIME_FORMAT -> format("date-time")
             DataFormat.UUID_ENCODED.lowercase() -> format("uuid-encoded")
             is String -> format(format)
             else -> Unit

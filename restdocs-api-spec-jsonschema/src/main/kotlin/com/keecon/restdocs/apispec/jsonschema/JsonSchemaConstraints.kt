@@ -3,6 +3,7 @@ package com.keecon.restdocs.apispec.jsonschema
 import com.keecon.restdocs.apispec.model.AbstractDescriptor
 import com.keecon.restdocs.apispec.model.ConstraintResolver
 import com.keecon.restdocs.apispec.model.DataFormat
+import com.keecon.restdocs.apispec.model.RFC3339_DATETIME_FORMAT
 import org.everit.json.schema.ArraySchema
 import org.everit.json.schema.FormatValidator
 import org.everit.json.schema.NumberSchema
@@ -49,6 +50,10 @@ internal object JsonSchemaConstraints {
 
                     DataFormat.DATETIME.lowercase() -> {
                         FormatValidator.forFormat("date-time")
+                    }
+
+                    RFC3339_DATETIME_FORMAT -> {
+                        Rfc3339DateTimeFormatValidator()
                     }
 
                     DataFormat.UUID_ENCODED.lowercase() -> {
