@@ -3,12 +3,11 @@ package com.keecon.restdocs.apispec.jsonschema
 import com.keecon.restdocs.apispec.model.AbstractDescriptor
 import com.keecon.restdocs.apispec.model.ConstraintResolver
 import com.keecon.restdocs.apispec.model.DataFormat
+import com.keecon.restdocs.apispec.model.RFC3339_DATETIME_FORMAT
 import org.everit.json.schema.ArraySchema
 import org.everit.json.schema.FormatValidator
 import org.everit.json.schema.NumberSchema
 import org.everit.json.schema.StringSchema
-
-internal const val RFC3339_DATETIME_FORMAT = "rfc3339_datetime"
 
 internal object JsonSchemaConstraints {
 

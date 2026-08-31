@@ -442,7 +442,7 @@ object OpenApi3Generator {
                 examplesWithOperationId
                     .map {
                         it.key to Example().apply {
-                            if (!contentType.contains("json")) {
+                            if (!contentType.isJsonContentType()) {
                                 value(it.value)
                             } else {
                                 value(objectMapper.readValue(it.value, Any::class.java))

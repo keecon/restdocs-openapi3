@@ -2,6 +2,9 @@ package com.keecon.restdocs.apispec.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
+/** resource.json wire-format marker for fields requiring RFC 3339 date-time validation. */
+const val RFC3339_DATETIME_FORMAT = "rfc3339_datetime"
+
 data class ResourceModel(
     val operationId: String,
     val summary: String? = null,

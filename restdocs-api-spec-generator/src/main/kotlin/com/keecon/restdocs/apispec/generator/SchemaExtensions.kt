@@ -3,6 +3,7 @@ package com.keecon.restdocs.apispec.generator
 import com.keecon.restdocs.apispec.model.AbstractDescriptor
 import com.keecon.restdocs.apispec.model.AbstractParameterDescriptor
 import com.keecon.restdocs.apispec.model.DataFormat
+import com.keecon.restdocs.apispec.model.RFC3339_DATETIME_FORMAT
 import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.BooleanSchema
 import io.swagger.v3.oas.models.media.IntegerSchema

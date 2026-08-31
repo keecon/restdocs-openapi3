@@ -27,6 +27,7 @@ import org.springframework.restdocs.snippet.Attributes
 import java.io.File
 import java.io.IOException
 import java.nio.file.Path
+import java.time.Instant
 
 class ResourceSnippetTest {
 
@@ -44,6 +45,24 @@ class ResourceSnippetTest {
     @BeforeEach
     fun init(@TempDir tempDir: Path) {
         rootOutputDirectory = tempDir.toFile()
+    }
+
+    @Test
+    fun `should serialize the inferred RFC 3339 format wire contract`() {
+        givenOperationWithRequestAndResponseBody(
+            requestContent = """{"createdAt":"2026-08-30T06:30:00Z"}"""
+        )
+        parametersBuilder.requestFields(
+            Constraints.model(Rfc3339Fields::class.java)
+                .withPath("createdAt")
+                .description("creation time")
+        )
+
+        whenResourceSnippetInvoked()
+        thenSnippetFileExists()
+
+        then(resourceSnippetJson.read<String>("request.requestFields[0].attributes.format"))
+            .isEqualTo("rfc3339_datetime")
     }
 
     @Test
@@ -758,4 +777,6 @@ class ResourceSnippetTest {
     companion object {
         private const val OPERATION_NAME = "test"
     }
+
+    private data class Rfc3339Fields(val createdAt: Instant)
 }

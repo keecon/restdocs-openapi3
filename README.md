@@ -150,13 +150,17 @@ Java time fields are inferred as follows:
 | `ZonedDateTime` | `string` | `date-time` | RFC 3339 with a numeric offset; the region ID must be omitted |
 
 JSON examples for these inferred Java time fields are validated when the OpenAPI document is
-generated. The supported canonical RFC 3339 profile requires uppercase `T`, uppercase `Z` when
-used, seconds, and an offset. Fractions may contain from one to nine digits. All three types accept
-either `Z` or a numeric offset; the table shows the typical textual output produced by Jackson.
+generated. The full RFC 3339 syntax is accepted: seconds and an offset are required; `T` and `Z`
+may be uppercase or lowercase; fractions may contain any positive number of digits; numeric offsets
+range through `+23:59`/`-23:59`, including the unknown-local-offset form `-00:00`; and positive leap
+seconds are accepted at the UTC end of June or December. Uppercase `T` and `Z` are recommended for
+interoperability. All three types accept either `Z` or a numeric offset; the table shows the typical
+textual output produced by Jackson.
 
 ```text
 accepted: 2026-08-30T15:30:00+09:00
-accepted: 2026-08-30T06:30:00.123456789Z
+accepted: 2026-08-30t06:30:00.123456789012z
+accepted: 1990-12-31T23:59:60Z
 rejected: 2026-08-30T15:30:00
 rejected: 2026-08-30T15:30:00+09:00[Asia/Seoul]
 rejected: 1788071400
@@ -166,7 +170,7 @@ This library does not configure the application's JSON serializer. Configure Jac
 textual date values rather than timestamps, and do not enable zone-ID output for `ZonedDateTime`.
 Generation fails if captured JSON request or response body examples violate this contract.
 Fields declared manually as `DATETIME` retain their existing validation behavior and are not
-subject to this Java-compatible canonical profile.
+subject to this inferred-type RFC 3339 validation.
 
 `LocalDateTime` is intentionally not inferred as `date-time`: even its textual Jackson
 representation has no offset, while RFC 3339 `date-time` requires one. Use `Instant`,

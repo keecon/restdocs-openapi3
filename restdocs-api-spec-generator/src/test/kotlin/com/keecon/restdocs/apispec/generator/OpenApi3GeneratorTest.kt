@@ -57,8 +57,8 @@ class OpenApi3GeneratorTest {
     }
 
     @Test
-    fun `should emit date-time schemas for canonical examples`() {
-        resources = listOf(dateTimeResource("2026-08-30T15:30:00+09:00"))
+    fun `should emit date-time schemas for RFC 3339 examples`() {
+        resources = listOf(dateTimeResource("2026-08-30t06:30:00.123456789012z"))
 
         whenOpenApiObjectGeneratedWithoutOAuth2()
 
@@ -69,7 +69,7 @@ class OpenApi3GeneratorTest {
     }
 
     @Test
-    fun `should fail generation for non canonical date-time examples`() {
+    fun `should fail generation for invalid RFC 3339 date-time examples`() {
         resources = listOf(dateTimeResource("2026-08-30T15:30:00+09:00[Asia/Seoul]"))
 
         val exception = assertThrows<IllegalArgumentException> {
@@ -80,6 +80,24 @@ class OpenApi3GeneratorTest {
             .hasMessageContaining("dates-create")
             .hasMessageContaining("request")
             .hasMessageContaining("RFC 3339 date-time")
+    }
+
+    @Test
+    fun `should serialize JSON examples as objects regardless of content type case`() {
+        resources = listOf(
+            dateTimeResource(
+                requestDateTime = "2026-08-30T15:30:00+09:00",
+                requestContentType = "Application/JSON",
+            )
+        )
+
+        whenOpenApiObjectGeneratedWithoutOAuth2()
+
+        then(
+            openApiJsonPathContext.read<Any>(
+                "paths./dates.post.requestBody.content.Application/JSON.examples.dates-create.value"
+            )
+        ).isInstanceOf(Map::class.java)
     }
 
     @Test
@@ -1194,14 +1212,17 @@ class OpenApi3GeneratorTest {
         )
     }
 
-    private fun dateTimeResource(requestDateTime: String) = ResourceModel(
+    private fun dateTimeResource(
+        requestDateTime: String,
+        requestContentType: String = "application/json",
+    ) = ResourceModel(
         operationId = "dates-create",
         privateResource = false,
         deprecated = false,
         request = RequestModel(
             path = "/dates",
             method = HTTPMethod.POST,
-            contentType = "application/json",
+            contentType = requestContentType,
             securityRequirements = null,
             headers = emptyList(),
             pathParameters = emptyList(),
@@ -1213,7 +1234,7 @@ class OpenApi3GeneratorTest {
                     path = "createdAt",
                     description = "",
                     type = "string",
-                    attributes = Attributes(format = RFC3339_DATETIME_FORMAT),
+                    attributes = Attributes(format = "rfc3339_datetime"),
                 )
             ),
             example = """{"createdAt":"$requestDateTime"}""",
@@ -1230,7 +1251,7 @@ class OpenApi3GeneratorTest {
                     attributes = Attributes(
                         items = TypeDescriptor(
                             type = "string",
-                            attributes = Attributes(format = RFC3339_DATETIME_FORMAT),
+                            attributes = Attributes(format = "rfc3339_datetime"),
                         )
                     ),
                 )

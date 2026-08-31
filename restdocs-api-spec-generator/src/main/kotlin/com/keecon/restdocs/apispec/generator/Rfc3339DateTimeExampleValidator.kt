@@ -3,11 +3,10 @@ package com.keecon.restdocs.apispec.generator
 import com.keecon.restdocs.apispec.jsonschema.JsonSchemaGenerator
 import com.keecon.restdocs.apispec.model.Attributes
 import com.keecon.restdocs.apispec.model.FieldDescriptor
+import com.keecon.restdocs.apispec.model.RFC3339_DATETIME_FORMAT
 import com.keecon.restdocs.apispec.model.ResourceModel
 import com.keecon.restdocs.apispec.model.TypeDescriptor
 import org.everit.json.schema.ValidationException
-
-internal const val RFC3339_DATETIME_FORMAT = "rfc3339_datetime"
 
 internal object Rfc3339DateTimeExampleValidator {
 
@@ -39,11 +38,11 @@ internal object Rfc3339DateTimeExampleValidator {
         example: String?,
         fieldDescriptors: List<FieldDescriptor>,
     ) {
-        if (contentType?.contains("json", ignoreCase = true) != true || example == null) return
+        if (!contentType.isJsonContentType() || example == null) return
 
         val dateTimeDescriptors = fieldDescriptors
             .filterNot { it.ignored }
-            .filter(::isCanonicalDateTime)
+            .filter(::isRfc3339DateTime)
             .map(::toValidationDescriptor)
         if (dateTimeDescriptors.isEmpty()) return
         val dateTimePointers = dateTimeDescriptors.map(::dateTimePointer)
@@ -57,18 +56,18 @@ internal object Rfc3339DateTimeExampleValidator {
                 }
                 ?: return
             throw IllegalArgumentException(
-                "Operation '$operationId' $direction example does not match the Java-compatible " +
-                    "RFC 3339 date-time profile at ${violation.pointerToViolation}: ${violation.errorMessage}",
+                "Operation '$operationId' $direction example does not match RFC 3339 date-time " +
+                    "at ${violation.pointerToViolation}: ${violation.errorMessage}",
                 exception,
             )
         }
     }
 
-    private fun isCanonicalDateTime(descriptor: FieldDescriptor): Boolean =
-        descriptor.attributes.format.isCanonicalDateTime() ||
-            descriptor.attributes.items?.attributes?.format.isCanonicalDateTime()
+    private fun isRfc3339DateTime(descriptor: FieldDescriptor): Boolean =
+        descriptor.attributes.format.isRfc3339DateTime() ||
+            descriptor.attributes.items?.attributes?.format.isRfc3339DateTime()
 
-    private fun String?.isCanonicalDateTime() =
+    private fun String?.isRfc3339DateTime() =
         equals(RFC3339_DATETIME_FORMAT, ignoreCase = true)
 
     private fun toValidationDescriptor(descriptor: FieldDescriptor) = FieldDescriptor(
@@ -97,7 +96,7 @@ internal object Rfc3339DateTimeExampleValidator {
         else causingExceptions.asSequence().flatMap { it.leafViolations() }
 
     private fun dateTimePointer(descriptor: FieldDescriptor): Regex {
-        val validatesArrayItems = descriptor.attributes.items?.attributes?.format.isCanonicalDateTime()
+        val validatesArrayItems = descriptor.attributes.items?.attributes?.format.isRfc3339DateTime()
         val path = if (validatesArrayItems && !descriptor.path.endsWithArraySegment()) {
             "${descriptor.path}[]"
         } else {
@@ -108,10 +107,7 @@ internal object Rfc3339DateTimeExampleValidator {
             val pointerSegment = if (arraySegment == null) {
                 Regex.escape(segment.toJsonPointerToken())
             } else {
-                arraySegment.groups[1]?.value
-                    ?.takeUnless { it == "*" }
-                    ?.let(Regex::escape)
-                    ?: "\\d+"
+                "\\d+"
             }
             "/$pointerSegment"
         }

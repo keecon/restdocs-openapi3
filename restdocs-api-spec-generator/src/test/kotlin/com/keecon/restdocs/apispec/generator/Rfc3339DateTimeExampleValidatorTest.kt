@@ -17,11 +17,11 @@ import org.junit.jupiter.api.Test
 class Rfc3339DateTimeExampleValidatorTest {
 
     @Test
-    fun `should accept canonical request and response date times`() {
+    fun `should accept RFC 3339 request and response date times`() {
         val resource = resource(
-            requestExample = """{"createdAt":"2026-08-30T15:30:00+09:00"}""",
+            requestExample = """{"createdAt":"1990-12-31t23:59:60z"}""",
             responseExample =
-                """{"createdAt":"2026-08-30T06:30:00Z","history":["2026-08-30T06:30:00.123456789Z"]}""",
+                """{"createdAt":"2026-08-30T06:30:00-00:00","history":["2026-08-30T06:30:00.123456789012Z"]}""",
             requestFields = listOf(dateTimeField("createdAt")),
             responseFields = listOf(dateTimeField("createdAt"), dateTimeArray("history[]")),
         )
@@ -73,7 +73,7 @@ class Rfc3339DateTimeExampleValidatorTest {
     }
 
     @Test
-    fun `should report an invalid canonical date time array item`() {
+    fun `should report an invalid RFC 3339 date time array item`() {
         val resource = resource(
             responseExample = """{"history":["2026-08-30T06:30:00Z","not-a-date"]}""",
             responseFields = listOf(dateTimeArray("history[]")),
@@ -82,6 +82,18 @@ class Rfc3339DateTimeExampleValidatorTest {
         thenThrownBy { Rfc3339DateTimeExampleValidator.validate(listOf(resource)) }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("response")
+            .hasMessageContaining("#/history/1")
+    }
+
+    @Test
+    fun `should report invalid later items for an explicitly indexed array path`() {
+        val resource = resource(
+            responseExample = """{"history":["2026-08-30T06:30:00Z","not-a-date"]}""",
+            responseFields = listOf(dateTimeArray("history[0]")),
+        )
+
+        thenThrownBy { Rfc3339DateTimeExampleValidator.validate(listOf(resource)) }
+            .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("#/history/1")
     }
 
@@ -154,7 +166,7 @@ class Rfc3339DateTimeExampleValidatorTest {
     }
 
     @Test
-    fun `should ignore canonical date time descriptors marked ignored`() {
+    fun `should ignore RFC 3339 date time descriptors marked ignored`() {
         val resource = resource(
             requestExample = """{"createdAt":"not-a-date"}""",
             requestFields = listOf(dateTimeField("createdAt", ignored = true)),
@@ -177,7 +189,7 @@ class Rfc3339DateTimeExampleValidatorTest {
     }
 
     @Test
-    fun `should ignore structural violations before an optional canonical date time`() {
+    fun `should ignore structural violations before an optional RFC 3339 date time`() {
         val resource = resource(
             requestExample = """{"nested":"not-an-object"}""",
             requestFields = listOf(dateTimeField("nested.createdAt", optional = true)),
@@ -229,7 +241,7 @@ class Rfc3339DateTimeExampleValidatorTest {
         type = "string",
         optional = optional,
         ignored = ignored,
-        attributes = Attributes(format = RFC3339_DATETIME_FORMAT),
+        attributes = Attributes(format = "rfc3339_datetime"),
     )
 
     private fun dateTimeArray(path: String) = FieldDescriptor(
@@ -239,7 +251,7 @@ class Rfc3339DateTimeExampleValidatorTest {
         attributes = Attributes(
             items = TypeDescriptor(
                 type = "string",
-                attributes = Attributes(format = RFC3339_DATETIME_FORMAT),
+                attributes = Attributes(format = "rfc3339_datetime"),
             )
         ),
     )
