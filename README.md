@@ -17,7 +17,7 @@ And only support [OpenAPI 3.0.1] specs.
 
 | Artifact line | Spring Boot | Spring REST Docs | Java bytecode | Tested JDKs | Status |
 |---|---|---|---|---|---|
-| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | Active (latest release: 2.1.3) |
+| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | Active (latest release: 2.1.4) |
 | [1.x (`v1.x`)](https://github.com/keecon/restdocs-openapi3/tree/v1.x) | 3.5.x | 3.0.x | 17 | 17, 21, 25 | Maintained |
 | [0.x (`v0.x`)](https://github.com/keecon/restdocs-openapi3/tree/v0.x) | 2.7.x | 2.0.x | — | — | Frozen, unsupported |
 
@@ -25,7 +25,7 @@ The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin 
 `com.keecon.restdocs-openapi3` across release lines.
 
 The 2.x line requires Java 17 or newer. CI verifies the LTS JDK releases 17, 21, and 25.
-Use 1.1.2 for Spring Boot 3.5 applications. Version 2.1.3 is available from JitPack; no Plugin
+Use 1.1.2 for Spring Boot 3.5 applications. Version 2.1.4 is available from JitPack; no Plugin
 Portal publication is assumed.
 
 See [MAINTENANCE.md](MAINTENANCE.md) for the branch lifecycle, backport, and release policy.
@@ -42,7 +42,7 @@ See [MAINTENANCE.md](MAINTENANCE.md) for the branch lifecycle, backport, and rel
       }
       dependencies {
         // ...
-        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.1.3'
+        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.1.4'
       }
     }
 
@@ -59,8 +59,8 @@ See [MAINTENANCE.md](MAINTENANCE.md) for the branch lifecycle, backport, and rel
 
     dependencies {
       //..
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:2.1.3'
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:2.1.3'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:2.1.4'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:2.1.4'
     }
 
     openapi3 {
@@ -150,20 +150,24 @@ Java time fields are inferred as follows:
 | `ZonedDateTime` | `string` | `date-time` | RFC 3339 with a numeric offset; the region ID must be omitted |
 
 JSON examples for these inferred Java time fields are validated when the OpenAPI document is
-generated. The full RFC 3339 syntax is accepted: seconds and an offset are required; `T` and `Z`
-may be uppercase or lowercase; fractions may contain any positive number of digits; numeric offsets
-range through `+23:59`/`-23:59`, including the unknown-local-offset form `-00:00`; and positive leap
-seconds are accepted at the UTC end of June or December. Uppercase `T` and `Z` are recommended for
-interoperability. All three types accept either `Z` or a numeric offset; the table shows the typical
-textual output produced by Jackson.
+generated. The accepted range is an RFC 3339 profile without positive leap seconds: seconds and an
+offset are required; seconds must range from `00` through `59`; `T` and `Z` may be uppercase or
+lowercase; fractions may contain any positive number of digits; and numeric offsets range through
+`+23:59`/`-23:59`, including the unknown-local-offset form `-00:00`. Uppercase `T` and `Z` are
+recommended for interoperability. All three types accept either `Z` or a numeric offset; the table
+shows the typical textual output produced by Jackson.
+
+To keep examples consistent with typical Jackson serialization, leap seconds (`:60`) are rejected
+regardless of their historical occurrence. This library does not maintain external leap-second
+announcements or history.
 
 ```text
 accepted: 2026-08-30T15:30:00+09:00
 accepted: 2026-08-30t06:30:00.123456789012z
-accepted: 1990-12-31T23:59:60Z
 rejected: 2026-08-30T15:30:00
 rejected: 2026-08-30T15:30:00+09:00[Asia/Seoul]
 rejected: 1788071400
+rejected: 1990-12-31T23:59:60Z
 ```
 
 This library does not configure the application's JSON serializer. Configure Jackson to emit
@@ -180,7 +184,7 @@ The WebTestClient integration is available from the `restdocs-api-spec-webtestcl
 
 ```groovy
 dependencies {
-  testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-webtestclient:2.1.3'
+  testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-webtestclient:2.1.4'
 }
 ```
 

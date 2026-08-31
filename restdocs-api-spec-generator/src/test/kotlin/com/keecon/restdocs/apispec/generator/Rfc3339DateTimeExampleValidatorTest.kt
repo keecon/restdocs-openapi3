@@ -17,9 +17,9 @@ import org.junit.jupiter.api.Test
 class Rfc3339DateTimeExampleValidatorTest {
 
     @Test
-    fun `should accept RFC 3339 request and response date times`() {
+    fun `should accept supported RFC 3339 request and response date time profile`() {
         val resource = resource(
-            requestExample = """{"createdAt":"1990-12-31t23:59:60z"}""",
+            requestExample = """{"createdAt":"2026-08-30t06:30:00z"}""",
             responseExample =
                 """{"createdAt":"2026-08-30T06:30:00-00:00","history":["2026-08-30T06:30:00.123456789012Z"]}""",
             requestFields = listOf(dateTimeField("createdAt")),
@@ -27,6 +27,22 @@ class Rfc3339DateTimeExampleValidatorTest {
         )
 
         thenCode { Rfc3339DateTimeExampleValidator.validate(listOf(resource)) }.doesNotThrowAnyException()
+    }
+
+    @Test
+    fun `should reject leap second examples that Jackson cannot round trip`() {
+        val resource = resource(
+            requestExample = """{"createdAt":"1990-12-31T23:59:60Z"}""",
+            requestFields = listOf(dateTimeField("createdAt")),
+        )
+
+        thenThrownBy { Rfc3339DateTimeExampleValidator.validate(listOf(resource)) }
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessageContaining("dates-create")
+            .hasMessageContaining("request")
+            .hasMessageContaining("#/createdAt")
+            .hasMessageContaining("supported RFC 3339 date-time profile")
+            .hasCauseInstanceOf(ValidationException::class.java)
     }
 
     @Test

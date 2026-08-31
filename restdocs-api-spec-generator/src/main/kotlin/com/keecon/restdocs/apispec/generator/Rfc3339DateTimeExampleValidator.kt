@@ -56,7 +56,8 @@ internal object Rfc3339DateTimeExampleValidator {
                 }
                 ?: return
             throw IllegalArgumentException(
-                "Operation '$operationId' $direction example does not match RFC 3339 date-time " +
+                "Operation '$operationId' $direction example does not match " +
+                    "the supported RFC 3339 date-time profile " +
                     "at ${violation.pointerToViolation}: ${violation.errorMessage}",
                 exception,
             )

@@ -17,7 +17,7 @@
 
 | 아티팩트 버전대 | Spring Boot | Spring REST Docs | Java 바이트코드 | 테스트 JDK | 상태 |
 |---|---|---|---|---|---|
-| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | 활성(최신 릴리스: 2.1.3) |
+| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | 활성(최신 릴리스: 2.1.4) |
 | [1.x (`v1.x`)](https://github.com/keecon/restdocs-openapi3/tree/v1.x) | 3.5.x | 3.0.x | 17 | 17, 21, 25 | 유지보수 중 |
 | [0.x (`v0.x`)](https://github.com/keecon/restdocs-openapi3/tree/v0.x) | 2.7.x | 2.0.x | — | — | 동결, 지원 종료 |
 
@@ -25,7 +25,7 @@
 `com.keecon.restdocs-openapi3`으로 유지됩니다.
 
 2.x 버전대는 Java 17 이상이 필요합니다. CI에서는 LTS JDK 릴리스 17, 21, 25를 검증합니다.
-Spring Boot 3.5 애플리케이션에서는 1.1.2를 사용하세요. 버전 2.1.3은 JitPack에서 제공되며
+Spring Boot 3.5 애플리케이션에서는 1.1.2를 사용하세요. 버전 2.1.4는 JitPack에서 제공되며
 Plugin Portal 배포는 전제하지 않습니다.
 
 브랜치 수명 주기, 백포트 및 릴리스 정책은 [MAINTENANCE.md](MAINTENANCE.md)를 참고하세요.
@@ -42,7 +42,7 @@ Plugin Portal 배포는 전제하지 않습니다.
       }
       dependencies {
         // ...
-        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.1.3'
+        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.1.4'
       }
     }
 
@@ -59,8 +59,8 @@ Plugin Portal 배포는 전제하지 않습니다.
 
     dependencies {
       //..
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:2.1.3'
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:2.1.3'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:2.1.4'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:2.1.4'
     }
 
     openapi3 {
@@ -150,19 +150,22 @@ Java 시간 타입은 다음과 같이 추론됩니다.
 | `ZonedDateTime` | `string` | `date-time` | 숫자 오프셋을 사용하고 지역 ID는 생략한 RFC 3339 |
 
 OpenAPI 문서를 생성할 때 이 Java 시간 타입으로 추론된 필드의 JSON 예제를 검증합니다. 지원하는
-범위는 RFC 3339 전체 문법입니다. 초와 오프셋은 필수이고, `T`와 `Z`는 대소문자를 모두 허용하며,
-소수 초는 한 자리 이상이면 길이 제한이 없습니다. 숫자 오프셋은 `+23:59`/`-23:59`까지 허용하고
-알 수 없는 로컬 오프셋을 뜻하는 `-00:00`도 허용합니다. 양의 윤초는 UTC 기준 6월 또는 12월 말에
+범위는 양의 윤초를 제외한 RFC 3339 프로필입니다. 초와 오프셋은 필수이고, 초는 `00`부터 `59`까지만
+허용합니다. `T`와 `Z`는 대소문자를 모두 허용하며, 소수 초는 한 자리 이상이면 길이 제한이 없습니다.
+숫자 오프셋은 `+23:59`/`-23:59`까지 허용하고 알 수 없는 로컬 오프셋을 뜻하는 `-00:00`도
 허용합니다. 상호운용성을 위해 대문자 `T`와 `Z` 사용을 권장합니다. 세 타입 모두 `Z` 또는 숫자
 오프셋을 허용하며, 표에는 Jackson이 출력하는 대표적인 문자열 형태를 기재했습니다.
+
+일반적인 Jackson 직렬화와 일관된 예제를 생성하기 위해 윤초(`:60`)는 실제 발생일과 관계없이
+거부합니다. 이 라이브러리는 외부 윤초 발표나 이력을 관리하지 않습니다.
 
 ```text
 허용: 2026-08-30T15:30:00+09:00
 허용: 2026-08-30t06:30:00.123456789012z
-허용: 1990-12-31T23:59:60Z
 거부: 2026-08-30T15:30:00
 거부: 2026-08-30T15:30:00+09:00[Asia/Seoul]
 거부: 1788071400
+거부: 1990-12-31T23:59:60Z
 ```
 
 이 라이브러리는 애플리케이션의 JSON serializer를 설정하지 않습니다. Jackson이 타임스탬프가
@@ -179,7 +182,7 @@ WebTestClient 통합은 `restdocs-api-spec-webtestclient` 모듈에서 제공합
 
 ```groovy
 dependencies {
-  testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-webtestclient:2.1.3'
+  testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-webtestclient:2.1.4'
 }
 ```
 
