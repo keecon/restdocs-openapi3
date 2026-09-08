@@ -15,25 +15,25 @@ And only support [OpenAPI 3.0.1] specs.
 
 | Artifact line | Spring Boot | Spring REST Docs | Java bytecode | Tested JDKs | Status |
 |---|---|---|---|---|---|
-| [1.x (`v1.x`)](https://github.com/keecon/restdocs-openapi3/tree/v1.x) | 3.5.x | 3.0.x | 17 | 17, 21, 25 | Maintained |
+| [1.x (`v1.x`)](https://github.com/keecon/restdocs-openapi3/tree/v1.x) | 3.5.x | 3.0.x | 17 | 17, 21, 25 (historical) | Frozen, unsupported |
 | [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | Active (2.1.2) |
 | [0.x (`v0.x`)](https://github.com/keecon/restdocs-openapi3/tree/v0.x) | 2.7.x | 2.0.x | — | — | Frozen, unsupported |
 
 The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin ID remains
 `com.keecon.restdocs-openapi3` across release lines.
 
-The supported release lines require Java 17 or newer and produce Java 17 bytecode. CI verifies the
-LTS JDK releases 17, 21, and 25. Use 1.1.2 for Spring Boot 3.5 applications.
+The frozen 1.x line targets Spring Boot 3.5 and Java 17 bytecode. Use 1.1.2 for existing consumers.
 
-### Maintenance policy
+### Frozen branch policy
 
-The `v1.x` branch receives security, compatibility, and managed dependency fixes. Fixes specific to
-1.x start on `v1.x` and are forward-ported to `main`; shared defects are validated on `main` first
-and only compatible parts are backported. The `v0.x` branch is frozen, while the active 2.x line
-stays on `main` until the next Spring Boot and project major transition creates `v2.x`.
+As of 2026-09-08, `v1.x` is frozen and unsupported, like `v0.x`. No further security,
+compatibility or dependency fixes, automated CI, or releases are provided. Historical
+JDK 17/21/25 results do not imply ongoing verification. Active development continues on `main`.
 
-Tags matching `1.*` must belong to `v1.x`, and tags matching `2.*` must belong to `main`. Releases
-run the full build on JDK 17, 21, and 25 with the Java 17 compilation toolchain.
+For source builds, use the Gradle 8.14.5 wrapper (`./gradlew clean build`) with JDK 17 or 21
+and an available JDK 17 compilation toolchain. This matches Spring Boot 3.5's supported
+Gradle 8.x range (8.4+). JDK 25 is not an officially supported Gradle 8.x runtime.
+If mise JDKs are not detected, pass `-Porg.gradle.java.installations.paths=/absolute/path/to/jdk17`.
 
 ### Gradle
 

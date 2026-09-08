@@ -1,7 +1,6 @@
 jdk:
   - openjdk17
 before_install:
-  # Run Gradle on Temurin 25.0.4 while retaining a Java 17 toolchain for published bytecode.
+  # Gradle 8.x runs on Java 17 and produces Java 17-compatible artifacts.
   - sdk install java 17.0.20-tem
-  - sdk install java 25.0.4-tem
-  - sdk use java 25.0.4-tem
+  - sdk use java 17.0.20-tem
