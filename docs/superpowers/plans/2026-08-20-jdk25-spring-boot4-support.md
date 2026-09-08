@@ -1,5 +1,13 @@
 # JDK 25 and Spring Boot 4 Support Implementation Plan
 
+> Policy update (2026-09-08): supersedes the historical build/maintenance policy below.
+> `main` compiles with JDK 25, retaining Java 17 bytecode/API compatibility and CI on 17/21/25.
+> Local main verification uses JDK 25. `v1.x` is frozen, with no automatic updates or releases;
+> its source build uses Gradle 8.14.5 and JDK 17/21 with a JDK 17 compilation toolchain.
+> Rationale: preserve Boot's Java 17 baseline; keep the frozen Boot 3.5 build within Gradle 8.x.
+> References: https://docs.spring.io/spring-boot/3.5/system-requirements.html
+> and https://docs.gradle.org/current/userguide/compatibility.html.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Status:** 2026-08-25 완료. `1.1.0`/`1.x`, `2.0.0`, `2.0.1` 릴리스가 원격에 반영되었으며,

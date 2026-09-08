@@ -18,7 +18,7 @@ And only support [OpenAPI 3.0.1] specs.
 | Artifact line | Spring Boot | Spring REST Docs | Java bytecode | Tested JDKs | Status |
 |---|---|---|---|---|---|
 | [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | Active (latest release: 2.1.4) |
-| [1.x (`v1.x`)](https://github.com/keecon/restdocs-openapi3/tree/v1.x) | 3.5.x | 3.0.x | 17 | 17, 21, 25 | Maintained |
+| [1.x (`v1.x`)](https://github.com/keecon/restdocs-openapi3/tree/v1.x) | 3.5.x | 3.0.x | 17 | 17, 21, 25 (historical) | Frozen, unsupported |
 | [0.x (`v0.x`)](https://github.com/keecon/restdocs-openapi3/tree/v0.x) | 2.7.x | 2.0.x | — | — | Frozen, unsupported |
 
 The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin ID remains
@@ -29,6 +29,10 @@ Use 1.1.2 for Spring Boot 3.5 applications. Version 2.1.4 is available from JitP
 Portal publication is assumed.
 
 See [MAINTENANCE.md](MAINTENANCE.md) for the branch lifecycle, backport, and release policy.
+
+Local builds require JDK 25; Java and Kotlin artifacts retain Java 17 compatibility.
+CI and release verification continue on JDK 17, 21, and 25. Use `./gradlew clean build`.
+The `v1.x` line is frozen: no further fixes, dependency updates, or automated releases.
 
 ### Gradle
 
