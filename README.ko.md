@@ -18,7 +18,7 @@
 | 아티팩트 버전대 | Spring Boot | Spring REST Docs | Java 바이트코드 | 테스트 JDK | 상태 |
 |---|---|---|---|---|---|
 | [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | 활성(최신 릴리스: 2.1.4) |
-| [1.x (`v1.x`)](https://github.com/keecon/restdocs-openapi3/tree/v1.x) | 3.5.x | 3.0.x | 17 | 17, 21, 25 | 유지보수 중 |
+| [1.x (`v1.x`)](https://github.com/keecon/restdocs-openapi3/tree/v1.x) | 3.5.x | 3.0.x | 17 | 17, 21, 25 (과거 검증) | 동결, 지원 종료 |
 | [0.x (`v0.x`)](https://github.com/keecon/restdocs-openapi3/tree/v0.x) | 2.7.x | 2.0.x | — | — | 동결, 지원 종료 |
 
 모든 릴리스 버전대에서 공개 패키지는 `com.keecon.restdocs.*`로 유지되며 Gradle 플러그인 ID는
@@ -29,6 +29,10 @@ Spring Boot 3.5 애플리케이션에서는 1.1.2를 사용하세요. 버전 2.1
 Plugin Portal 배포는 전제하지 않습니다.
 
 브랜치 수명 주기, 백포트 및 릴리스 정책은 [MAINTENANCE.md](MAINTENANCE.md)를 참고하세요.
+
+로컬 빌드는 JDK 25를 사용하며 Java/Kotlin 산출물은 Java 17 호환성을 유지합니다.
+CI와 릴리스 검증은 JDK 17·21·25를 유지합니다. `./gradlew clean build`로 빌드합니다.
+`v1.x`는 동결되어 추가 수정·의존성 업데이트·자동 릴리스를 제공하지 않습니다.
 
 ### Gradle
 

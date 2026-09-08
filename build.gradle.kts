@@ -95,7 +95,7 @@ allprojects {
 
     java {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
+            languageVersion.set(JavaLanguageVersion.of(25))
         }
     }
 
@@ -110,7 +110,7 @@ allprojects {
     tasks.withType<KotlinJvmCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
-            freeCompilerArgs.add("-Xjsr305=strict")
+            freeCompilerArgs.addAll("-Xjsr305=strict", "-Xjdk-release=17")
         }
     }
 

@@ -32,7 +32,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: |
-            17
+            25
             ${{ matrix.java }}
           cache: gradle
 
@@ -40,7 +40,7 @@ jobs:
         uses: gradle/actions/wrapper-validation@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
 
       - name: Build, test with Gradle
-        run: ./gradlew -Dorg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64 clean check testCodeCoverageReport :restdocs-api-spec-example:openapi3 --no-daemon
+        run: ./gradlew -Dorg.gradle.java.installations.fromEnv=JAVA_HOME_25_X64 clean check testCodeCoverageReport :restdocs-api-spec-example:openapi3 --no-daemon
 
       - name: Upload coverage to Codecov
         if: matrix.java == '17'
