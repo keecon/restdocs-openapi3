@@ -44,3 +44,15 @@ OpenAPI 보안 정의, JSON 예제 처리, 출력 경로 검증, HTTP 인증 스
 - Dependency Verification strict 모드에서 전체 빌드가 성공한다.
 - GitHub Actions 참조가 전체 commit SHA로 고정되고 읽기 전용 job은 `contents: read`만 가진다.
 - JDK 17/21/25의 생성 OpenAPI 해시가 동일하고 클래스 major version가 61이다.
+
+## 2026-09-15: 의존성 검증 임시 중단
+
+- Dependabot은 검증 메타데이터 자동 갱신을 지원하지 않아 새 버전의 체크섬이 없는 업데이트 PR이
+  컴파일·테스트 전에 실패한다. 관련 지원 요청: https://github.com/dependabot/dependabot-core/issues/1996
+- 사용자 승인에 따라 `gradle.properties`의 `org.gradle.dependency.verification=off`로 의존성 검증
+  전체를 일시 중단한다. 위 strict 모드 완료 기준은 재도입 시까지 유예한다.
+- 기존 `gradle/verification-metadata.xml`은 보존하며 빌드·테스트와 GitHub Actions 보안 설정은 유지한다.
+  중단 기간에는 승인된 체크섬과 다른 외부 아티팩트를 차단하는 보호가 제공되지 않는다.
+- 재도입 조건은 Dependabot의 해당 기능 지원 완료 및 실제 업데이트 PR에서 검증 메타데이터 자동
+  갱신 확인이다. 재도입 시 당시 의존성에 맞춰 메타데이터를 갱신·검토하고 `off` 설정을 제거한 뒤
+  JDK 17/21/25에서 strict 모드 전체 빌드를 검증한다.
