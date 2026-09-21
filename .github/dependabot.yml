@@ -2,6 +2,8 @@ version: 2
 updates:
   - package-ecosystem: "gradle"
     directory: "/"
+    cooldown:
+      default-days: 7
     schedule:
       interval: "weekly"
       day: "tuesday"
@@ -14,6 +16,8 @@ updates:
 
   - package-ecosystem: "github-actions"
     directory: "/"
+    cooldown:
+      default-days: 7
     schedule:
       interval: "weekly"
       day: "tuesday"
