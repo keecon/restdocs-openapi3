@@ -56,3 +56,13 @@ OpenAPI 보안 정의, JSON 예제 처리, 출력 경로 검증, HTTP 인증 스
 - 재도입 조건은 Dependabot의 해당 기능 지원 완료 및 실제 업데이트 PR에서 검증 메타데이터 자동
   갱신 확인이다. 재도입 시 당시 의존성에 맞춰 메타데이터를 갱신·검토하고 `off` 설정을 제거한 뒤
   JDK 17/21/25에서 strict 모드 전체 빌드를 검증한다.
+
+## 2026-10-02: Gradle 의존성 그래프 제출
+
+- Dependabot은 Gradle 빌드 파일을 정적으로 파싱해 전이 의존성을 알 수 없으므로
+  `gradle/actions/dependency-submission`으로 해석된 의존성 그래프를 제출한다.
+- 공개 라이브러리 사용자에게 전달되는 범위만 보도록 `runtimeClasspath`로 제한하고 배포하지 않는
+  `:restdocs-api-spec-example`은 제외한다. 사용자는 자신의 BOM으로 버전을 바꿀 수 있으므로 경고는
+  이 저장소가 해석한 버전 기준이다.
+- 그래프 제출에 필요한 `contents: write`는 이 워크플로 job에만 부여하고 Action은 전체 SHA로 고정한다.
+- 경고 생성에는 저장소의 Dependabot alerts 활성화가 필요하며 2026-10-02에 활성화했다.
