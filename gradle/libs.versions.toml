@@ -6,6 +6,8 @@ jacoco = "0.8.15"
 guava = "33.7.1-jre"
 spring-boot = "4.1.1"
 spring-dependency-management = "1.1.7"
+jackson2 = "2.22.3"
+jackson3 = "3.1.7"
 swagger = "2.2.55"
 swagger-parser = "2.1.48"
 json-schema-validator = "2.2.14"
@@ -34,6 +36,8 @@ spring-webflux = { module = "org.springframework:spring-webflux" }
 spring-restdocs-core = { module = "org.springframework.restdocs:spring-restdocs-core" }
 spring-restdocs-mockmvc = { module = "org.springframework.restdocs:spring-restdocs-mockmvc" }
 spring-restdocs-webtestclient = { module = "org.springframework.restdocs:spring-restdocs-webtestclient" }
+jackson2-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson2" }
+jackson3-bom = { module = "tools.jackson:jackson-bom", version.ref = "jackson3" }
 jackson2-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations" }
 jackson3-databind = { module = "tools.jackson.core:jackson-databind" }
 jackson3-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin" }
