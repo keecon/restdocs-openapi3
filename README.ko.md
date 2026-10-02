@@ -5,7 +5,6 @@
 [![jitpack-badge]](https://jitpack.io/#keecon/restdocs-openapi3)
 [![build-badge]](https://github.com/keecon/restdocs-openapi3/actions/workflows/build.yml)
 [![codecov-badge]](https://codecov.io/gh/keecon/restdocs-openapi3)
-[![sonarcloud-badge]](https://sonarcloud.io/summary/new_code?id=keecon_restdocs-openapi3)
 [![license-badge]](https://github.com/keecon/restdocs-openapi3/blob/main/LICENSE)
 
 이 프로젝트는 [ePages-de/restdocs-api-spec]을 수정하여 클래스 필드 타입과 제약 조건 추론을
@@ -337,8 +336,6 @@ resultActions
 [build-badge]: https://github.com/keecon/restdocs-openapi3/actions/workflows/build.yml/badge.svg
 
 [codecov-badge]: https://codecov.io/gh/keecon/restdocs-openapi3/branch/main/graph/badge.svg
-
-[sonarcloud-badge]: https://sonarcloud.io/api/project_badges/measure?project=keecon_restdocs-openapi3&metric=alert_status
 
 [license-badge]: https://img.shields.io/github/license/keecon/restdocs-openapi3.svg
 
