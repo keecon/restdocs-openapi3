@@ -66,3 +66,11 @@ OpenAPI 보안 정의, JSON 예제 처리, 출력 경로 검증, HTTP 인증 스
   이 저장소가 해석한 버전 기준이다.
 - 그래프 제출에 필요한 `contents: write`는 이 워크플로 job에만 부여하고 Action은 전체 SHA로 고정한다.
 - 경고 생성에는 저장소의 Dependabot alerts 활성화가 필요하며 2026-10-02에 활성화했다.
+
+## 2026-10-02: SonarCloud 사용 중단
+
+- SonarCloud 분석 업로드가 2025-04-29 이후 중단됐고 SonarCloud 프로젝트도 존재하지 않는다(#256).
+- 복구하지 않고 사용을 중단한다. 의존성 취약점은 Gradle 의존성 그래프 제출과 Dependabot alerts로,
+  테스트 커버리지는 Codecov로 확인한다.
+- README의 SonarCloud 배지를 제거하고 GitHub Code scanning의 SonarCloud 구성은 저장소 설정에서 삭제한다.
+- `.gitignore`의 SonarLint/SonarQube IDE 플러그인 항목은 개발자 로컬 파일 제외용이므로 유지한다.
