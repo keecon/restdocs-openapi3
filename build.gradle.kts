@@ -32,6 +32,7 @@ val scmVer = scmVersion.version!!
 val jacocoToolVersion = libs.versions.jacoco.get()
 val junitPlatformLauncher = libs.junit.platform.launcher
 val springBootBom = libs.spring.boot.dependencies
+val jacksonBoms = listOf(libs.jackson2.bom, libs.jackson3.bom)
 val consumerTestRepository = layout.buildDirectory.dir("consumer-test-repository")
 val cleanConsumerTestRepository = tasks.register<Delete>("cleanConsumerTestRepository") {
     delete(consumerTestRepository)
@@ -89,6 +90,11 @@ allprojects {
         if (!isExampleProject()) {
             add("api", platform(springBootBom))
             add("testImplementation", platform(springBootBom))
+            // ponytail: Jackson security floor above the Spring Boot BOM; remove once the BOM manages these versions
+            jacksonBoms.forEach {
+                add("api", platform(it))
+                add("testImplementation", platform(it))
+            }
         }
         add("testRuntimeOnly", junitPlatformLauncher)
     }
