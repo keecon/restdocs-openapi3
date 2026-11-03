@@ -3,7 +3,7 @@
 | Branch | Spring Boot | Status |
 |---|---|---|
 | `v0.x` | 2.7.x | Frozen; no fixes or releases |
-| `v1.x` | 3.5.x | Frozen; no fixes or releases |
+| `v1.x` | 3.5.x | Frozen; 1.1.3 is a one-time exception |
 | `main` | 4.x | Active 2.x development |
 
 The active release line stays on `main`. A maintenance branch named `vN.x` is
@@ -15,13 +15,14 @@ particular, there is no `v2.x` branch while project 2.x remains active on
 
 Fixes and dependency updates are made only on `main`. The frozen `v0.x` and
 `v1.x` lines receive neither fixes nor dependency updates, including security
-fixes; users of those lines should migrate to the 2.x line.
+fixes, except for the one-time 1.1.3 Gradle compatibility fix. Users of those
+lines should migrate to the 2.x line.
 
 ## Releases and Java support
 
 - Tags matching `2.*` must be created from a commit on `main`.
-- The 0.x and 1.x lines are frozen. Existing 0.x and 1.x tags remain historical
-  records, but no new release is made from those lines.
+- The 0.x and 1.x lines are frozen. Version 1.1.3 is a one-time exception;
+  no further releases are planned for these lines.
 - All supported artifacts target Java 17 bytecode. CI tests only the supported
   LTS JDKs 17, 21, and 25.
 

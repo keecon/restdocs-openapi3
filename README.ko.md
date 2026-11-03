@@ -24,14 +24,14 @@
 `com.keecon.restdocs-openapi3`으로 유지됩니다.
 
 2.x 버전대는 Java 17 이상이 필요합니다. CI에서는 LTS JDK 릴리스 17, 21, 25를 검증합니다.
-Spring Boot 3.5 애플리케이션에서는 1.1.2를 사용하세요. 버전 2.1.6는 JitPack에서 제공되며
+Spring Boot 3.5 애플리케이션에서는 1.1.3을 사용하세요. 버전 2.1.6는 JitPack에서 제공되며
 Plugin Portal 배포는 전제하지 않습니다.
 
 브랜치 수명 주기, 백포트 및 릴리스 정책은 [MAINTENANCE.md](MAINTENANCE.md)를 참고하세요.
 
 로컬 빌드는 JDK 25를 사용하며 Java/Kotlin 산출물은 Java 17 호환성을 유지합니다.
 CI와 릴리스 검증은 JDK 17·21·25를 유지합니다. `./gradlew clean build`로 빌드합니다.
-`v1.x`는 동결되어 추가 수정·의존성 업데이트·자동 릴리스를 제공하지 않습니다.
+`v1.x`는 동결 상태입니다. 1.1.3은 호환성 수정을 위한 일회성 예외이며, 이후 추가 수정·의존성 업데이트·자동 릴리스는 계획되어 있지 않습니다.
 
 ### Gradle
 
