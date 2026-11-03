@@ -25,13 +25,13 @@ abstract class ApiSpecTask : DefaultTask() {
     @Input
     lateinit var outputFileNamePrefix: String
 
+    private val projectDirectory = project.layout.projectDirectory.asFile
+
     private val outputDirectoryFile
-        get() = project.file(outputDirectory)
+        get() = projectDirectory.toPath().resolve(outputDirectory).toFile()
 
     private val snippetsDirectoryFile
-        get() = project.file(snippetsDirectory)
-
-    private val objectMapper = jacksonObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        get() = projectDirectory.toPath().resolve(snippetsDirectory).toFile()
 
     open fun applyExtension(extension: ApiSpecExtension) {
         outputDirectory = extension.outputDirectory
@@ -42,6 +42,7 @@ abstract class ApiSpecTask : DefaultTask() {
 
     @TaskAction
     fun aggregateResourceModels() {
+        val objectMapper = jacksonObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 
         val resourceModels = snippetsDirectoryFile.walkTopDown()
             .filter { it.name == "resource.json" }

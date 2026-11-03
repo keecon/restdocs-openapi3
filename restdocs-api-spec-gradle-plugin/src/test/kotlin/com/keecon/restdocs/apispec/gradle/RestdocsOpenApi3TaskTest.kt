@@ -2,6 +2,7 @@ package com.keecon.restdocs.apispec.gradle
 
 import com.jayway.jsonpath.JsonPath
 import org.assertj.core.api.BDDAssertions.then
+import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.Test
 import java.lang.Boolean.FALSE
 
@@ -10,6 +11,73 @@ class RestdocsOpenApi3TaskTest : RestdocsOpenApiTaskTestBase() {
     override val taskName = "openapi3"
 
     override var outputFileNamePrefix = "openapi3"
+
+    @Test
+    fun `should generate specification without execution time project access`() {
+        givenBuildFileWithoutApiSpecClosure()
+        givenResourceSnippet()
+
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir.toFile())
+            .withGradleVersion("8.14.6")
+            .withArguments("openapi3", "--warning-mode", "all", "--stacktrace")
+            .withPluginClasspath()
+            .build()
+
+        then(result.output).doesNotContain("Invocation of Task.project at execution time")
+        thenOutputFileFound()
+    }
+
+    @Test
+    fun `should resolve configured relative paths`() {
+        buildFile.writeText(baseBuildFile() + """
+            openapi3 {
+                snippetsDirectory = 'custom-snippets'
+                outputDirectory = 'custom-output'
+                format = 'yaml'
+            }
+        """.trimIndent())
+        snippetsFolder = testProjectDir.resolve("custom-snippets").toFile().apply { mkdirs() }
+        givenResourceSnippet()
+
+        GradleRunner.create()
+            .withProjectDir(testProjectDir.toFile())
+            .withGradleVersion("8.14.6")
+            .withArguments("openapi3", "--warning-mode", "all")
+            .withPluginClasspath()
+            .build()
+
+        then(testProjectDir.resolve("custom-output/openapi3.yaml").toFile()).exists()
+    }
+
+    @Test
+    fun `should resolve absolute paths and reuse configuration cache`() {
+        testProjectDir.resolve("gradle.properties").toFile().writeText("")
+        snippetsFolder = testProjectDir.resolve("absolute-snippets").toFile().apply { mkdirs() }
+        val output = testProjectDir.resolve("absolute-output/openapi3.yaml").toFile()
+        buildFile.writeText(baseBuildFile() + """
+            openapi3 {
+                snippetsDirectory = '${snippetsFolder.absolutePath}'
+                outputDirectory = '${output.parentFile.absolutePath}'
+                format = 'yaml'
+            }
+        """.trimIndent())
+        givenResourceSnippet()
+
+        val runner = GradleRunner.create()
+            .withProjectDir(testProjectDir.toFile())
+            .withGradleVersion("8.14.6")
+            .withArguments("openapi3", "--configuration-cache", "--configuration-cache-problems=fail", "--warning-mode", "all")
+            .withPluginClasspath()
+
+        val first = runner.build()
+        then(first.output).contains("Configuration cache entry stored")
+        val firstOutput = output.readText()
+        val second = runner.build()
+        then(second.output).contains("Reusing configuration cache")
+        then(second.output).doesNotContain("Invocation of Task.project at execution time")
+        then(output.readText()).isEqualTo(firstOutput).contains("/products/{id}")
+    }
 
     @Test
     override fun `should run openapi task`() {
