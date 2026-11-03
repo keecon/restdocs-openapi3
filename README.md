@@ -22,13 +22,13 @@ And only support [OpenAPI 3.0.1] specs.
 The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin ID remains
 `com.keecon.restdocs-openapi3` across release lines.
 
-The frozen 1.x line targets Spring Boot 3.5 and Java 17 bytecode. Use 1.1.2 for existing consumers.
+The frozen 1.x line targets Spring Boot 3.5 and Java 17 bytecode. Use 1.1.3 for existing consumers.
 
 ### Frozen branch policy
 
 As of 2026-09-08, `v1.x` is frozen and unsupported, like `v0.x`. The task execution-time
-project access fix is a one-time source exception. No further security, compatibility or
-dependency fixes, automated CI, or releases are provided. Historical
+project access fix and the 1.1.3 release are a one-time exception. No further security,
+compatibility or dependency fixes, automated CI, or releases are provided. Historical
 JDK 17/21/25 results do not imply ongoing verification. Active development continues on `main`.
 
 For source builds, use the Gradle 8.14.5 wrapper (`./gradlew clean build`) with JDK 17 or 21
@@ -48,7 +48,7 @@ If mise JDKs are not detected, pass `-Porg.gradle.java.installations.paths=/abso
       }
       dependencies {
         // ...
-        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:1.1.2'
+        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:1.1.3'
       }
     }
 
@@ -65,8 +65,8 @@ If mise JDKs are not detected, pass `-Porg.gradle.java.installations.paths=/abso
 
     dependencies {
       //..
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:1.1.2'
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:1.1.2'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:1.1.3'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:1.1.3'
     }
 
     openapi3 {
