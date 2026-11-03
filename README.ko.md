@@ -24,7 +24,8 @@
 `com.keecon.restdocs-openapi3`으로 유지됩니다.
 
 2.x 버전대는 Java 17 이상이 필요합니다. CI에서는 LTS JDK 릴리스 17, 21, 25를 검증합니다.
-Spring Boot 3.5 애플리케이션에서는 1.1.3을 사용하세요. 버전 2.1.6는 JitPack에서 제공되며
+Spring Boot 3.5용 1.1.3 태그가 생성되었으며 JitPack 제공 여부를 확인 중입니다. 제공 전에는 1.1.2를 사용하세요.
+버전 2.1.6는 JitPack에서 제공되며
 Plugin Portal 배포는 전제하지 않습니다.
 
 브랜치 수명 주기, 백포트 및 릴리스 정책은 [MAINTENANCE.md](MAINTENANCE.md)를 참고하세요.

@@ -24,7 +24,8 @@ The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin 
 `com.keecon.restdocs-openapi3` across release lines.
 
 The 2.x line requires Java 17 or newer. CI verifies the LTS JDK releases 17, 21, and 25.
-Use 1.1.3 for Spring Boot 3.5 applications. Version 2.1.6 is available from JitPack; no Plugin
+Version 1.1.3 is tagged for Spring Boot 3.5 applications; JitPack availability is being verified.
+Use 1.1.2 until 1.1.3 is available. Version 2.1.6 is available from JitPack; no Plugin
 Portal publication is assumed.
 
 See [MAINTENANCE.md](MAINTENANCE.md) for the branch lifecycle, backport, and release policy.
