@@ -131,6 +131,13 @@ its managed Gradle properties: scalar task getters now return `Property<T>` and 
 return `DirectoryProperty`, so set values with `.set(...)` instead of assigning the 1.x
 `String`/`Boolean` task properties directly.
 
+Since 2.0.1, a field is listed in a schema's `required` array when it has a `@NotNull`,
+`@NotEmpty`, or `@NotBlank` constraint **or** its descriptor is not marked `.optional()`. Spring REST
+Docs descriptors are non-optional by default, so fields without `.optional()` become `required`
+even without a validation constraint. In 1.x only the constraints were considered, so regenerated
+specs can gain `required` entries. Mark fields that may be absent from a response or request with
+`.optional()`.
+
 ### 2.1.0 features
 
 OpenAPI contact metadata can be configured in the Gradle DSL.

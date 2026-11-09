@@ -130,6 +130,12 @@ Groovy 구성은 계속 호환됩니다. `openapi3` 태스크를 직접 구성�
 디렉터리 getter는 `DirectoryProperty`를 반환하므로, 1.x의 `String`/`Boolean` 태스크
 프로퍼티처럼 대입하지 말고 `.set(...)`으로 값을 지정하세요.
 
+2.0.1부터 필드는 `@NotNull`, `@NotEmpty`, `@NotBlank` 제약이 있거나 descriptor에
+`.optional()`이 지정되지 않은 경우 스키마의 `required` 배열에 포함됩니다. Spring REST Docs
+descriptor는 기본이 non-optional이므로, 검증 제약이 없어도 `.optional()`이 없는 필드는
+`required`가 됩니다. 1.x는 제약만 고려했으므로 명세를 다시 생성하면 `required` 항목이 늘어날 수
+있습니다. 요청·응답에서 생략될 수 있는 필드에는 `.optional()`을 지정하세요.
+
 ### 2.1.0 기능
 
 Gradle DSL에서 OpenAPI 연락처 메타데이터를 구성할 수 있습니다.
