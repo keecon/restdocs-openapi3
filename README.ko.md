@@ -16,7 +16,7 @@
 
 | 아티팩트 버전대 | Spring Boot | Spring REST Docs | Java 바이트코드 | 테스트 JDK | 상태 |
 |---|---|---|---|---|---|
-| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | 활성(최신 릴리스: 2.1.6) |
+| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | 활성(최신 릴리스: 2.1.7) |
 | [1.x (`v1.x`)](https://github.com/keecon/restdocs-openapi3/tree/v1.x) | 3.5.x | 3.0.x | 17 | 17, 21, 25 (과거 검증) | 동결, 지원 종료 |
 | [0.x (`v0.x`)](https://github.com/keecon/restdocs-openapi3/tree/v0.x) | 2.7.x | 2.0.x | — | — | 동결, 지원 종료 |
 
@@ -25,7 +25,7 @@
 
 2.x 버전대는 Java 17 이상이 필요합니다. CI에서는 LTS JDK 릴리스 17, 21, 25를 검증합니다.
 Spring Boot 3.5용 1.1.3 태그가 생성되었으며 JitPack 제공 여부를 확인 중입니다. 제공 전에는 1.1.2를 사용하세요.
-버전 2.1.6는 JitPack에서 제공되며
+버전 2.1.7는 JitPack에서 제공되며
 Plugin Portal 배포는 전제하지 않습니다.
 
 브랜치 수명 주기, 백포트 및 릴리스 정책은 [MAINTENANCE.md](MAINTENANCE.md)를 참고하세요.
@@ -46,7 +46,7 @@ CI와 릴리스 검증은 JDK 17·21·25를 유지합니다. `./gradlew clean bu
       }
       dependencies {
         // ...
-        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.1.6'
+        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.1.7'
       }
     }
 
@@ -63,8 +63,8 @@ CI와 릴리스 검증은 JDK 17·21·25를 유지합니다. `./gradlew clean bu
 
     dependencies {
       //..
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:2.1.6'
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:2.1.6'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:2.1.7'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:2.1.7'
     }
 
     openapi3 {
@@ -130,11 +130,11 @@ Groovy 구성은 계속 호환됩니다. `openapi3` 태스크를 직접 구성�
 디렉터리 getter는 `DirectoryProperty`를 반환하므로, 1.x의 `String`/`Boolean` 태스크
 프로퍼티처럼 대입하지 말고 `.set(...)`으로 값을 지정하세요.
 
-2.0.1부터 필드는 `@NotNull`, `@NotEmpty`, `@NotBlank` 제약이 있거나 descriptor에
-`.optional()`이 지정되지 않은 경우 스키마의 `required` 배열에 포함됩니다. Spring REST Docs
-descriptor는 기본이 non-optional이므로, 검증 제약이 없어도 `.optional()`이 없는 필드는
-`required`가 됩니다. 1.x는 제약만 고려했으므로 명세를 다시 생성하면 `required` 항목이 늘어날 수
-있습니다. 요청·응답에서 생략될 수 있는 필드에는 `.optional()`을 지정하세요.
+2.0.1부터 2.1.6까지는 검증 제약이 없어도 `.optional()`이 없는 필드가 스키마의 `required`에
+포함되었습니다. 2.1.7부터는 2.0.0 이전과 같이 `@NotNull`, `@NotEmpty`, `@NotBlank` 제약을
+기준으로 필수 필드를 판단하며 `javax`와 `jakarta` 제약을 모두 지원합니다. 명세를 다시 생성하면
+필수 필드가 줄어들 수 있습니다. 쿼리 파라미터와 요청 헤더는 기존 방식대로 필수 제약이 있으면
+`.optional()`을 지정해도 필수로 처리합니다.
 
 ### 2.1.0 기능
 
@@ -192,7 +192,7 @@ WebTestClient 통합은 `restdocs-api-spec-webtestclient` 모듈에서 제공합
 
 ```groovy
 dependencies {
-  testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-webtestclient:2.1.6'
+  testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-webtestclient:2.1.7'
 }
 ```
 

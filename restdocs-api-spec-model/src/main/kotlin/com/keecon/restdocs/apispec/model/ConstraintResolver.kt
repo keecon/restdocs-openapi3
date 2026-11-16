@@ -56,7 +56,7 @@ object ConstraintResolver {
     private fun AbstractDescriptor.maybeConstraint(types: Set<String>) = constraints().firstOrNull { it.name in types }
 
     fun isRequired(descriptor: AbstractDescriptor) =
-        descriptor.constraints().any { REQUIRED_CONSTRAINTS.contains(it.name) } || !descriptor.optional
+        descriptor.constraints().any { REQUIRED_CONSTRAINTS.contains(it.name) }
 
     private fun AbstractDescriptor.maybePatternConstraint() = maybeConstraint(PATTERN_CONSTRAINTS)
 

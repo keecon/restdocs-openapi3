@@ -4,8 +4,11 @@ import com.keecon.restdocs.apispec.model.Attributes
 import com.keecon.restdocs.apispec.model.Constraint
 import com.keecon.restdocs.apispec.model.ConstraintResolver
 import com.keecon.restdocs.apispec.model.ParameterDescriptor
+import com.keecon.restdocs.apispec.generator.ParameterExtensions.applyProperties
 import io.swagger.v3.oas.models.media.NumberSchema
 import io.swagger.v3.oas.models.media.StringSchema
+import io.swagger.v3.oas.models.parameters.HeaderParameter
+import io.swagger.v3.oas.models.parameters.QueryParameter
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -59,6 +62,17 @@ class ConstraintCompatibilityTest {
 
         then(descriptor.optional).isTrue()
         then(ConstraintResolver.isRequired(descriptor)).isTrue()
+    }
+
+    @Test
+    fun `optional query and header parameters with required constraints remain required`() {
+        val descriptor = descriptor(
+            type = "STRING",
+            constraints = listOf(Constraint("jakarta.validation.constraints.NotNull", emptyMap()))
+        )
+
+        then(QueryParameter().apply { required = false }.applyProperties(descriptor).required).isTrue()
+        then(HeaderParameter().apply { required = false }.applyProperties(descriptor).required).isTrue()
     }
 
     private fun stringSchema(vararg constraints: Constraint) =

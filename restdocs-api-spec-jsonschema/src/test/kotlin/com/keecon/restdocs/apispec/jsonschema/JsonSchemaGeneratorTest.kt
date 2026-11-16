@@ -247,16 +247,28 @@ class JsonSchemaGeneratorTest {
     }
 
     @Test
-    fun should_use_field_descriptor_optional_flag_for_required_properties() {
+    fun `unconstrained fields are not required regardless of optional flag`() {
         fieldDescriptors = listOf(
-            FieldDescriptor("requiredField", "required", "STRING", optional = false),
-            FieldDescriptor("optionalField", "optional", "STRING", optional = true)
+            FieldDescriptor("present", "", "STRING", optional = false),
+            FieldDescriptor("optional", "", "STRING", optional = true)
         )
 
         whenSchemaGenerated()
 
-        val objectSchema = schema as ObjectSchema
-        then(objectSchema.requiredProperties).containsExactly("requiredField")
+        then((schema as ObjectSchema).requiredProperties).isEmpty()
+    }
+
+    @Test
+    fun `required constraints apply regardless of optional flag`() {
+        val constraints = Attributes(listOf(Constraint(NotNull::class.java.name, emptyMap())))
+        fieldDescriptors = listOf(
+            FieldDescriptor("present", "", "STRING", optional = false, attributes = constraints),
+            FieldDescriptor("optional", "", "STRING", optional = true, attributes = constraints)
+        )
+
+        whenSchemaGenerated()
+
+        then((schema as ObjectSchema).requiredProperties).containsExactlyInAnyOrder("present", "optional")
     }
 
     @Test

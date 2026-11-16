@@ -16,7 +16,7 @@ And only support [OpenAPI 3.0.1] specs.
 
 | Artifact line | Spring Boot | Spring REST Docs | Java bytecode | Tested JDKs | Status |
 |---|---|---|---|---|---|
-| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | Active (latest release: 2.1.6) |
+| [2.x (`main`)](https://github.com/keecon/restdocs-openapi3/tree/main) | 4.1.x | 4.0.x | 17 | 17, 21, 25 | Active (latest release: 2.1.7) |
 | [1.x (`v1.x`)](https://github.com/keecon/restdocs-openapi3/tree/v1.x) | 3.5.x | 3.0.x | 17 | 17, 21, 25 (historical) | Frozen, unsupported |
 | [0.x (`v0.x`)](https://github.com/keecon/restdocs-openapi3/tree/v0.x) | 2.7.x | 2.0.x | — | — | Frozen, unsupported |
 
@@ -25,7 +25,7 @@ The public packages remain under `com.keecon.restdocs.*`, and the Gradle plugin 
 
 The 2.x line requires Java 17 or newer. CI verifies the LTS JDK releases 17, 21, and 25.
 Version 1.1.3 is tagged for Spring Boot 3.5 applications; JitPack availability is being verified.
-Use 1.1.2 until 1.1.3 is available. Version 2.1.6 is available from JitPack; no Plugin
+Use 1.1.2 until 1.1.3 is available. Version 2.1.7 is available from JitPack; no Plugin
 Portal publication is assumed.
 
 See [MAINTENANCE.md](MAINTENANCE.md) for the branch lifecycle, backport, and release policy.
@@ -47,7 +47,7 @@ fixes, dependency updates, or automated releases are planned.
       }
       dependencies {
         // ...
-        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.1.6'
+        classpath 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-gradle-plugin:2.1.7'
       }
     }
 
@@ -64,8 +64,8 @@ fixes, dependency updates, or automated releases are planned.
 
     dependencies {
       //..
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:2.1.6'
-      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:2.1.6'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec:2.1.7'
+      testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-mockmvc:2.1.7'
     }
 
     openapi3 {
@@ -131,12 +131,12 @@ its managed Gradle properties: scalar task getters now return `Property<T>` and 
 return `DirectoryProperty`, so set values with `.set(...)` instead of assigning the 1.x
 `String`/`Boolean` task properties directly.
 
-Since 2.0.1, a field is listed in a schema's `required` array when it has a `@NotNull`,
-`@NotEmpty`, or `@NotBlank` constraint **or** its descriptor is not marked `.optional()`. Spring REST
-Docs descriptors are non-optional by default, so fields without `.optional()` become `required`
-even without a validation constraint. In 1.x only the constraints were considered, so regenerated
-specs can gain `required` entries. Mark fields that may be absent from a response or request with
-`.optional()`.
+From 2.0.1 through 2.1.6, fields without `.optional()` were included in a schema's `required`
+array even without a validation constraint. Since 2.1.7, required fields are again inferred from
+`@NotNull`, `@NotEmpty`, or `@NotBlank` constraints, as in 2.0.0 and earlier. Both `javax` and
+`jakarta` constraints are supported. Regenerated schemas may therefore contain fewer required fields.
+Query parameters and request headers retain their existing optional and constraint handling: a
+required constraint takes precedence over `.optional()`.
 
 ### 2.1.0 features
 
@@ -196,7 +196,7 @@ The WebTestClient integration is available from the `restdocs-api-spec-webtestcl
 
 ```groovy
 dependencies {
-  testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-webtestclient:2.1.6'
+  testImplementation 'com.github.keecon.restdocs-openapi3:restdocs-api-spec-webtestclient:2.1.7'
 }
 ```
 
